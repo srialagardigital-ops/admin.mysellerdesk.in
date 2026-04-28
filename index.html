@@ -90,14 +90,13 @@
   <div class="auth-card">
     <div class="auth-logo">MS</div>
     <h2>Admin Login</h2>
-    <p>MySellerDesk Master Admin panel. Authorized admin email mattum login aagum.</p>
+    <p>Login pannina admin dashboard open aagum.</p>
     <div id="authError" class="auth-error"></div>
     <form id="adminLoginForm">
       <div class="auth-field"><label>Email</label><input id="adminEmail" type="email" autocomplete="username" placeholder="Admin email" required></div>
       <div class="auth-field"><label>Password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password" required></div>
       <button id="loginBtn" class="auth-btn" type="submit">Login</button>
     </form>
-    <div class="auth-note">3 wrong attempts → 3 minutes login lock</div>
   </div>
 </div>
 
@@ -144,18 +143,10 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ADMIN LOGIN SETTINGS
 // Future-la innoru admin email add panna, inga comma pottu add pannunga.
 const ALLOWED_ADMIN_EMAILS = ['salagurajanrsp@gmail.com'];
-const LOCK_KEY = 'mysellerdesk_admin_login_lock_v1';
-const ATTEMPT_KEY = 'mysellerdesk_admin_login_attempts_v1';
 let dashboardStarted = false;
 
 function authError(msg){ const el=document.getElementById('authError'); if(el){el.style.display='block';el.textContent=msg;} }
 function clearAuthError(){ const el=document.getElementById('authError'); if(el){el.style.display='none';el.textContent='';} }
-function getLockUntil(){ return Number(localStorage.getItem(LOCK_KEY)||0); }
-function setLock(){ localStorage.setItem(LOCK_KEY, String(Date.now()+180000)); localStorage.setItem(ATTEMPT_KEY,'0'); }
-function isLocked(){ return Date.now() < getLockUntil(); }
-function lockMessage(){ const sec=Math.ceil((getLockUntil()-Date.now())/1000); const min=Math.ceil(sec/60); return '3 wrong attempts. '+min+' minute wait pannitu try pannunga.'; }
-function addFailedAttempt(){ const n=Number(localStorage.getItem(ATTEMPT_KEY)||0)+1; if(n>=3){ setLock(); return true; } localStorage.setItem(ATTEMPT_KEY,String(n)); return false; }
-function resetAttempts(){ localStorage.removeItem(ATTEMPT_KEY); localStorage.removeItem(LOCK_KEY); }
 function showLogin(){ const a=document.getElementById('authScreen'); const app=document.getElementById('adminApp'); if(a)a.style.display='flex'; if(app)app.style.display='none'; }
 function showDashboard(){ const a=document.getElementById('authScreen'); const app=document.getElementById('adminApp'); if(a)a.style.display='none'; if(app)app.style.display='flex'; if(!dashboardStarted){ dashboardStarted=true; init(); } }
 async function startAuthGate(){
@@ -171,21 +162,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(!form) return;
   form.addEventListener('submit',async(e)=>{
     e.preventDefault(); clearAuthError();
-    if(isLocked()){ authError(lockMessage()); return; }
     const btn=document.getElementById('loginBtn');
     const email=String(document.getElementById('adminEmail').value||'').trim().toLowerCase();
     const password=document.getElementById('adminPassword').value||'';
     if(!ALLOWED_ADMIN_EMAILS.includes(email)){
-      if(addFailedAttempt()) authError(lockMessage()); else authError('This email-ku admin access illa.');
+      authError('Admin access illa.');
       return;
     }
     if(btn){btn.disabled=true;btn.textContent='Checking...';}
     const { data, error } = await sb.auth.signInWithPassword({email,password});
     if(btn){btn.disabled=false;btn.textContent='Login';}
-    if(error){ if(addFailedAttempt()) authError(lockMessage()); else authError('Email / password wrong.'); return; }
+    if(error){ authError('Email / password wrong.'); return; }
     const loggedEmail=String(data?.user?.email||'').toLowerCase();
     if(!ALLOWED_ADMIN_EMAILS.includes(loggedEmail)){ await sb.auth.signOut(); authError('Access denied.'); return; }
-    resetAttempts(); showDashboard();
+    showDashboard();
   });
 });
 

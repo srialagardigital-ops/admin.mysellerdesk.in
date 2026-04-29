@@ -128,7 +128,9 @@
 </div>
 </section>
 <section id="ordersPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Today Orders</div><div class="value" id="ordersToday2">0</div><span class="trend up">Order ID created</span></div><div class="card"><div class="label">Processing</div><div class="value" id="processingOrders">0</div><span class="trend neutral">Live orders</span></div><div class="card"><div class="label">Delivered</div><div class="value" id="deliveredOrders">0</div><span class="trend up">Completed</span></div><div class="card"><div class="label">Cancelled</div><div class="value" id="cancelledOrders">0</div><span class="trend down">Need attention</span></div></section><div class="panel"><div class="panel-head"><div><h3>Recent Orders</h3><p class="small">All sellers order activity</p></div></div><table class="table"><thead><tr><th>Order ID</th><th>Seller</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentOrderRows"></tbody></table></div></section>
-<section id="topPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Top Seller Orders</div><div class="value" id="topSellerOrders">0</div><span class="trend up" id="topSellerName">-</span></div><div class="card"><div class="label">Best Revenue Seller</div><div class="value">-</div><span class="trend up">Need order revenue relation</span></div><div class="card"><div class="label">Fast Delivery Seller</div><div class="value">-</div><span class="trend neutral">Need delivery data</span></div><div class="card"><div class="label">Rising Seller</div><div class="value">-</div><span class="trend up">Need monthly comparison</span></div></section><div class="panel"><div class="panel-head"><div><h3>Seller Leaderboard</h3><p class="small">Real sellers from Supabase</p></div></div><div class="list" id="leaderboard"></div></div></section>
+<section id="topPage" class="page" style="display:none">
+<div id="leaderboard"></div>
+</section>
 <section id="districtPage" class="page" style="display:none"><section class="grid"><div class="panel"><div class="panel-head"><div><h3>District-wise Sellers</h3><p class="small">Seller distribution</p></div></div><canvas id="districtChart2"></canvas></div><div class="panel"><div class="panel-head"><div><h3>District Activity Heat Map</h3><p class="small">Darker blocks = more sellers</p></div></div><div class="heatmap-grid" id="heatMap"></div></div></section></section>
 <section id="subscriptionsPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Paid Sellers</div><div class="value" id="paidSellers">0</div><span class="trend up">Monthly + Yearly paid</span></div><div class="card"><div class="label">Monthly Paid</div><div class="value" id="monthlyPaid">0</div><span class="trend neutral">₹199 plan</span></div><div class="card"><div class="label">Yearly Paid</div><div class="value" id="yearlyPaid">0</div><span class="trend up">₹1,999 plan</span></div><div class="card"><div class="label">Revenue This Month</div><div class="value" id="revenueThisMonth">₹0</div><span class="trend up">Subscription income</span></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>Revenue Overview</h3><p class="small">Last 6 months</p></div></div><canvas id="revenueChart"></canvas></div><div class="panel"><div class="panel-head"><div><h3>Plan Distribution</h3><p class="small">Trial vs paid</p></div></div><canvas id="planChart2"></canvas></div></section><div class="panel"><div class="panel-head"><div><h3>Payment Details</h3><p class="small">Recent subscription payments</p></div></div><table class="table"><thead><tr><th>Seller</th><th>Plan</th><th>Amount</th><th>Status</th><th>Expiry</th></tr></thead><tbody id="paymentRows"></tbody></table></div></section>
 <section id="supportPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Open Tickets</div><div class="value" id="openTickets">0</div><span class="trend down">Need attention</span></div><div class="card"><div class="label">In Progress</div><div class="value" id="progressTickets">0</div><span class="trend neutral">Working</span></div><div class="card"><div class="label">Resolved Today</div><div class="value" id="resolvedTickets">0</div><span class="trend up">Good</span></div><div class="card"><div class="label">Avg Response Time</div><div class="value">-</div><span class="trend up">Need SLA data</span></div></section><section class="kanban"><div class="kanban-col"><div class="kanban-title">Open</div><div id="openTicketList"></div></div><div class="kanban-col"><div class="kanban-title">In Progress</div><div id="progressTicketList"></div></div><div class="kanban-col"><div class="kanban-title">Resolved</div><div id="resolvedTicketList"></div></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>All Tickets</h3><p class="small">Latest issues from sellers</p></div></div><table class="table"><thead><tr><th>ID</th><th>Issue</th><th>Priority</th><th>Status</th></tr></thead><tbody id="ticketRows"></tbody></table></div><div class="panel"><div class="panel-head"><div><h3>Quick Reply Templates</h3></div></div><div class="quick-replies"><div class="reply-chip">Payment received. Your plan will be activated shortly.</div><div class="reply-chip">Please refresh and login again after 2 minutes.</div><div class="reply-chip">We are checking your issue and will update soon.</div><div class="reply-chip">Your invoice has been generated and shared.</div></div></div></section></section>
@@ -364,18 +366,82 @@ async function loadTickets(){const{data,error}=await sb.from('support_tickets').
 function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
 function drawPlans(v){chart('planChart',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});chart('planChart2',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}}); chart('revenueChart',{type:'line',data:{labels:['This Month'],datasets:[{data:[Number(String($('revenueThisMonth')?.textContent||'0').replace(/[^0-9]/g,''))],borderWidth:3,tension:.4}]},options:common})}
 function renderTop(sellers){
-  const badgeMeta = [
-    {label:'Diamond Seller', cls:'diamond', card:'rank-diamond', icon:'gem'},
-    {label:'Gold Seller', cls:'gold', card:'rank-gold', icon:'trophy'},
-    {label:'Silver Seller', cls:'silver', card:'rank-silver', icon:'award'}
-  ];
-  let top=sellers.slice(0,10);
-  let html=top.map((s,i)=>{
-    const b = badgeMeta[i] || {label:'Prime Seller', cls:'prime', card:'rank-prime', icon:'badge-check'};
-    return `<div class="performer-card ${b.card}"><div class="performer-left"><img class="profile-img" src="${img(s.name)}"><div><div><b>${safe(s.name,'Seller')}</b></div><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span class="award ${b.cls}"><i data-lucide="${b.icon}"></i>${b.label}</span></div>`;
-  }).join('')||'<div class="ticket"><b>No sellers found</b></div>';
-  $('dashTopList').innerHTML=html;
-  $('leaderboard').innerHTML=html;
+  // Rank thresholds based on order count
+  // Diamond=1st, Gold=2nd, Silver=3rd, rest=Prime
+  const top = sellers.slice(0,10);
+  if(!top.length){
+    const empty='<div class="ticket"><b>No sellers found</b></div>';
+    $('dashTopList').innerHTML=empty;
+    $('leaderboard').innerHTML=empty;
+    return;
+  }
+
+  // Order counts sorted desc - use index as rank
+  const maxOrders = top[0]?.orderCount||1;
+
+  // Rank boundaries: diamond=top1, gold=top2, silver=top3, prime=rest
+  // Target: prime needs silver orders, silver needs gold orders, gold needs diamond orders
+  const getRank = (i) => {
+    if(i===0) return {label:'Diamond Seller',cls:'diamond',icon:'gem',border:'#60a5fa',bg:'linear-gradient(135deg,#eef2ff,#fff 55%,#e0f2fe)',color:'#1d4ed8'};
+    if(i===1) return {label:'Gold Seller',cls:'gold',icon:'trophy',border:'#f59e0b',bg:'linear-gradient(135deg,#fffbeb,#fff 55%,#fef3c7)',color:'#92400e'};
+    if(i===2) return {label:'Silver Seller',cls:'silver',icon:'award',border:'#cbd5e1',bg:'linear-gradient(135deg,#f8fafc,#fff 55%,#e5e7eb)',color:'#374151'};
+    return {label:'Prime Seller',cls:'prime',icon:'badge-check',border:'#bfdbfe',bg:'linear-gradient(135deg,#f8fbff,#fff 60%,#eff6ff)',color:'#1d4ed8'};
+  };
+
+  const getTarget = (i, sellers) => {
+    // Target = next rank's order count + 1
+    if(i===0) return null; // Diamond - already top
+    const targetOrders = sellers[i-1]?.orderCount||0;
+    const myOrders = sellers[i]?.orderCount||0;
+    const need = Math.max(0, targetOrders - myOrders + 1);
+    const nextRank = getRank(i-1).label;
+    return {need, nextRank};
+  };
+
+  // Top 3 big cards
+  const top3 = top.slice(0,3).map((s,i)=>{
+    const r = getRank(i);
+    const t = getTarget(i, top);
+    const targetHtml = t ? `<div style="margin-top:10px;background:#f1f5f9;border-radius:10px;padding:8px 12px;font-size:12px;color:#475569"><span style="font-weight:800;color:${r.color}">${t.need} more orders</span> to reach ${t.nextRank}</div>` : `<div style="margin-top:10px;background:#dcfce7;border-radius:10px;padding:8px 12px;font-size:12px;color:#15803d;font-weight:800">🏆 Top Performer!</div>`;
+    return `<div style="background:${r.bg};border:2px solid ${r.border};border-radius:20px;padding:20px;flex:1;min-width:200px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08)">
+      <div style="font-size:11px;font-weight:900;color:${r.color};margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">${r.label}</div>
+      <img src="${img(s.name)}" style="width:64px;height:64px;border-radius:50%;border:3px solid ${r.border};margin-bottom:10px">
+      <div style="font-size:17px;font-weight:900;color:#071427">${safe(s.name,'Seller')}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:4px">${safe(s.city,'—')} • Rank #${i+1}</div>
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:20px">
+        <div><div style="font-size:20px;font-weight:900;color:#071427">${s.orderCount||0}</div><div style="font-size:11px;color:#64748b">Orders</div></div>
+      </div>
+      ${targetHtml}
+    </div>`;
+  }).join('');
+
+  // Remaining 7 prime cards
+  const primeCards = top.slice(3).map((s,j)=>{
+    const i = j+3;
+    const t = getTarget(i, top);
+    return `<div style="background:#fff;border:1.5px solid #bfdbfe;border-radius:16px;padding:14px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.05)">
+      <div style="font-size:10px;font-weight:900;color:#1d4ed8;margin-bottom:8px">PRIME SELLER</div>
+      <img src="${img(s.name)}" style="width:44px;height:44px;border-radius:50%;border:2px solid #bfdbfe;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:900;color:#071427">${safe(s.name,'Seller')}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px">${s.orderCount||0} orders • Rank #${i+1}</div>
+      ${t?`<div style="margin-top:8px;font-size:11px;color:#7c3aed;font-weight:800">${t.need} more → Silver</div>`:''}
+    </div>`;
+  }).join('');
+
+  const html = `
+    <div style="padding:4px 0 20px">
+      <h3 style="font-size:18px;font-weight:900;margin-bottom:4px">Top Performers</h3>
+      <p style="font-size:13px;color:#64748b;margin-bottom:20px">Ranked by total orders handled</p>
+      <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">${top3}</div>
+      ${primeCards?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">${primeCards}</div>`:''}
+    </div>`;
+
+  $('dashTopList').innerHTML = top.slice(0,3).map((s,i)=>{
+    const r=getRank(i);
+    return `<div class="performer-card rank-${r.cls}"><div class="performer-left"><img class="profile-img" src="${img(s.name)}"><div><b>${safe(s.name)}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span class="award ${r.cls}"><i data-lucide="${r.icon}"></i>${r.label}</span></div>`;
+  }).join('')||'<div class="ticket"><b>No sellers</b></div>';
+
+  $('leaderboard').innerHTML = html;
   if(window.lucide) lucide.createIcons();
 }
 

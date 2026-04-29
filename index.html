@@ -349,13 +349,14 @@ async function loadActivity(){
     return;
   }
   $('liveFeed').innerHTML=activities.map(a=>{
-    let cls='live-order',icon='bell',title='Activity';
-    if(a.type.includes('payment')){cls='live-payment';icon='credit-card';title='Payment Received'}
-    else if(a.type.includes('signup')){cls='live-signup';icon='user-plus';title='New Seller Signup'}
-    else if(a.type.includes('login')){cls='live-login';icon='log-in';title='Seller Login'}
-    else if(a.type.includes('trial')){cls='live-trial';icon='alarm-clock';title='Trial Expiring Soon'}
-    else if(a.type.includes('order')){cls='live-order';icon='package-plus';title='New Order ID Created'}
-    return`<div class="live-item ${cls}"><span class="live-icon"><i data-lucide="${icon}"></i></span><div><b>${title}</b><p>${a.msg} • ${a.time?new Date(a.time).toLocaleString('en-IN'):'-'}</p></div></div>`;
+    let cls='live-order',icon='bell',label='Activity';
+    if(a.type.includes('payment')){cls='live-payment';icon='credit-card';label='Payment Received'}
+    else if(a.type.includes('signup')){cls='live-signup';icon='user-plus';label='New Seller Signup'}
+    else if(a.type.includes('login')){cls='live-login';icon='log-in';label='Seller Login'}
+    else if(a.type.includes('trial')){cls='live-trial';icon='alarm-clock';label='Trial Expiring Soon'}
+    else if(a.type.includes('order')){cls='live-order';icon='package-plus';label='New Order Created'}
+    const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'-';
+    return`<div class="live-item ${cls}"><span class="live-icon"><i data-lucide="${icon}"></i></span><div><b>${a.msg}</b><p>${label} • ${ist}</p></div></div>`;
   }).join('');
   if(window.lucide)lucide.createIcons();
 }
@@ -409,22 +410,18 @@ async function init(){
   }
   await Promise.all([loadCounts(), loadActivity()]);
   Promise.all([loadSellers(), loadOrders(), loadSubs(), loadTickets()]);
-
   sb.channel('live-activity')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'activity_logs'},()=>{
       loadActivity(); loadCounts();
     }).subscribe();
-
   sb.channel('live-orders')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'orders'},()=>{
       loadCounts();
     }).subscribe();
-
   sb.channel('live-profiles')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
       loadCounts();
     }).subscribe();
-
   setInterval(()=>{ loadCounts(); loadActivity(); }, 30000);
 }
 startAuthGate();

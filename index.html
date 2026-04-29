@@ -10,7 +10,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0} body{font-family:Inter,'Noto Sans Tamil',sans-serif;background:#f4f7fb;color:#111827}.app{display:flex;min-height:100vh}.sidebar{width:80px;background:#071427;color:#fff;padding:24px 10px;position:fixed;top:0;bottom:0;left:0;transition:.3s;overflow:hidden}.sidebar:hover{width:260px;padding:24px 18px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:32px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#f97316);display:flex;align-items:center;justify-content:center;font-weight:900}.brand h1{font-size:20px}.brand p{font-size:12px;color:#93a4bd;margin-top:3px}.menu{display:grid;gap:8px}.menu a{color:#b8c4d6;text-decoration:none;padding:13px 14px;border-radius:14px;font-size:14px;display:flex;gap:12px;align-items:center}.menu i{width:18px;height:18px}.menu a.active,.menu a:hover{background:#13243d;color:#fff}.main{margin-left:80px;width:calc(100% - 80px);padding:20px;transition:.3s}.sidebar:hover ~ .main{margin-left:260px;width:calc(100% - 260px)}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;background:#fff;border:1px solid #eef2f7;border-radius:24px;padding:16px 18px;box-shadow:0 12px 28px rgba(15,23,42,.05)}.page-kicker{display:flex;align-items:center;gap:10px;color:#64748b;font-size:13px;font-weight:800;margin-bottom:6px}.date-chip{display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:999px;padding:9px 13px;font-size:13px;color:#334155;font-weight:800}.admin-profile{display:flex;align-items:center;gap:12px;background:#071427;color:#fff;border-radius:18px;padding:10px 14px;min-width:220px}.admin-avatar{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#f97316);display:flex;align-items:center;justify-content:center;font-weight:900}.admin-name{font-size:14px;font-weight:900}.admin-role{font-size:12px;color:#b8c4d6;margin-top:3px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}.card{background:#fff;border-radius:22px;padding:18px;box-shadow:0 12px 28px rgba(15,23,42,.06);border:1px solid #eef2f7}.label{font-size:13px;color:#64748b;font-weight:700}.value{font-size:30px;font-weight:900;margin-top:8px}.trend{display:inline-flex;margin-top:10px;font-size:12px;font-weight:800;padding:5px 9px;border-radius:999px}.up{background:#dcfce7;color:#15803d}.down{background:#fee2e2;color:#b91c1c}.neutral{background:#e0f2fe;color:#0369a1}.grid{display:grid;grid-template-columns:1.35fr .85fr;gap:18px;margin-bottom:18px}.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border-radius:24px;padding:20px;box-shadow:0 12px 28px rgba(15,23,42,.06);border:1px solid #eef2f7}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.panel h3{font-size:18px;font-weight:900}.small{font-size:13px;color:#64748b}.table{width:100%;border-collapse:collapse}.table th{text-align:left;font-size:12px;color:#64748b;padding:12px;border-bottom:1px solid #edf2f7}.table td{padding:14px 12px;border-bottom:1px solid #f1f5f9;font-size:14px}.badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;display:inline-block}.paid{background:#dcfce7;color:#15803d}.trial{background:#fff7ed;color:#c2410c}.expired{background:#fee2e2;color:#b91c1c}.seller-row{display:flex;align-items:center;gap:10px;font-weight:800}.seller-img{width:36px;height:36px;border-radius:12px;object-fit:cover;border:2px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,.08)}.status-chip{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;display:inline-block}.processing{background:#e0f2fe;color:#0369a1}.delivered{background:#dcfce7;color:#15803d}.pending{background:#fff7ed;color:#c2410c}.cancelled{background:#fee2e2;color:#b91c1c}.support,.list{display:grid;gap:12px}.ticket{border-left:4px solid #f97316;background:#f8fafc;border-radius:14px;padding:12px}.ticket b{font-size:14px}.ticket p{font-size:12px;color:#64748b;margin-top:4px}.live-feed{display:grid;gap:12px}.live-item{display:flex;gap:12px;align-items:flex-start;background:#f8fafc;border-radius:16px;padding:12px;border-left:4px solid #f97316}.live-icon{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:0 0 34px}.live-icon i{width:17px;height:17px}.live-item b{font-size:14px}.live-item p{font-size:12px;color:#64748b;margin-top:4px;line-height:1.45}.live-payment{border-left-color:#16a34a}.live-payment .live-icon{background:#dcfce7;color:#15803d}.live-signup{border-left-color:#1d4ed8}.live-signup .live-icon{background:#dbeafe;color:#1d4ed8}.live-login{border-left-color:#7c3aed}.live-login .live-icon{background:#ede9fe;color:#6d28d9}.live-order{border-left-color:#f97316}.live-order .live-icon{background:#ffedd5;color:#c2410c}.live-trial{border-left-color:#dc2626}.live-trial .live-icon{background:#fee2e2;color:#b91c1c}.performer-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f8fafc;border:1px solid #eef2f7;border-radius:18px;padding:12px}.performer-left{display:flex;align-items:center;gap:12px}.profile-img{width:46px;height:46px;border-radius:16px}.award{padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900;display:inline-block}.gold{background:#fef3c7;color:#92400e}.silver{background:#e5e7eb;color:#374151}.bronze{background:#ffedd5;color:#9a3412}.blue{background:#dbeafe;color:#1d4ed8}.green{background:#dcfce7;color:#15803d}.heatmap-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.heat-cell{border-radius:18px;padding:16px;min-height:92px;display:flex;flex-direction:column;justify-content:space-between}.heat-5{background:#071427;color:#fff}.heat-4{background:#1d4ed8;color:#fff}.heat-3{background:#93c5fd}.heat-2{background:#dbeafe;color:#1e3a8a}.heat-1{background:#f8fafc;color:#475569}.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}.kanban-col{background:#f8fafc;border:1px solid #eef2f7;border-radius:22px;padding:14px}.kanban-title{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:900;margin-bottom:12px}.kanban-card{background:#fff;border:1px solid #eef2f7;border-radius:18px;padding:14px;margin-bottom:12px}.quick-replies{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.reply-chip{background:#f8fafc;border:1px solid #eef2f7;border-radius:16px;padding:12px;font-size:12px;font-weight:800}.settings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}.setting-card{background:#fff;border:1px solid #eef2f7;border-radius:24px;padding:18px}.setting-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eef2f7;padding:14px 0}.control-btn{border:0;border-radius:14px;padding:9px 12px;font-size:12px;font-weight:900;cursor:pointer}.primary-btn{background:#071427;color:#fff}.orange-btn{background:#f97316;color:#fff}.light-btn{background:#f8fafc;color:#334155;border:1px solid #e5e7eb}canvas{max-height:230px}@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.grid,.two{grid-template-columns:1fr}.sidebar{display:none}.main{margin-left:0;width:100%}}@media(max-width:900px){.kanban,.settings-grid{grid-template-columns:1fr}.heatmap-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.cards,.heatmap-grid{grid-template-columns:1fr}.topbar{display:block}.admin-profile{margin-top:14px;width:100%;min-width:0}}
+    *{box-sizing:border-box;margin:0;padding:0} body{font-family:Inter,'Noto Sans Tamil',sans-serif;background:#f4f7fb;color:#111827}.app{display:flex;min-height:100vh}.sidebar{width:80px;background:#071427;color:#fff;padding:24px 10px;position:fixed;top:0;bottom:0;left:0;transition:.3s;overflow:hidden}.sidebar:hover{width:260px;padding:24px 18px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:32px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#f97316);display:flex;align-items:center;justify-content:center;font-weight:900}.brand h1{font-size:20px}.brand p{font-size:12px;color:#93a4bd;margin-top:3px}.menu{display:grid;gap:8px}.menu a{color:#b8c4d6;text-decoration:none;padding:13px 14px;border-radius:14px;font-size:14px;display:flex;gap:12px;align-items:center}.menu i{width:18px;height:18px}.menu a.active,.menu a:hover{background:#13243d;color:#fff}.main{margin-left:80px;width:calc(100% - 80px);padding:20px;transition:.3s}.sidebar:hover ~ .main{margin-left:260px;width:calc(100% - 260px)}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;background:#fff;border:1px solid #eef2f7;border-radius:24px;padding:16px 18px;box-shadow:0 12px 28px rgba(15,23,42,.05)}.page-kicker{display:flex;align-items:center;gap:10px;color:#64748b;font-size:13px;font-weight:800;margin-bottom:6px}.date-chip{display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:999px;padding:9px 13px;font-size:13px;color:#334155;font-weight:800}.admin-profile{display:flex;align-items:center;gap:12px;background:#071427;color:#fff;border-radius:18px;padding:10px 14px;min-width:220px}.admin-avatar{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#f97316);display:flex;align-items:center;justify-content:center;font-weight:900}.admin-name{font-size:14px;font-weight:900}.admin-role{font-size:12px;color:#b8c4d6;margin-top:3px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}.card{background:#fff;border-radius:22px;padding:18px;box-shadow:0 12px 28px rgba(15,23,42,.06);border:1px solid #eef2f7}.label{font-size:13px;color:#64748b;font-weight:700}.value{font-size:30px;font-weight:900;margin-top:8px}.trend{display:inline-flex;margin-top:10px;font-size:12px;font-weight:800;padding:5px 9px;border-radius:999px}.up{background:#dcfce7;color:#15803d}.down{background:#fee2e2;color:#b91c1c}.neutral{background:#e0f2fe;color:#0369a1}.grid{display:grid;grid-template-columns:1.35fr .85fr;gap:18px;margin-bottom:18px}.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border-radius:24px;padding:20px;box-shadow:0 12px 28px rgba(15,23,42,.06);border:1px solid #eef2f7}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.panel h3{font-size:18px;font-weight:900}.small{font-size:13px;color:#64748b}.table{width:100%;border-collapse:collapse}.table th{text-align:left;font-size:12px;color:#64748b;padding:12px;border-bottom:1px solid #edf2f7}.table td{padding:14px 12px;border-bottom:1px solid #f1f5f9;font-size:14px}.badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;display:inline-block}.paid{background:#dcfce7;color:#15803d}.trial{background:#fff7ed;color:#c2410c}.expired{background:#fee2e2;color:#b91c1c}.seller-row{display:flex;align-items:center;gap:10px;font-weight:800}.seller-img{width:36px;height:36px;border-radius:12px;object-fit:cover;border:2px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,.08)}.status-chip{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;display:inline-block}.processing{background:#e0f2fe;color:#0369a1}.delivered{background:#dcfce7;color:#15803d}.pending{background:#fff7ed;color:#c2410c}.cancelled{background:#fee2e2;color:#b91c1c}.support,.list{display:grid;gap:12px}.ticket{border-left:4px solid #f97316;background:#f8fafc;border-radius:14px;padding:12px}.ticket b{font-size:14px}.ticket p{font-size:12px;color:#64748b;margin-top:4px}.live-feed{display:grid;gap:10px;max-height:400px;overflow:hidden}.live-item{display:flex;gap:12px;align-items:flex-start;background:#f8fafc;border-radius:16px;padding:12px;border-left:4px solid #f97316}.live-icon{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:0 0 34px}.live-icon i{width:17px;height:17px}.live-item b{font-size:14px}.live-item p{font-size:12px;color:#64748b;margin-top:4px;line-height:1.45}.live-payment{border-left-color:#16a34a}.live-payment .live-icon{background:#dcfce7;color:#15803d}.live-signup{border-left-color:#1d4ed8}.live-signup .live-icon{background:#dbeafe;color:#1d4ed8}.live-login{border-left-color:#7c3aed}.live-login .live-icon{background:#ede9fe;color:#6d28d9}.live-order{border-left-color:#f97316}.live-order .live-icon{background:#ffedd5;color:#c2410c}.live-trial{border-left-color:#dc2626}.live-trial .live-icon{background:#fee2e2;color:#b91c1c}.performer-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f8fafc;border:1px solid #eef2f7;border-radius:18px;padding:12px}.performer-left{display:flex;align-items:center;gap:12px}.profile-img{width:46px;height:46px;border-radius:16px}.award{padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900;display:inline-block}.gold{background:#fef3c7;color:#92400e}.silver{background:#e5e7eb;color:#374151}.bronze{background:#ffedd5;color:#9a3412}.blue{background:#dbeafe;color:#1d4ed8}.green{background:#dcfce7;color:#15803d}.heatmap-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.heat-cell{border-radius:18px;padding:16px;min-height:92px;display:flex;flex-direction:column;justify-content:space-between}.heat-5{background:#071427;color:#fff}.heat-4{background:#1d4ed8;color:#fff}.heat-3{background:#93c5fd}.heat-2{background:#dbeafe;color:#1e3a8a}.heat-1{background:#f8fafc;color:#475569}.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}.kanban-col{background:#f8fafc;border:1px solid #eef2f7;border-radius:22px;padding:14px}.kanban-title{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:900;margin-bottom:12px}.kanban-card{background:#fff;border:1px solid #eef2f7;border-radius:18px;padding:14px;margin-bottom:12px}.quick-replies{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.reply-chip{background:#f8fafc;border:1px solid #eef2f7;border-radius:16px;padding:12px;font-size:12px;font-weight:800}.settings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}.setting-card{background:#fff;border:1px solid #eef2f7;border-radius:24px;padding:18px}.setting-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eef2f7;padding:14px 0}.control-btn{border:0;border-radius:14px;padding:9px 12px;font-size:12px;font-weight:900;cursor:pointer}.primary-btn{background:#071427;color:#fff}.orange-btn{background:#f97316;color:#fff}.light-btn{background:#f8fafc;color:#334155;border:1px solid #e5e7eb}canvas{max-height:230px}@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.grid,.two{grid-template-columns:1fr}.sidebar{display:none}.main{margin-left:0;width:100%}}@media(max-width:900px){.kanban,.settings-grid{grid-template-columns:1fr}.heatmap-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.cards,.heatmap-grid{grid-template-columns:1fr}.topbar{display:block}.admin-profile{margin-top:14px;width:100%;min-width:0}}
   
 
 /* MINIMAL SIDEBAR FIX ONLY - added by ChatGPT */
@@ -91,7 +91,7 @@
   <div class="auth-card">
     <div class="auth-logo">MS</div>
     <h2>Admin Login</h2>
-    <p>Login pannina admin dashboard open aagum.</p>
+    
     <div id="authError" class="auth-error"></div>
     <form id="adminLoginForm">
       <div class="auth-field"><label>Email</label><input id="adminEmail" type="email" autocomplete="username" placeholder="Admin email" required></div>
@@ -123,7 +123,7 @@
     <button class="seller-tab" data-seller-filter="confirmed">Confirmed</button>
     <button class="seller-tab" data-seller-filter="pending">Pending Verification</button>
   </div>
-  <div class="table-wrap"><table class="table"><thead><tr><th>Seller</th><th>Email / Mobile</th><th>City</th><th>Signup Date</th><th>Email Status</th><th>Action</th></tr></thead><tbody id="sellerRows"></tbody></table></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>Seller</th><th>Email / Mobile</th><th>District</th><th>Signup Date</th><th>Email Status</th><th>Action</th></tr></thead><tbody id="sellerRows"></tbody></table></div>
   <p class="muted-note" style="margin-top:12px">Note: Pending Verification users will show from sellers/signup_leads table when email_confirmed, confirmed_at or email_confirmed_at fields are available.</p>
 </div>
 </section>
@@ -183,50 +183,115 @@ const $=id=>document.getElementById(id); const todayStart=new Date();todayStart.
 function setText(id,v){if($(id))$(id).textContent=v} function badge(s){s=String(s||'').toLowerCase(); if(s.includes('paid')||s.includes('active')||s.includes('resolve'))return'paid'; if(s.includes('trial')||s.includes('pending')||s.includes('process'))return'trial'; return'expired'} function orderCls(s){s=String(s||'').toLowerCase(); if(s.includes('deliver')||s.includes('complete'))return'delivered'; if(s.includes('cancel'))return'cancelled'; if(s.includes('pending'))return'pending'; return'processing'}
 function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(charts[id])charts[id].destroy(); charts[id]=new Chart(el,config)} const common={responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef2f7'}},x:{grid:{display:false}}}};
 async function count(table,fn){let q=sb.from(table).select('*',{count:'exact',head:true}); if(fn)q=fn(q); const{count,error}=await q; if(error){console.warn(table,error.message);return 0} return count||0}
-async function loadCounts(){
-  try{
-    const confirmed=await count('profiles',q=>q.eq('role','seller'));
-    const pending=await count('pending_sellers');
-    const total=confirmed+pending;
-    const totalOrders=await count('orders');
-    const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));
-    setText('totalSellers',total);
-    setText('activeSellers',confirmed);
-    setText('totalOrders',totalOrders);
-    setText('ordersToday',orders);
-    setText('ordersToday2',orders);
-    setText('pendingVerification',pending);
-    console.log('Counts:',{total,confirmed,pending,totalOrders,orders});
-  }catch(e){console.error('loadCounts error:',e);}
-}
+async function loadCounts(){const {data:cnt}=await sb.rpc('get_seller_counts');const verified=(cnt&&cnt.verified_sellers)||0;const unverified=(cnt&&cnt.unverified_sellers)||0;const total=verified+unverified;const totalOrders=await count('orders');const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
 async function loadSellers(){
-  const {data,error}=await sb.from('profiles').select('*').eq('role','seller').order('created_at',{ascending:false}).limit(100);
-  const {data:pendingData}=await sb.from('pending_sellers').select('*').order('created_at',{ascending:false}).limit(100);
-  if(error){$('sellerRows').innerHTML=`<tr><td colspan="6">${error.message}</td></tr>`;return[]}
-  const confirmedSellers=(data||[]).map(s=>({...s,_status:'confirmed'}));
-  const pendingSellers=(pendingData||[]).map(s=>({...s,_status:'pending'}));
-  const sellers=[...confirmedSellers,...pendingSellers];
-  const isConfirmed=s=>s._status==='confirmed';
-  const pending=sellers.filter(s=>!isConfirmed(s));
-  const confirmed=sellers.filter(isConfirmed);
-  const convertedToday=confirmed.filter(s=>{let d=s.confirmed_at||s.email_confirmed_at||s.updated_at;return d&&new Date(d)>=todayStart}).length;
-  const confirmedCount=confirmedSellers.length;
-  const pendingCount=pendingSellers.length;
-  const convertedToday=confirmedSellers.filter(s=>{let d=s.updated_at||s.created_at;return d&&new Date(d)>=todayStart}).length;
-  setText('confirmedSellersCount',confirmedCount);
-  setText('pendingSellersCount',pendingCount);
-  setText('pendingVerification',pendingCount);
-  setText('convertedTodayCount',convertedToday);
-  window.__allSellers=sellers; window.__sellerFilter='all';
-  renderSellerTable(sellers);
-  const recentRows=confirmed.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.business_name||s.email)}">${safe(s.name||s.business_name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders_count||s.total_orders,'-')}</td><td><span class="badge paid">Confirmed</span></td></tr>`).join('')||'<tr><td colspan="4">No confirmed sellers found</td></tr>';
+  const {data:authData,error:authErr}=await sb.rpc('get_seller_details');
+  if(authErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${authErr.message}</td></tr>`;return[]}
+  const allSellers=(authData||[]).map(u=>({
+    user_id:u.user_id,
+    shop_name:u.shop_name||'',
+    name:u.shop_name&&u.shop_name.trim()?u.shop_name:u.email,
+    email:u.email,
+    phone:u.phone||'',
+    mobile:u.phone||'',
+    city:u.district||'-',
+    district:u.district||'-',
+    address:u.address||'-',
+    pincode:u.pincode||'',
+    created_at:u.created_at,
+    _status:u.email_confirmed_at?'confirmed':'pending'
+  }));
+  const verified=allSellers.filter(s=>s._status==='confirmed');
+  const unverified=allSellers.filter(s=>s._status==='pending');
+  const convertedToday=verified.filter(s=>{let d=s.created_at;return d&&new Date(d)>=todayStart}).length;
+  setText('confirmedSellersCount',verified.length);setText('pendingSellersCount',unverified.length);setText('pendingVerification',unverified.length);setText('convertedTodayCount',convertedToday);
+  setText('totalSellers',allSellers.length);setText('activeSellers',verified.length);
+  window.__allSellers=allSellers; window.__sellerFilter='all';
+  renderSellerTable(allSellers);
+  const recentRows=verified.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.email)}">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,'-')}</td><td><span class="badge paid">Verified</span></td></tr>`).join('')||'<tr><td colspan="4">No verified sellers found</td></tr>';
   if($('recentSellerRows'))$('recentSellerRows').innerHTML=recentRows;
-  renderTop(confirmed.length?confirmed:sellers); drawDistrict(sellers); bindSellerTabs(); return sellers
+  renderTop(verified.length?verified:allSellers); drawDistrict(allSellers); bindSellerTabs(); return allSellers
 }
-function sellerStatus(s){return 'Confirmed';}
+function sellerStatus(s){return s._status==='confirmed'?'Confirmed':'Pending';}
 function renderSellerTable(list){
-  const rows=(list||[]).map(s=>{const name=s.name||s.business_name||s.store_name||s.email||'Unnamed Seller'; const email=s.email||s.mobile||s.phone||'-'; const status=sellerStatus(s); const phone=String(s.mobile||s.phone||'').replace(/[^0-9]/g,''); const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+name+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'#'; return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}"><td><div class="seller-row"><img class="seller-img" src="${img(name)}">${safe(name)}</div></td><td>${safe(email)}</td><td>${safe(s.city)}</td><td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td><td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td><td><div class="action-row"><a class="tiny-btn" href="mailto:${s.email||''}?subject=Verify your MySellerDesk account">Resend Email</a><a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a><button class="tiny-btn done" type="button">Contacted</button></div></td></tr>`}).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
+  const rows=(list||[]).map((s,idx)=>{
+    const shopName=s.shop_name&&s.shop_name.trim()&&s.shop_name!==s.email?s.shop_name:(s.business_name||s.store_name||'');
+    const displayLabel=shopName||s.email||'Unnamed';
+    const avatarSeed=shopName||s.email||'Seller';
+    const displayName=s.email||s.mobile||s.phone||'-';
+    const email=s.email||'-';
+    const status=sellerStatus(s);
+    const phone=String(s.phone||'').replace(/[^0-9]/g,'');
+    const district=s.city||s.district||'-';
+    const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(avatarSeed);
+    const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
+    const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
+    return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
+      <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${idx})" data-seller-idx="${idx}">
+        <img class="seller-img" src="${profilePic}" onerror="this.src='${img(avatarSeed)}'">${safe(displayLabel)}
+      </div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1e293b">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#eef2ff;border-radius:6px;flex-shrink:0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+          ${safe(s.email||'-')}
+        </div>
+        ${phone?`<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;margin-top:5px;font-weight:600">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#f0fdf4;border-radius:6px;flex-shrink:0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.07 3.4 2 2 0 0 1 3 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15z"/></svg></span>
+          ${phone}
+        </div>`:''}
+      </td>
+      <td>${safe(district)}</td>
+      <td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td>
+      <td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td>
+      <td><div class="action-row">
+        <a class="tiny-btn" href="mailto:${email}?subject=Verify your MySellerDesk account&body=Hi ${shopName},%0D%0A%0D%0APlease verify your MySellerDesk account by clicking the confirmation link sent to your email.%0D%0A%0D%0AThank you!" target="_blank">Resend Email</a>
+        <a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a>
+      </div></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
   if($('sellerRows'))$('sellerRows').innerHTML=rows;
+  window.__renderedSellers=list||[];
+}
+function openSellerPopup(idx){
+  const s=(window.__renderedSellers||[])[idx];
+  if(!s)return;
+  const shopName=s.shop_name||s.name||s.business_name||s.store_name||'Unnamed Shop';
+  const email=s.email||'-';
+  const phone=s.mobile||s.phone||s.phone_number||'-';
+  const district=s.city||s.district||'-';
+  const status=sellerStatus(s);
+  const address=s.address||'-';
+  const signupDate=s.created_at?new Date(s.created_at).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}):'-';
+  const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(shopName);
+  let modal=$('sellerModal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='sellerModal';
+    modal.style.cssText='position:fixed;inset:0;background:rgba(7,20,39,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML=`<div id="sellerModalBox" style="background:#fff;border-radius:28px;padding:28px;max-width:440px;width:100%;box-shadow:0 28px 70px rgba(15,23,42,.2);position:relative">
+      <button onclick="$('sellerModal').style.display='none'" style="position:absolute;top:16px;right:16px;border:0;background:#f1f5f9;border-radius:999px;width:32px;height:32px;font-size:18px;cursor:pointer;color:#334155">✕</button>
+      <div id="sellerModalContent"></div>
+    </div>`;
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.style.display='none';});
+    document.body.appendChild(modal);
+  }
+  $('sellerModalContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <img src="${profilePic}" onerror="this.src='${img(shopName)}'" style="width:64px;height:64px;border-radius:20px;object-fit:cover;border:3px solid #eef2f7;box-shadow:0 8px 18px rgba(15,23,42,.1)">
+      <div>
+        <div style="font-size:20px;font-weight:900;color:#071427">${safe(shopName)}</div>
+        <span style="padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800;background:${status==='Confirmed'?'#dcfce7':'#fff7ed'};color:${status==='Confirmed'?'#15803d':'#c2410c'}">${status}</span>
+      </div>
+    </div>
+    <div style="display:grid;gap:12px">
+      ${row('📧','Email',email)}
+      ${row('📱','Phone',phone)}
+      ${row('📍','District',district)}
+      ${row('🏠','Address',address)}
+      ${row('📅','Signup Date',signupDate)}
+    </div>`;
+  modal.style.display='flex';
+  function row(icon,label,val){return`<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:#f8fafc;border-radius:16px"><span style="font-size:18px">${icon}</span><div><div style="font-size:11px;color:#64748b;font-weight:800;margin-bottom:2px">${label}</div><div style="font-size:14px;font-weight:700;color:#1e293b">${safe(val)}</div></div></div>`}
 }
 function bindSellerTabs(){
   document.querySelectorAll('[data-seller-filter]').forEach(btn=>{
@@ -251,9 +316,52 @@ function bindSellerTabs(){
 }
 async function loadOrders(){const{data,error}=await sb.from('orders').select('id,order_id,created_at,status,amount,seller_id').order('created_at',{ascending:false}).limit(20); if(error){$('recentOrderRows').innerHTML=`<tr><td colspan="5">${error.message}</td></tr>`;return[]} const arr=data||[]; setText('processingOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('process')).length); setText('deliveredOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('deliver')||String(o.status||'').toLowerCase().includes('complete')).length); setText('cancelledOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('cancel')).length); $('recentOrderRows').innerHTML=arr.map(o=>`<tr><td class="order-id">${safe(o.order_id||o.id)}</td><td>${safe(o.seller_id,'Seller')}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${o.created_at?new Date(o.created_at).toLocaleDateString('en-IN'):'-'}</td></tr>`).join('')||'<tr><td colspan="5">No orders found</td></tr>'; return arr}
 async function loadSubs(){const{data,error}=await sb.from('subscriptions').select('seller_id,plan_type,amount,status,payment_date,expiry_date').order('payment_date',{ascending:false}).limit(100); if(error){drawPlans([0,0,0]);return[]} const paid=(data||[]).filter(x=>String(x.status||'').toLowerCase().includes('paid')||String(x.status||'').toLowerCase().includes('active')); const monthly=paid.filter(x=>String(x.plan_type||'').toLowerCase().includes('month')); const yearly=paid.filter(x=>String(x.plan_type||'').toLowerCase().includes('year')); const rev=paid.filter(x=>x.payment_date&&new Date(x.payment_date)>=monthStart).reduce((s,x)=>s+Number(x.amount||0),0); setText('paidSellers',paid.length);setText('monthlyPaid',monthly.length);setText('yearlyPaid',yearly.length);setText('revenueThisMonth',rupee(rev)); drawPlans([0,monthly.length,yearly.length]); $('paymentRows').innerHTML=(data||[]).slice(0,10).map(x=>`<tr><td>${safe(x.seller_id,'Seller')}</td><td>${safe(x.plan_type)}</td><td>${rupee(x.amount)}</td><td><span class="badge ${badge(x.status)}">${safe(x.status)}</span></td><td>${x.expiry_date?new Date(x.expiry_date).toLocaleDateString('en-IN'):'-'}</td></tr>`).join('')||'<tr><td colspan="5">No subscription data</td></tr>'}
-async function loadActivity(){const{data,error}=await sb.from('activity_logs').select('type,message,created_at').order('created_at',{ascending:false}).limit(5); if(error||!data?.length){$('liveFeed').innerHTML='<div class="ticket"><b>No live activity yet</b><p>activity_logs table data varumbodhu inga show aagum</p></div>';return} $('liveFeed').innerHTML=data.map(a=>{let type=String(a.type||'').toLowerCase(),cls='live-order',icon='bell',title='Activity'; if(type.includes('payment')){cls='live-payment';icon='credit-card';title='Payment Received'}else if(type.includes('signup')){cls='live-signup';icon='user-plus';title='New Seller Signup'}else if(type.includes('login')){cls='live-login';icon='log-in';title='Seller Login'}else if(type.includes('trial')){cls='live-trial';icon='alarm-clock';title='Trial Expiring Soon'}else if(type.includes('order')){cls='live-order';icon='package-plus';title='New Order ID Created'} return`<div class="live-item ${cls}"><span class="live-icon"><i data-lucide="${icon}"></i></span><div><b>${title}</b><p>${safe(a.message)} • ${a.created_at?new Date(a.created_at).toLocaleString('en-IN'):'-'}</p></div></div>`}).join(''); if(window.lucide)lucide.createIcons()}
+async function loadActivity(){
+  // Try activity_logs first; if empty/missing, fallback to sellers + orders
+  let activities = [];
+  try {
+    const {data,error}=await sb.from('activity_logs').select('type,message,created_at').order('created_at',{ascending:false}).limit(5);
+    if(!error && data && data.length>0){
+      activities = data.map(a=>({type:String(a.type||'').toLowerCase(),msg:safe(a.message),time:a.created_at}));
+    }
+  } catch(e){}
+
+  if(activities.length===0){
+    // Fallback: build activity from sellers + orders tables
+    const [{data:sellers},{data:orders},{data:subs}] = await Promise.all([
+      sb.from('sellers').select('shop_name,email,created_at,district').order('created_at',{ascending:false}).limit(5),
+      sb.from('orders').select('order_id,id,created_at,seller_id').order('created_at',{ascending:false}).limit(3),
+      sb.from('subscriptions').select('seller_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2)
+    ]);
+    (sellers||[]).forEach(s=>activities.push({type:'signup',msg:`New seller signed up: ${safe(s.email||s.shop_name)} from ${safe(s.district,'')}`,time:s.created_at}));
+    (orders||[]).forEach(o=>activities.push({type:'order',msg:`Order ${safe(o.order_id||o.id)} created by ${safe(o.seller_id)}`,time:o.created_at}));
+    (subs||[]).forEach(s=>{
+      const isPaid=String(s.status||'').toLowerCase().includes('paid')||String(s.status||'').toLowerCase().includes('active');
+      if(isPaid) activities.push({type:'payment',msg:`Payment ₹${safe(s.amount,'?')} received - ${safe(s.plan_type)} plan by ${safe(s.seller_id)}`,time:s.created_at});
+      else if(String(s.status||'').toLowerCase().includes('trial')) activities.push({type:'trial',msg:`Trial expiring soon for ${safe(s.seller_id)}`,time:s.created_at});
+    });
+    activities.sort((a,b)=>new Date(b.time)-new Date(a.time));
+    activities=activities.slice(0,8);
+  }
+
+  if(!activities.length){
+    $('liveFeed').innerHTML='<div class="ticket"><b>No live activity yet</b><p>Sellers or orders data varum podhu inga show aagum</p></div>';
+    return;
+  }
+  $('liveFeed').innerHTML=activities.map(a=>{
+    let cls='live-order',icon='bell',label='Activity';
+    if(a.type.includes('payment')){cls='live-payment';icon='credit-card';label='Payment Received'}
+    else if(a.type.includes('signup')){cls='live-signup';icon='user-plus';label='New Seller Signup'}
+    else if(a.type.includes('login')){cls='live-login';icon='log-in';label='Seller Login'}
+    else if(a.type.includes('trial')){cls='live-trial';icon='alarm-clock';label='Trial Expiring Soon'}
+    else if(a.type.includes('order')){cls='live-order';icon='package-plus';label='New Order Created'}
+    const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'-';
+    return`<div class="live-item ${cls}"><span class="live-icon"><i data-lucide="${icon}"></i></span><div><b>${a.msg}</b><p>${label} • ${ist}</p></div></div>`;
+  }).join('');
+  if(window.lucide)lucide.createIcons();
+}
 async function loadTickets(){const{data,error}=await sb.from('support_tickets').select('id,subject,message,priority,status,created_at').order('created_at',{ascending:false}).limit(50); if(error)return; const arr=data||[]; const open=arr.filter(t=>String(t.status||'').toLowerCase().includes('open')); const prog=arr.filter(t=>String(t.status||'').toLowerCase().includes('progress')); const res=arr.filter(t=>String(t.status||'').toLowerCase().includes('resolved')); setText('openTickets',open.length);setText('progressTickets',prog.length);setText('resolvedTickets',res.length); const card=t=>`<div class="kanban-card"><b>${safe(t.subject||t.id)}</b><p>${safe(t.message,'No message')}</p><span class="badge ${badge(t.priority)}">${safe(t.priority,'medium')}</span></div>`; $('openTicketList').innerHTML=open.map(card).join('')||'<p class="small">No open tickets</p>'; $('progressTicketList').innerHTML=prog.map(card).join('')||'<p class="small">No in progress</p>'; $('resolvedTicketList').innerHTML=res.map(card).join('')||'<p class="small">No resolved</p>'; $('ticketRows').innerHTML=arr.map(t=>`<tr><td>${safe(t.id)}</td><td>${safe(t.subject||t.message)}</td><td><span class="badge ${badge(t.priority)}">${safe(t.priority)}</span></td><td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td></tr>`).join('')||'<tr><td colspan="4">No tickets found</td></tr>'; if($('dashTickets')) $('dashTickets').innerHTML=arr.slice(0,3).map(t=>`<div class="ticket"><b>${safe(t.subject||t.id)}</b><p>${safe(t.status)} • ${safe(t.priority)}</p></div>`).join('')||'<div class="ticket"><b>No tickets</b><p>support_tickets empty</p></div>'}
-function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.plan||'free';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
+function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
 function drawPlans(v){chart('planChart',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});chart('planChart2',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}}); chart('revenueChart',{type:'line',data:{labels:['This Month'],datasets:[{data:[Number(String($('revenueThisMonth')?.textContent||'0').replace(/[^0-9]/g,''))],borderWidth:3,tension:.4}]},options:common})}
 function renderTop(sellers){
   const badgeMeta = [
@@ -271,7 +379,23 @@ function renderTop(sellers){
   if(window.lucide) lucide.createIcons();
 }
 
-function nav(){document.querySelectorAll('.menu a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));a.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.style.display='none');const page=$(a.dataset.page);if(page)page.style.display='block';if(window.lucide)lucide.createIcons();}))}
+function nav(){
+  const saved=sessionStorage.getItem('activePage')||'dashboardPage';
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  const sp=$(saved);if(sp)sp.style.display='block';
+  document.querySelectorAll('.menu a').forEach(a=>{
+    a.classList.toggle('active',a.dataset.page===saved);
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+      const page=$(a.dataset.page);if(page)page.style.display='block';
+      sessionStorage.setItem('activePage',a.dataset.page);
+      if(window.lucide)lucide.createIcons();
+    });
+  });
+}
 async function init(){
   nav();
   bindSellerTabs();
@@ -284,13 +408,21 @@ async function init(){
     if($('leaderboard')) $('leaderboard').innerHTML='<div class="ticket"><b>No seller data</b><p>Supabase connect pannina real data varum.</p></div>';
     return;
   }
-  await loadCounts();
-  await loadSellers();
-  await loadOrders();
-  await loadSubs();
-  await loadActivity();
-  await loadTickets();
-  setInterval(async()=>{await loadCounts();await loadActivity();},30000)
+  await Promise.all([loadCounts(), loadActivity()]);
+  Promise.all([loadSellers(), loadOrders(), loadSubs(), loadTickets()]);
+  sb.channel('live-activity')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'activity_logs'},()=>{
+      loadActivity(); loadCounts();
+    }).subscribe();
+  sb.channel('live-orders')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'orders'},()=>{
+      loadCounts();
+    }).subscribe();
+  sb.channel('live-profiles')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
+      loadCounts();
+    }).subscribe();
+  setInterval(()=>{ loadCounts(); loadActivity(); }, 30000);
 }
 startAuthGate();
 </script>

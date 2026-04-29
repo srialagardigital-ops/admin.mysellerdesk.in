@@ -123,7 +123,7 @@
     <button class="seller-tab" data-seller-filter="confirmed">Confirmed</button>
     <button class="seller-tab" data-seller-filter="pending">Pending Verification</button>
   </div>
-  <div class="table-wrap"><table class="table"><thead><tr><th>Seller</th><th>Email / Mobile</th><th>City</th><th>Signup Date</th><th>Email Status</th><th>Action</th></tr></thead><tbody id="sellerRows"></tbody></table></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>Seller</th><th>Email / Mobile</th><th>District</th><th>Signup Date</th><th>Email Status</th><th>Action</th></tr></thead><tbody id="sellerRows"></tbody></table></div>
   <p class="muted-note" style="margin-top:12px">Note: Pending Verification users will show from sellers/signup_leads table when email_confirmed, confirmed_at or email_confirmed_at fields are available.</p>
 </div>
 </section>
@@ -194,10 +194,13 @@ async function loadSellers(){
   (sData||[]).forEach(s=>{settingsMap[s.user_id]=s;});
   const allSellers=(authData||[]).map(u=>({
     user_id:u.user_id,
+    shop_name:(settingsMap[u.user_id]&&settingsMap[u.user_id].shop_name)||'',
     name:(settingsMap[u.user_id]&&settingsMap[u.user_id].shop_name)||u.email,
     email:u.email,
     phone:(settingsMap[u.user_id]&&settingsMap[u.user_id].phone)||'',
     city:(settingsMap[u.user_id]&&settingsMap[u.user_id].district)||'-',
+    district:(settingsMap[u.user_id]&&settingsMap[u.user_id].district)||'-',
+    address:(settingsMap[u.user_id]&&settingsMap[u.user_id].address)||'-',
     created_at:u.created_at,
     _status:u.email_confirmed_at?'confirmed':'pending'
   }));
@@ -214,8 +217,73 @@ async function loadSellers(){
 }
 function sellerStatus(s){return s._status==='confirmed'?'Confirmed':'Pending';}
 function renderSellerTable(list){
-  const rows=(list||[]).map(s=>{const name=s.name||s.business_name||s.store_name||s.email||'Unnamed Seller'; const email=s.email||s.mobile||s.phone||'-'; const status=sellerStatus(s); const phone=String(s.mobile||s.phone||'').replace(/[^0-9]/g,''); const district=s.city||s.district||'-'; const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+name+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+name+', please verify your MySellerDesk account.'); return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}"><td><div class="seller-row"><img class="seller-img" src="${img(name)}">${safe(name)}</div></td><td>${safe(email)}</td><td>${safe(district)}</td><td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td><td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td><td><div class="action-row"><a class="tiny-btn" href="mailto:${s.email||''}?subject=Verify your MySellerDesk account&body=Hi ${name},%0D%0A%0D%0APlease verify your MySellerDesk account by clicking the confirmation link sent to your email.%0D%0A%0D%0AThank you!" target="_blank">Resend Email</a><a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a><button class="tiny-btn done" type="button">Contacted</button></div></td></tr>`}).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
+  const rows=(list||[]).map((s,idx)=>{
+    const shopName=s.shop_name||s.name||s.business_name||s.store_name||'Unnamed Shop';
+    const displayName=s.email||s.mobile||s.phone||'-';
+    const email=s.email||'-';
+    const status=sellerStatus(s);
+    const phone=String(s.mobile||s.phone||s.phone_number||'').replace(/[^0-9]/g,'');
+    const district=s.city||s.district||'-';
+    const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(shopName);
+    const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
+    const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
+    return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
+      <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${idx})" data-seller-idx="${idx}">
+        <img class="seller-img" src="${profilePic}" onerror="this.src='${img(shopName)}'">${safe(shopName)}
+      </div></td>
+      <td>${safe(displayName)}</td>
+      <td>${safe(district)}</td>
+      <td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td>
+      <td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td>
+      <td><div class="action-row">
+        <a class="tiny-btn" href="mailto:${email}?subject=Verify your MySellerDesk account&body=Hi ${shopName},%0D%0A%0D%0APlease verify your MySellerDesk account by clicking the confirmation link sent to your email.%0D%0A%0D%0AThank you!" target="_blank">Resend Email</a>
+        <a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a>
+      </div></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
   if($('sellerRows'))$('sellerRows').innerHTML=rows;
+  window.__renderedSellers=list||[];
+}
+function openSellerPopup(idx){
+  const s=(window.__renderedSellers||[])[idx];
+  if(!s)return;
+  const shopName=s.shop_name||s.name||s.business_name||s.store_name||'Unnamed Shop';
+  const email=s.email||'-';
+  const phone=s.mobile||s.phone||s.phone_number||'-';
+  const district=s.city||s.district||'-';
+  const status=sellerStatus(s);
+  const address=s.address||'-';
+  const signupDate=s.created_at?new Date(s.created_at).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}):'-';
+  const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(shopName);
+  let modal=$('sellerModal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='sellerModal';
+    modal.style.cssText='position:fixed;inset:0;background:rgba(7,20,39,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML=`<div id="sellerModalBox" style="background:#fff;border-radius:28px;padding:28px;max-width:440px;width:100%;box-shadow:0 28px 70px rgba(15,23,42,.2);position:relative">
+      <button onclick="$('sellerModal').style.display='none'" style="position:absolute;top:16px;right:16px;border:0;background:#f1f5f9;border-radius:999px;width:32px;height:32px;font-size:18px;cursor:pointer;color:#334155">✕</button>
+      <div id="sellerModalContent"></div>
+    </div>`;
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.style.display='none';});
+    document.body.appendChild(modal);
+  }
+  $('sellerModalContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <img src="${profilePic}" onerror="this.src='${img(shopName)}'" style="width:64px;height:64px;border-radius:20px;object-fit:cover;border:3px solid #eef2f7;box-shadow:0 8px 18px rgba(15,23,42,.1)">
+      <div>
+        <div style="font-size:20px;font-weight:900;color:#071427">${safe(shopName)}</div>
+        <span style="padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800;background:${status==='Confirmed'?'#dcfce7':'#fff7ed'};color:${status==='Confirmed'?'#15803d':'#c2410c'}">${status}</span>
+      </div>
+    </div>
+    <div style="display:grid;gap:12px">
+      ${row('📧','Email',email)}
+      ${row('📱','Phone',phone)}
+      ${row('📍','District',district)}
+      ${row('🏠','Address',address)}
+      ${row('📅','Signup Date',signupDate)}
+    </div>`;
+  modal.style.display='flex';
+  function row(icon,label,val){return`<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:#f8fafc;border-radius:16px"><span style="font-size:18px">${icon}</span><div><div style="font-size:11px;color:#64748b;font-weight:800;margin-bottom:2px">${label}</div><div style="font-size:14px;font-weight:700;color:#1e293b">${safe(val)}</div></div></div>`}
 }
 function bindSellerTabs(){
   document.querySelectorAll('[data-seller-filter]').forEach(btn=>{

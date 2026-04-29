@@ -183,23 +183,23 @@ const $=id=>document.getElementById(id); const todayStart=new Date();todayStart.
 function setText(id,v){if($(id))$(id).textContent=v} function badge(s){s=String(s||'').toLowerCase(); if(s.includes('paid')||s.includes('active')||s.includes('resolve'))return'paid'; if(s.includes('trial')||s.includes('pending')||s.includes('process'))return'trial'; return'expired'} function orderCls(s){s=String(s||'').toLowerCase(); if(s.includes('deliver')||s.includes('complete'))return'delivered'; if(s.includes('cancel'))return'cancelled'; if(s.includes('pending'))return'pending'; return'processing'}
 function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(charts[id])charts[id].destroy(); charts[id]=new Chart(el,config)} const common={responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef2f7'}},x:{grid:{display:false}}}};
 async function count(table,fn){let q=sb.from(table).select('*',{count:'exact',head:true}); if(fn)q=fn(q); const{count,error}=await q; if(error){console.warn(table,error.message);return 0} return count||0}
-async function loadCounts(){const total=await count('customers'); const active=total; const totalOrders=await count('orders'); const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString())); const pending=0; setText('totalSellers',total);setText('activeSellers',active);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',pending)}
+async function loadCounts(){const verified=await count('verified_sellers'); const unverified=await count('unverified_sellers'); const total=verified+unverified; const totalOrders=await count('orders'); const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString())); setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
 async function loadSellers(){
-  const {data,error}=await sb.from('customers').select('*').order('created_at',{ascending:false}).limit(100);
-  if(error){$('sellerRows').innerHTML=`<tr><td colspan="6">${error.message}</td></tr>`;return[]}
-  const sellers=data||[];
-  const isConfirmed=s=>true;
-  const pending=sellers.filter(s=>!isConfirmed(s));
-  const confirmed=sellers.filter(isConfirmed);
-  const convertedToday=confirmed.filter(s=>{let d=s.confirmed_at||s.email_confirmed_at||s.updated_at;return d&&new Date(d)>=todayStart}).length;
-  setText('confirmedSellersCount',confirmed.length);setText('pendingSellersCount',pending.length);setText('pendingVerification',pending.length);setText('convertedTodayCount',convertedToday);
-  window.__allSellers=sellers; window.__sellerFilter='all';
-  renderSellerTable(sellers);
-  const recentRows=confirmed.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.business_name||s.email)}">${safe(s.name||s.business_name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders_count||s.total_orders,'-')}</td><td><span class="badge paid">Confirmed</span></td></tr>`).join('')||'<tr><td colspan="4">No confirmed sellers found</td></tr>';
+  const {data:vData,error:vErr}=await sb.from('verified_sellers').select('*').order('created_at',{ascending:false}).limit(100);
+  const {data:uData,error:uErr}=await sb.from('unverified_sellers').select('*').order('created_at',{ascending:false}).limit(100);
+  if(vErr){$('sellerRows').innerHTML=`<tr><td colspan="6">${vErr.message}</td></tr>`;return[]}
+  const verified=(vData||[]).map(s=>({...s,_status:'confirmed'}));
+  const unverified=(uData||[]).map(s=>({...s,_status:'pending'}));
+  const allSellers=[...verified,...unverified];
+  const convertedToday=verified.filter(s=>{let d=s.verified_at||s.created_at;return d&&new Date(d)>=todayStart}).length;
+  setText('confirmedSellersCount',verified.length);setText('pendingSellersCount',unverified.length);setText('pendingVerification',unverified.length);setText('convertedTodayCount',convertedToday);
+  window.__allSellers=allSellers; window.__sellerFilter='all';
+  renderSellerTable(allSellers);
+  const recentRows=verified.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.email)}">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,'-')}</td><td><span class="badge paid">Verified</span></td></tr>`).join('')||'<tr><td colspan="4">No verified sellers found</td></tr>';
   if($('recentSellerRows'))$('recentSellerRows').innerHTML=recentRows;
-  renderTop(confirmed.length?confirmed:sellers); drawDistrict(sellers); bindSellerTabs(); return sellers
+  renderTop(verified.length?verified:allSellers); drawDistrict(allSellers); bindSellerTabs(); return allSellers
 }
-function sellerStatus(s){return 'Confirmed';}
+function sellerStatus(s){return s._status==='confirmed'?'Confirmed':'Pending';}
 function renderSellerTable(list){
   const rows=(list||[]).map(s=>{const name=s.name||s.business_name||s.store_name||s.email||'Unnamed Seller'; const email=s.email||s.mobile||s.phone||'-'; const status=sellerStatus(s); const phone=String(s.mobile||s.phone||'').replace(/[^0-9]/g,''); const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+name+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'#'; return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}"><td><div class="seller-row"><img class="seller-img" src="${img(name)}">${safe(name)}</div></td><td>${safe(email)}</td><td>${safe(s.city)}</td><td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td><td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td><td><div class="action-row"><a class="tiny-btn" href="mailto:${s.email||''}?subject=Verify your MySellerDesk account">Resend Email</a><a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a><button class="tiny-btn done" type="button">Contacted</button></div></td></tr>`}).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
   if($('sellerRows'))$('sellerRows').innerHTML=rows;

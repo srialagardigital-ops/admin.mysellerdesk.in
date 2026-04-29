@@ -185,22 +185,27 @@ function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(chart
 async function count(table,fn){let q=sb.from(table).select('*',{count:'exact',head:true}); if(fn)q=fn(q); const{count,error}=await q; if(error){console.warn(table,error.message);return 0} return count||0}
 async function loadCounts(){const {data:cnt}=await sb.rpc('get_seller_counts');const verified=(cnt&&cnt.verified_sellers)||0;const unverified=(cnt&&cnt.unverified_sellers)||0;const total=verified+unverified;const totalOrders=await count('orders');const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
 async function loadSellers(){
-  const {data:sData,error:sErr}=await sb.from('settings').select('user_id,shop_name,phone,district,created_at').order('created_at',{ascending:false}).limit(100);
-  const {data:cntData}=await sb.rpc('get_seller_counts');
-  if(sErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${sErr.message}</td></tr>`;return[]}
-  const verifiedCount=(cntData&&cntData.verified_sellers)||0;
-  const unverifiedCount=(cntData&&cntData.unverified_sellers)||0;
-  const allSellers=(sData||[]).map((s,i)=>({
-    ...s,
-    name:s.shop_name,
-    city:s.district,
-    email:'',
-    _status: i < verifiedCount ? 'confirmed' : 'pending'
+  const [{data:authData,error:authErr},{data:sData,error:sErr}]=await Promise.all([
+    sb.rpc('get_seller_details'),
+    sb.from('settings').select('user_id,shop_name,phone,district,address,created_at')
+  ]);
+  if(authErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${authErr.message}</td></tr>`;return[]}
+  const settingsMap={};
+  (sData||[]).forEach(s=>{settingsMap[s.user_id]=s;});
+  const allSellers=(authData||[]).map(u=>({
+    user_id:u.user_id,
+    name:(settingsMap[u.user_id]&&settingsMap[u.user_id].shop_name)||u.email,
+    email:u.email,
+    phone:(settingsMap[u.user_id]&&settingsMap[u.user_id].phone)||'',
+    city:(settingsMap[u.user_id]&&settingsMap[u.user_id].district)||'-',
+    created_at:u.created_at,
+    _status:u.email_confirmed_at?'confirmed':'pending'
   }));
   const verified=allSellers.filter(s=>s._status==='confirmed');
   const unverified=allSellers.filter(s=>s._status==='pending');
   const convertedToday=verified.filter(s=>{let d=s.created_at;return d&&new Date(d)>=todayStart}).length;
   setText('confirmedSellersCount',verified.length);setText('pendingSellersCount',unverified.length);setText('pendingVerification',unverified.length);setText('convertedTodayCount',convertedToday);
+  setText('totalSellers',allSellers.length);setText('activeSellers',verified.length);
   window.__allSellers=allSellers; window.__sellerFilter='all';
   renderSellerTable(allSellers);
   const recentRows=verified.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.email)}">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,'-')}</td><td><span class="badge paid">Verified</span></td></tr>`).join('')||'<tr><td colspan="4">No verified sellers found</td></tr>';

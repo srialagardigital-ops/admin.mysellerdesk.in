@@ -231,7 +231,16 @@ function renderSellerTable(list){
       <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${idx})" data-seller-idx="${idx}">
         <img class="seller-img" src="${profilePic}" onerror="this.src='${img(shopName)}'">${safe(shopName)}
       </div></td>
-      <td>${safe(displayName)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1e293b">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#eef2ff;border-radius:6px;flex-shrink:0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+          ${safe(s.email||'-')}
+        </div>
+        ${phone?`<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;margin-top:5px;font-weight:600">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#f0fdf4;border-radius:6px;flex-shrink:0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.07 3.4 2 2 0 0 1 3 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15z"/></svg></span>
+          ${phone}
+        </div>`:''}
+      </td>
       <td>${safe(district)}</td>
       <td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td>
       <td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td>

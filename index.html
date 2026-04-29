@@ -185,31 +185,22 @@ function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(chart
 async function count(table,fn){let q=sb.from(table).select('*',{count:'exact',head:true}); if(fn)q=fn(q); const{count,error}=await q; if(error){console.warn(table,error.message);return 0} return count||0}
 async function loadCounts(){const {data:cnt}=await sb.rpc('get_seller_counts');const verified=(cnt&&cnt.verified_sellers)||0;const unverified=(cnt&&cnt.unverified_sellers)||0;const total=verified+unverified;const totalOrders=await count('orders');const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
 async function loadSellers(){
-  const [{data:authData,error:authErr},{data:sData,error:sErr}]=await Promise.all([
-    sb.rpc('get_seller_details'),
-    sb.from('settings').select('user_id,shop_name,phone,mobile,mobile_number,whatsapp,district,address,created_at')
-  ]);
+  const {data:authData,error:authErr}=await sb.rpc('get_seller_details');
   if(authErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${authErr.message}</td></tr>`;return[]}
-  const settingsMap={};
-  (sData||[]).forEach(s=>{settingsMap[s.user_id]=s;});
-  const allSellers=(authData||[]).map(u=>{
-    const st=settingsMap[u.user_id]||{};
-    const rawPhone=st.phone||'';
-    const rawShop=st.shop_name||'';
-    return {
-      user_id:u.user_id,
-      shop_name:rawShop,
-      name:rawShop||u.email,
-      email:u.email,
-      phone:rawPhone,
-      mobile:rawPhone,
-      city:st.district||'-',
-      district:st.district||'-',
-      address:st.address||'-',
-      created_at:u.created_at,
-      _status:u.email_confirmed_at?'confirmed':'pending'
-    };
-  });
+  const allSellers=(authData||[]).map(u=>({
+    user_id:u.user_id,
+    shop_name:u.shop_name||'',
+    name:u.shop_name&&u.shop_name.trim()?u.shop_name:u.email,
+    email:u.email,
+    phone:u.phone||'',
+    mobile:u.phone||'',
+    city:u.district||'-',
+    district:u.district||'-',
+    address:u.address||'-',
+    pincode:u.pincode||'',
+    created_at:u.created_at,
+    _status:u.email_confirmed_at?'confirmed':'pending'
+  }));
   const verified=allSellers.filter(s=>s._status==='confirmed');
   const unverified=allSellers.filter(s=>s._status==='pending');
   const convertedToday=verified.filter(s=>{let d=s.created_at;return d&&new Date(d)>=todayStart}).length;

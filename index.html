@@ -184,29 +184,39 @@ function setText(id,v){if($(id))$(id).textContent=v} function badge(s){s=String(
 function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(charts[id])charts[id].destroy(); charts[id]=new Chart(el,config)} const common={responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef2f7'}},x:{grid:{display:false}}}};
 async function count(table,fn){let q=sb.from(table).select('*',{count:'exact',head:true}); if(fn)q=fn(q); const{count,error}=await q; if(error){console.warn(table,error.message);return 0} return count||0}
 async function loadCounts(){
-  const total=await count('profiles',q=>q.eq('role','seller'));
-  const totalOrders=await count('orders');
-  const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));
-  const {data:sellers}=await sb.from('profiles').select('id').eq('role','seller');
-  const sellerIds=(sellers||[]).map(s=>s.id);
-  let active=0,pending=0;
-  if(sellerIds.length){
-    const {data:authData}=await sb.from('profiles').select('id,plan').eq('role','seller');
-    const {data:confirmedData}=await sb.rpc('get_confirmed_sellers').catch(()=>({data:null}));
-    active=confirmedData||0;
-    pending=total-active;
-  }
-  setText('totalSellers',total);setText('activeSellers',active);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',pending)
+  try{
+    const confirmed=await count('profiles',q=>q.eq('role','seller'));
+    const pending=await count('pending_sellers');
+    const total=confirmed+pending;
+    const totalOrders=await count('orders');
+    const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));
+    setText('totalSellers',total);
+    setText('activeSellers',confirmed);
+    setText('totalOrders',totalOrders);
+    setText('ordersToday',orders);
+    setText('ordersToday2',orders);
+    setText('pendingVerification',pending);
+    console.log('Counts:',{total,confirmed,pending,totalOrders,orders});
+  }catch(e){console.error('loadCounts error:',e);}
 }
 async function loadSellers(){
   const {data,error}=await sb.from('profiles').select('*').eq('role','seller').order('created_at',{ascending:false}).limit(100);
+  const {data:pendingData}=await sb.from('pending_sellers').select('*').order('created_at',{ascending:false}).limit(100);
   if(error){$('sellerRows').innerHTML=`<tr><td colspan="6">${error.message}</td></tr>`;return[]}
-  const sellers=data||[];
-  const isConfirmed=s=>true;
+  const confirmedSellers=(data||[]).map(s=>({...s,_status:'confirmed'}));
+  const pendingSellers=(pendingData||[]).map(s=>({...s,_status:'pending'}));
+  const sellers=[...confirmedSellers,...pendingSellers];
+  const isConfirmed=s=>s._status==='confirmed';
   const pending=sellers.filter(s=>!isConfirmed(s));
   const confirmed=sellers.filter(isConfirmed);
   const convertedToday=confirmed.filter(s=>{let d=s.confirmed_at||s.email_confirmed_at||s.updated_at;return d&&new Date(d)>=todayStart}).length;
-  setText('confirmedSellersCount',confirmed.length);setText('pendingSellersCount',pending.length);setText('pendingVerification',pending.length);setText('convertedTodayCount',convertedToday);
+  const confirmedCount=confirmedSellers.length;
+  const pendingCount=pendingSellers.length;
+  const convertedToday=confirmedSellers.filter(s=>{let d=s.updated_at||s.created_at;return d&&new Date(d)>=todayStart}).length;
+  setText('confirmedSellersCount',confirmedCount);
+  setText('pendingSellersCount',pendingCount);
+  setText('pendingVerification',pendingCount);
+  setText('convertedTodayCount',convertedToday);
   window.__allSellers=sellers; window.__sellerFilter='all';
   renderSellerTable(sellers);
   const recentRows=confirmed.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.business_name||s.email)}">${safe(s.name||s.business_name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders_count||s.total_orders,'-')}</td><td><span class="badge paid">Confirmed</span></td></tr>`).join('')||'<tr><td colspan="4">No confirmed sellers found</td></tr>';

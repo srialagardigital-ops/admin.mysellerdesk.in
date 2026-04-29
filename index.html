@@ -187,23 +187,29 @@ async function loadCounts(){const {data:cnt}=await sb.rpc('get_seller_counts');c
 async function loadSellers(){
   const [{data:authData,error:authErr},{data:sData,error:sErr}]=await Promise.all([
     sb.rpc('get_seller_details'),
-    sb.from('settings').select('user_id,shop_name,phone,district,address,created_at')
+    sb.from('settings').select('user_id,shop_name,phone,mobile,mobile_number,whatsapp,district,address,created_at')
   ]);
   if(authErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${authErr.message}</td></tr>`;return[]}
   const settingsMap={};
   (sData||[]).forEach(s=>{settingsMap[s.user_id]=s;});
-  const allSellers=(authData||[]).map(u=>({
-    user_id:u.user_id,
-    shop_name:(settingsMap[u.user_id]&&settingsMap[u.user_id].shop_name)||'',
-    name:(settingsMap[u.user_id]&&settingsMap[u.user_id].shop_name)||u.email,
-    email:u.email,
-    phone:(settingsMap[u.user_id]&&settingsMap[u.user_id].phone)||'',
-    city:(settingsMap[u.user_id]&&settingsMap[u.user_id].district)||'-',
-    district:(settingsMap[u.user_id]&&settingsMap[u.user_id].district)||'-',
-    address:(settingsMap[u.user_id]&&settingsMap[u.user_id].address)||'-',
-    created_at:u.created_at,
-    _status:u.email_confirmed_at?'confirmed':'pending'
-  }));
+  const allSellers=(authData||[]).map(u=>{
+    const st=settingsMap[u.user_id]||{};
+    const rawPhone=st.phone||'';
+    const rawShop=st.shop_name||'';
+    return {
+      user_id:u.user_id,
+      shop_name:rawShop,
+      name:rawShop||u.email,
+      email:u.email,
+      phone:rawPhone,
+      mobile:rawPhone,
+      city:st.district||'-',
+      district:st.district||'-',
+      address:st.address||'-',
+      created_at:u.created_at,
+      _status:u.email_confirmed_at?'confirmed':'pending'
+    };
+  });
   const verified=allSellers.filter(s=>s._status==='confirmed');
   const unverified=allSellers.filter(s=>s._status==='pending');
   const convertedToday=verified.filter(s=>{let d=s.created_at;return d&&new Date(d)>=todayStart}).length;
@@ -218,18 +224,20 @@ async function loadSellers(){
 function sellerStatus(s){return s._status==='confirmed'?'Confirmed':'Pending';}
 function renderSellerTable(list){
   const rows=(list||[]).map((s,idx)=>{
-    const shopName=s.shop_name||s.name||s.business_name||s.store_name||'Unnamed Shop';
+    const shopName=s.shop_name&&s.shop_name.trim()&&s.shop_name!==s.email?s.shop_name:(s.business_name||s.store_name||'');
+    const displayLabel=shopName||s.email||'Unnamed';
+    const avatarSeed=shopName||s.email||'Seller';
     const displayName=s.email||s.mobile||s.phone||'-';
     const email=s.email||'-';
     const status=sellerStatus(s);
-    const phone=String(s.mobile||s.phone||s.phone_number||'').replace(/[^0-9]/g,'');
+    const phone=String(s.phone||'').replace(/[^0-9]/g,'');
     const district=s.city||s.district||'-';
-    const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(shopName);
+    const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(avatarSeed);
     const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
     const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
     return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
       <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${idx})" data-seller-idx="${idx}">
-        <img class="seller-img" src="${profilePic}" onerror="this.src='${img(shopName)}'">${safe(shopName)}
+        <img class="seller-img" src="${profilePic}" onerror="this.src='${img(avatarSeed)}'">${safe(displayLabel)}
       </div></td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1e293b">

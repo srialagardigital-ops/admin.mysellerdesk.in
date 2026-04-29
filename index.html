@@ -91,7 +91,7 @@
   <div class="auth-card">
     <div class="auth-logo">MS</div>
     <h2>Admin Login</h2>
-    <p>Login pannina admin dashboard open aagum.</p>
+    
     <div id="authError" class="auth-error"></div>
     <form id="adminLoginForm">
       <div class="auth-field"><label>Email</label><input id="adminEmail" type="email" autocomplete="username" placeholder="Admin email" required></div>
@@ -378,26 +378,60 @@ function renderTop(sellers){
   if(window.lucide) lucide.createIcons();
 }
 
-function nav(){document.querySelectorAll('.menu a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));a.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.style.display='none');const page=$(a.dataset.page);if(page)page.style.display='block';if(window.lucide)lucide.createIcons();}))}
+function nav(){
+  const saved=sessionStorage.getItem('activePage')||'dashboardPage';
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  const sp=$(saved);if(sp)sp.style.display='block';
+  document.querySelectorAll('.menu a').forEach(a=>{
+    a.classList.toggle('active',a.dataset.page===saved);
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+      const page=$(a.dataset.page);if(page)page.style.display='block';
+      sessionStorage.setItem('activePage',a.dataset.page);
+      if(window.lucide)lucide.createIcons();
+    });
+  });
+}
 async function init(){
   nav();
   bindSellerTabs();
   if(window.lucide)lucide.createIcons();
   if(SUPABASE_URL.includes('PASTE_')||SUPABASE_ANON_KEY.includes('PASTE_')){
-    console.warn('Supabase URL and anon key paste pannunga. No sample data will be shown.');
-    ['sellerRows','recentSellerRows','recentOrderRows','paymentRows','ticketRows'].forEach(id=>{ const el=$(id); if(el) el.innerHTML='<tr><td colspan="6">Supabase connect pannina real data varum.</td></tr>'; });
-    if($('liveFeed')) $('liveFeed').innerHTML='<div class="ticket"><b>Waiting for Supabase</b><p>URL and anon key paste pannunga.</p></div>';
-    if($('dashTopList')) $('dashTopList').innerHTML='<div class="ticket"><b>No seller data</b><p>Supabase connect pannina real data varum.</p></div>';
-    if($('leaderboard')) $('leaderboard').innerHTML='<div class="ticket"><b>No seller data</b><p>Supabase connect pannina real data varum.</p></div>';
+    console.warn('Supabase URL and anon key paste pannunga.');
     return;
   }
-  await loadCounts();
-  await loadSellers();
-  await loadOrders();
-  await loadSubs();
-  await loadActivity();
-  await loadTickets();
-  setInterval(async()=>{await loadCounts();await loadActivity();},30000)
+
+  // Speed: load critical first, rest in background
+  await Promise.all([loadCounts(), loadActivity()]);
+  Promise.all([loadSellers(), loadOrders(), loadSubs(), loadTickets()]);
+
+  // Realtime: activity_logs -> instant Live Activity + counts update
+  sb.channel('live-activity')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'activity_logs'},()=>{
+      loadActivity();
+      loadCounts();
+    })
+    .subscribe();
+
+  // Realtime: orders table -> counts update instantly
+  sb.channel('live-orders')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'orders'},()=>{
+      loadCounts();
+    })
+    .subscribe();
+
+  // Realtime: profiles/auth -> total sellers count update
+  sb.channel('live-profiles')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
+      loadCounts();
+    })
+    .subscribe();
+
+  // Fallback poll every 30s
+  setInterval(()=>{ loadCounts(); loadActivity(); }, 30000);
 }
 startAuthGate();
 </script>

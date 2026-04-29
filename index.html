@@ -183,15 +183,23 @@ const $=id=>document.getElementById(id); const todayStart=new Date();todayStart.
 function setText(id,v){if($(id))$(id).textContent=v} function badge(s){s=String(s||'').toLowerCase(); if(s.includes('paid')||s.includes('active')||s.includes('resolve'))return'paid'; if(s.includes('trial')||s.includes('pending')||s.includes('process'))return'trial'; return'expired'} function orderCls(s){s=String(s||'').toLowerCase(); if(s.includes('deliver')||s.includes('complete'))return'delivered'; if(s.includes('cancel'))return'cancelled'; if(s.includes('pending'))return'pending'; return'processing'}
 function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(charts[id])charts[id].destroy(); charts[id]=new Chart(el,config)} const common={responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef2f7'}},x:{grid:{display:false}}}};
 async function count(table,fn){let q=sb.from(table).select('*',{count:'exact',head:true}); if(fn)q=fn(q); const{count,error}=await q; if(error){console.warn(table,error.message);return 0} return count||0}
-async function loadCounts(){const verified=await count('verified_sellers'); const unverified=await count('unverified_sellers'); const total=verified+unverified; const totalOrders=await count('orders'); const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString())); setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
+async function loadCounts(){const {data:cnt}=await sb.rpc('get_seller_counts');const verified=(cnt&&cnt.verified_sellers)||0;const unverified=(cnt&&cnt.unverified_sellers)||0;const total=verified+unverified;const totalOrders=await count('orders');const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
 async function loadSellers(){
-  const {data:vData,error:vErr}=await sb.from('verified_sellers').select('*').order('created_at',{ascending:false}).limit(100);
-  const {data:uData,error:uErr}=await sb.from('unverified_sellers').select('*').order('created_at',{ascending:false}).limit(100);
-  if(vErr){$('sellerRows').innerHTML=`<tr><td colspan="6">${vErr.message}</td></tr>`;return[]}
-  const verified=(vData||[]).map(s=>({...s,_status:'confirmed'}));
-  const unverified=(uData||[]).map(s=>({...s,_status:'pending'}));
-  const allSellers=[...verified,...unverified];
-  const convertedToday=verified.filter(s=>{let d=s.verified_at||s.created_at;return d&&new Date(d)>=todayStart}).length;
+  const {data:sData,error:sErr}=await sb.from('settings').select('user_id,shop_name,phone,district,created_at').order('created_at',{ascending:false}).limit(100);
+  const {data:cntData}=await sb.rpc('get_seller_counts');
+  if(sErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${sErr.message}</td></tr>`;return[]}
+  const verifiedCount=(cntData&&cntData.verified_sellers)||0;
+  const unverifiedCount=(cntData&&cntData.unverified_sellers)||0;
+  const allSellers=(sData||[]).map((s,i)=>({
+    ...s,
+    name:s.shop_name,
+    city:s.district,
+    email:'',
+    _status: i < verifiedCount ? 'confirmed' : 'pending'
+  }));
+  const verified=allSellers.filter(s=>s._status==='confirmed');
+  const unverified=allSellers.filter(s=>s._status==='pending');
+  const convertedToday=verified.filter(s=>{let d=s.created_at;return d&&new Date(d)>=todayStart}).length;
   setText('confirmedSellersCount',verified.length);setText('pendingSellersCount',unverified.length);setText('pendingVerification',unverified.length);setText('convertedTodayCount',convertedToday);
   window.__allSellers=allSellers; window.__sellerFilter='all';
   renderSellerTable(allSellers);

@@ -394,15 +394,33 @@ async function loadActivity(){
 }
 async function loadTickets(){
   const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
-  if(error){console.error('Tickets error:',error.message);return;}
+  if(error){console.error('Tickets error:',error.message);
+    ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small" style="color:#b91c1c">Error loading tickets: '+error.message+'</p>';});
+    if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="5" style="color:#b91c1c">'+error.message+'</td></tr>';
+    return;
+  }
   const arr=data||[];
+  if(!arr.length){
+    ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small">No tickets found</p>';});
+    if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="5">No tickets found</td></tr>';
+    setText('openTickets',0);setText('progressTickets',0);setText('resolvedTickets',0);
+    return;
+  }
 
-  // Fetch seller names from settings table using seller_id or user_id
+  // Fetch seller names — try settings table first, then profiles table as fallback
   const uids=[...new Set(arr.map(t=>t.seller_id||t.user_id).filter(Boolean))];
   let sellerNameMap={};
   if(uids.length){
+    // 1. Try settings table (shop_name)
     const{data:sdata}=await sb.from('settings').select('user_id,shop_name').in('user_id',uids);
-    (sdata||[]).forEach(s=>{sellerNameMap[s.user_id]=s.shop_name;});
+    (sdata||[]).forEach(s=>{ if(s.shop_name) sellerNameMap[s.user_id]=s.shop_name; });
+
+    // 2. For any uid still missing, try profiles table (full_name or email)
+    const missing=uids.filter(u=>!sellerNameMap[u]);
+    if(missing.length){
+      const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
+      (pdata||[]).forEach(p=>{ sellerNameMap[p.id]=p.full_name||p.email||p.id; });
+    }
   }
   const getSellerName=t=>{
     const uid=t.seller_id||t.user_id;

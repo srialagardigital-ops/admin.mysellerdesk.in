@@ -334,9 +334,12 @@ async function loadOrders(){
   setText('cancelledOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('cancel')).length);
   $('recentOrderRows').innerHTML=arr.map(o=>{
     let displayDate = '-';
-    if(o.date && o.date !== '-') displayDate = o.date;
-    else if(o.created_at) displayDate = new Date(o.created_at).toLocaleDateString('en-IN');
-    else if(o.id){const ts=parseInt((o.id||'').split('_')[1]);if(ts>1000000000000)displayDate=new Date(ts).toLocaleDateString('en-IN');}
+    const fmtDT = d => d.toLocaleDateString('en-IN') + ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    if(o.date && o.date !== '-'){
+      if(o.created_at) displayDate = o.date + ' ' + new Date(o.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+      else { const ts=parseInt((o.id||'').split('_')[1]); displayDate = o.date + (ts>1000000000000?' '+new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):''); }
+    } else if(o.created_at) displayDate = fmtDT(new Date(o.created_at));
+    else if(o.id){const ts=parseInt((o.id||'').split('_')[1]);if(ts>1000000000000)displayDate=fmtDT(new Date(ts));}
     return `<tr><td class="order-id">${safe(o.order_id||o.id)}</td><td>${safe(shopMap[o.user_id]||o.user_id,'Seller')}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
   }).join('')||'<tr><td colspan="5">No orders found</td></tr>';
   return arr

@@ -180,7 +180,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 const $=id=>document.getElementById(id); const todayStart=new Date();todayStart.setHours(0,0,0,0); const monthStart=new Date();monthStart.setDate(1);monthStart.setHours(0,0,0,0); const rupee=n=>'₹'+Number(n||0).toLocaleString('en-IN'); const safe=(v,f='-')=>(v===null||v===undefined||v==='')?f:v; const img=s=>`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s||'Seller')}`; let charts={};
-function setText(id,v){if($(id))$(id).textContent=v} function badge(s){s=String(s||'').toLowerCase(); if(s.includes('paid')||s.includes('active')||s.includes('resolve'))return'paid'; if(s.includes('trial')||s.includes('pending')||s.includes('process'))return'trial'; return'expired'} function orderCls(s){s=String(s||'').toLowerCase(); if(s.includes('deliver')||s.includes('complete'))return'delivered'; if(s.includes('cancel'))return'cancelled'; if(s.includes('pending'))return'pending'; return'processing'}
+function setText(id,v){if($(id))$(id).textContent=v}
+function parseDMY(s){if(!s)return 0;const p=String(s).split('/');if(p.length===3)return new Date(p[2],p[1]-1,p[0]).getTime();return 0} function badge(s){s=String(s||'').toLowerCase(); if(s.includes('paid')||s.includes('active')||s.includes('resolve'))return'paid'; if(s.includes('trial')||s.includes('pending')||s.includes('process'))return'trial'; return'expired'} function orderCls(s){s=String(s||'').toLowerCase(); if(s.includes('deliver')||s.includes('complete'))return'delivered'; if(s.includes('cancel'))return'cancelled'; if(s.includes('pending'))return'pending'; return'processing'}
 function chart(id,config){const el=$(id); if(!el||!window.Chart)return; if(charts[id])charts[id].destroy(); charts[id]=new Chart(el,config)} const common={responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef2f7'}},x:{grid:{display:false}}}};
 async function count(table,fn){let q=sb.from(table).select('id',{count:'exact',head:false}); if(fn)q=fn(q); const{data,count:c,error}=await q; if(error){console.error('COUNT ERROR ['+table+']:', error.message);return 0} return c!==null?c:(data?data.length:0)}
 async function loadCounts(){const {data:cnt,error:cntErr}=await sb.rpc('get_seller_counts'); if(cntErr) console.error('RPC ERROR:', cntErr.message); const verified=(cnt&&cnt.verified_sellers)||0;const unverified=(cnt&&cnt.unverified_sellers)||0;const total=verified+unverified;const totalOrders=await count('orders');const orders=await count('orders',q=>q.gte('created_at',todayStart.toISOString()));setText('totalSellers',total);setText('activeSellers',verified);setText('totalOrders',totalOrders);setText('ordersToday',orders);setText('ordersToday2',orders);setText('pendingVerification',unverified)}
@@ -315,9 +316,15 @@ function bindSellerTabs(){
   });
 }
 async function loadOrders(){
-  const{data,error}=await sb.from('orders').select('id,order_id,created_at,status,amount,user_id').order('created_at',{ascending:false}).limit(20);
+  const{data,error}=await sb.from('orders').select('id,order_id,created_at,date,status,amount,user_id').order('created_at',{ascending:false}).limit(20);
   if(error){$('recentOrderRows').innerHTML=`<tr><td colspan="5">${error.message}</td></tr>`;return[]}
-  const arr=data||[];
+  // Sort by date field (dd/mm/yyyy) first, fallback to created_at
+  const getOrderTime = o => {
+    if(o.date && o.date!=='-') return parseDMY(o.date);
+    if(o.created_at) return new Date(o.created_at).getTime();
+    const ts=parseInt((o.id||'').split('_')[1]); return ts>1000000000000?ts:0;
+  };
+  const arr=(data||[]).sort((a,b)=>getOrderTime(b)-getOrderTime(a));
   // Fetch shop names separately from settings
   const uids=[...new Set(arr.map(o=>o.user_id).filter(Boolean))];
   let shopMap={};
@@ -325,7 +332,13 @@ async function loadOrders(){
   setText('processingOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('process')).length);
   setText('deliveredOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('deliver')||String(o.status||'').toLowerCase().includes('complete')).length);
   setText('cancelledOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('cancel')).length);
-  $('recentOrderRows').innerHTML=arr.map(o=>`<tr><td class="order-id">${safe(o.order_id||o.id)}</td><td>${safe(shopMap[o.user_id]||o.user_id,'Seller')}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${o.created_at?new Date(o.created_at).toLocaleDateString('en-IN'):'-'}</td></tr>`).join('')||'<tr><td colspan="5">No orders found</td></tr>';
+  $('recentOrderRows').innerHTML=arr.map(o=>{
+    let displayDate = '-';
+    if(o.date && o.date !== '-') displayDate = o.date;
+    else if(o.created_at) displayDate = new Date(o.created_at).toLocaleDateString('en-IN');
+    else if(o.id){const ts=parseInt((o.id||'').split('_')[1]);if(ts>1000000000000)displayDate=new Date(ts).toLocaleDateString('en-IN');}
+    return `<tr><td class="order-id">${safe(o.order_id||o.id)}</td><td>${safe(shopMap[o.user_id]||o.user_id,'Seller')}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
+  }).join('')||'<tr><td colspan="5">No orders found</td></tr>';
   return arr
 }
 async function loadSubs(){const{data,error}=await sb.from('subscriptions').select('user_id,plan_type,amount,status,payment_date,expiry_date').order('payment_date',{ascending:false}).limit(100); if(error){drawPlans([0,0,0]);return[]} const paid=(data||[]).filter(x=>String(x.status||'').toLowerCase().includes('paid')||String(x.status||'').toLowerCase().includes('active')); const monthly=paid.filter(x=>String(x.plan_type||'').toLowerCase().includes('month')); const yearly=paid.filter(x=>String(x.plan_type||'').toLowerCase().includes('year')); const rev=paid.filter(x=>x.payment_date&&new Date(x.payment_date)>=monthStart).reduce((s,x)=>s+Number(x.amount||0),0); setText('paidSellers',paid.length);setText('monthlyPaid',monthly.length);setText('yearlyPaid',yearly.length);setText('revenueThisMonth',rupee(rev)); drawPlans([0,monthly.length,yearly.length]); $('paymentRows').innerHTML=(data||[]).slice(0,10).map(x=>`<tr><td>${safe(x.user_id,'Seller')}</td><td>${safe(x.plan_type)}</td><td>${rupee(x.amount)}</td><td><span class="badge ${badge(x.status)}">${safe(x.status)}</span></td><td>${x.expiry_date?new Date(x.expiry_date).toLocaleDateString('en-IN'):'-'}</td></tr>`).join('')||'<tr><td colspan="5">No subscription data</td></tr>'}

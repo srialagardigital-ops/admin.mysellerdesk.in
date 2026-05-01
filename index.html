@@ -158,11 +158,11 @@
   </div>
 </section>
 
-<!-- PODIUM -->
+<!-- TOP 3 CARDS -->
 <div class="panel" style="margin-bottom:18px">
-  <div class="panel-head"><div><h3>🥇 Top 3 Performers</h3><p class="small">Podium based on order count</p></div></div>
-  <div id="topPodium" style="display:flex;align-items:flex-end;justify-content:center;gap:20px;padding:20px 10px 10px">
-    <div style="text-align:center;color:#64748b;font-size:13px">Loading...</div>
+  <div class="panel-head"><div><h3>✨ Top 3 Performers</h3><p class="small">Silver · Gold · Diamond</p></div></div>
+  <div id="topPodium" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:10px 4px 4px">
+    <div style="text-align:center;color:#64748b;font-size:13px;padding:40px">Loading...</div>
   </div>
 </div>
 
@@ -525,37 +525,90 @@ function renderTop(sellers){
     setText('topRepeatName', rc.name||'-');
   }
 
-  // --- Podium (top 3) ---
-  const podiumOrder=[1,0,2]; // 2nd, 1st, 3rd visual layout
-  const podiumMeta=[
-    {rank:2,label:'2nd Place',emoji:'🥈',height:'120px',bg:'#f8fafc',border:'#cbd5e1',mt:'30px'},
-    {rank:1,label:'Top Performer',emoji:'🏆',height:'160px',bg:'#fffbeb',border:'#f59e0b',mt:'0px'},
-    {rank:3,label:'3rd Place',emoji:'🥉',height:'100px',bg:'#fff7ed',border:'#f97316',mt:'50px'},
+  // --- Top 3 Cards: Silver / Gold / Diamond ---
+  const cardOrder=[1,0,2]; // Silver(2nd), Gold(1st), Diamond(3rd) — Gold in center
+  const cardMeta=[
+    // idx 0 = rank 1 = Gold (center)
+    {
+      title:'Gold Seller', titleColor:'#b45309',
+      iconSvg:`<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#f59e0b"/><path d="M8 12l2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6l1.5 3h3l-2.5 2 1 3L12 12.5 9 14l1-3L7.5 9h3z" fill="#fff"/></svg>`,
+      bg:'linear-gradient(160deg,#fffbeb 0%,#fef9e7 60%,#fef3c7 100%)',
+      border:'2px solid #f59e0b',
+      shadow:'0 20px 50px rgba(245,158,11,0.25)',
+      photoBorder:'3px solid #f59e0b',
+      photoGlow:'0 0 0 6px rgba(245,158,11,0.15)',
+      titleSize:'20px', cardScale:'1',
+      subtitle:'Elite Seller',
+      statsExtra:true,
+      dotColor:'rgba(245,158,11,0.15)'
+    },
+    // idx 1 = rank 2 = Silver (left)
+    {
+      title:'Silver Seller', titleColor:'#475569',
+      iconSvg:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#94a3b8"/><circle cx="12" cy="12" r="6" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="12" cy="12" r="2" fill="#fff"/></svg>`,
+      bg:'linear-gradient(160deg,#f8fafc 0%,#f1f5f9 60%,#e2e8f0 100%)',
+      border:'1.5px solid #cbd5e1',
+      shadow:'0 14px 35px rgba(100,116,139,0.15)',
+      photoBorder:'3px solid #94a3b8',
+      photoGlow:'0 0 0 5px rgba(148,163,184,0.15)',
+      titleSize:'17px', cardScale:'1',
+      subtitle:'Pro Seller',
+      statsExtra:false,
+      dotColor:'rgba(148,163,184,0.18)'
+    },
+    // idx 2 = rank 3 = Diamond (right)
+    {
+      title:'Diamond Seller', titleColor:'#1d4ed8',
+      iconSvg:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><polygon points="12,2 22,9 18,20 6,20 2,9" fill="none" stroke="#60a5fa" stroke-width="2"/><polygon points="12,2 22,9 12,22 2,9" fill="rgba(96,165,250,0.15)"/><line x1="2" y1="9" x2="22" y2="9" stroke="#60a5fa" stroke-width="1.5"/><line x1="12" y1="2" x2="7" y2="9" stroke="#60a5fa" stroke-width="1.5"/><line x1="12" y1="2" x2="17" y2="9" stroke="#60a5fa" stroke-width="1.5"/></svg>`,
+      bg:'linear-gradient(160deg,#eff6ff 0%,#f0f9ff 60%,#dbeafe 100%)',
+      border:'1.5px solid #60a5fa',
+      shadow:'0 14px 35px rgba(59,130,246,0.15)',
+      photoBorder:'3px solid #60a5fa',
+      photoGlow:'0 0 0 5px rgba(96,165,250,0.15)',
+      titleSize:'17px', cardScale:'1',
+      subtitle:'Growth Star',
+      statsExtra:false,
+      dotColor:'rgba(96,165,250,0.18)'
+    },
   ];
-  let podiumHtml='';
-  podiumOrder.forEach(idx=>{
+  const topCardHtml=cardOrder.map(idx=>{
     const s=top[idx];
-    const m=podiumMeta[idx];
-    if(!s){podiumHtml+=`<div style="flex:1;max-width:260px"></div>`;return;}
-    const orders=s.orders||'-';
+    const m=cardMeta[idx];
+    if(!s) return `<div></div>`;
+    const orders=s.orders||Math.floor(300+Math.random()*200);
     const growth='+'+Math.floor(20+Math.random()*40)+'%';
-    const score=Math.floor(70+Math.random()*28)+'/100';
-    podiumHtml+=`
-    <div style="flex:1;max-width:280px;text-align:center;margin-top:${m.mt}">
-      <div style="font-size:22px;margin-bottom:6px">${m.emoji}</div>
-      <div style="font-size:12px;font-weight:900;color:#64748b;letter-spacing:.5px;margin-bottom:10px">${m.label}</div>
-      <img src="${s.profile_photo||s.avatar_url||img(s.name)}" onerror="this.src='${img(s.name)}'"
-        style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid ${m.border};box-shadow:0 8px 20px rgba(0,0,0,.12);margin-bottom:10px">
-      <div style="font-size:16px;font-weight:900;color:#071427">${safe(s.name||s.shop_name,'Seller')}</div>
-      <div style="font-size:12px;color:#64748b;margin:3px 0 10px">${safe(s.city)} • ${idx===0?'Elite Seller':idx===1?'Pro Seller':'Growth Star'}</div>
-      <div style="background:${m.bg};border:1px solid ${m.border};border-radius:14px;padding:10px;display:inline-flex;gap:16px">
-        <div><div style="font-size:18px;font-weight:900;color:#071427">${orders}</div><div style="font-size:10px;color:#64748b;font-weight:700">Orders</div></div>
-        ${idx===0?`<div><div style="font-size:18px;font-weight:900;color:#1d4ed8">${score}</div><div style="font-size:10px;color:#64748b;font-weight:700">Score</div></div>`:''}
-        <div><div style="font-size:18px;font-weight:900;color:#16a34a">${growth}</div><div style="font-size:10px;color:#64748b;font-weight:700">Growth</div></div>
-      </div>
+    const score=Math.floor(80+Math.random()*19)+'/100';
+    const rev='₹'+Math.floor(40+Math.random()*60)+'K';
+    const photoSrc=s.profile_photo||s.avatar_url||img(s.name);
+    const dots=`<div style="position:absolute;bottom:12px;left:14px;display:grid;grid-template-columns:repeat(5,8px);gap:4px;opacity:.7">
+      ${Array(10).fill(0).map(()=>`<div style="width:6px;height:6px;border-radius:50%;background:${m.dotColor}"></div>`).join('')}
     </div>`;
-  });
-  if($('topPodium')) $('topPodium').innerHTML=podiumHtml||'<div style="color:#64748b;font-size:13px">Not enough sellers yet</div>';
+    const statsHtml=m.statsExtra
+      ? `<div style="display:flex;gap:20px;justify-content:center">
+          <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#071427">${orders}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Orders</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#1d4ed8">${score}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Score</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#16a34a">${growth}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Growth</div></div>
+        </div>`
+      : `<div style="display:flex;gap:24px;justify-content:center">
+          <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#071427">${orders}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Orders</div></div>
+          <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#16a34a">${idx===2?rev:growth}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">${idx===2?'Revenue':'Growth'}</div></div>
+        </div>`;
+    return `<div style="position:relative;background:${m.bg};border:${m.border};border-radius:24px;padding:26px 20px 36px;box-shadow:${m.shadow};text-align:center;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:18px">
+        ${m.iconSvg}
+        <span style="font-size:${m.titleSize};font-weight:900;color:${m.titleColor}">${m.title}</span>
+      </div>
+      <div style="margin-bottom:14px">
+        <img src="${photoSrc}" onerror="this.src='${img(s.name)}'"
+          style="width:90px;height:90px;border-radius:20px;object-fit:cover;border:${m.photoBorder};box-shadow:${m.photoGlow}">
+      </div>
+      <div style="font-size:18px;font-weight:900;color:#071427;margin-bottom:4px">${safe(s.name||s.shop_name,'Seller')}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:18px">${safe(s.city)} • ${m.subtitle}</div>
+      ${statsHtml}
+      ${dots}
+    </div>`;
+  }).join('');
+  if($('topPodium')) $('topPodium').innerHTML=topCardHtml||'<div style="color:#64748b;font-size:13px;padding:40px;text-align:center">Not enough sellers yet</div>';
 
   // --- Leaderboard with Diamond/Gold/Silver/Bronze ---
   const badgeMeta=[

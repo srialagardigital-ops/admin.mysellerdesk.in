@@ -288,6 +288,24 @@ async function loadCounts(){const {data:cnt,error:cntErr}=await sb.rpc('get_sell
 async function loadSellers(){
   const {data:authData,error:authErr}=await sb.rpc('get_seller_details');
   if(authErr){if($('sellerRows'))$('sellerRows').innerHTML=`<tr><td colspan="6">${authErr.message}</td></tr>`;return[]}
+
+  // Fetch real order stats per seller using get_seller_stats()
+  let statsMap={};
+  try {
+    const {data:statsData,error:statsErr}=await sb.rpc('get_seller_stats');
+    if(!statsErr && statsData){
+      statsData.forEach(s=>{
+        statsMap[s.seller_id]={
+          orders: Number(s.total_orders||0),
+          delivered: Number(s.delivered_orders||0),
+          revenue: Number(s.total_revenue||0)
+        };
+      });
+    } else if(statsErr){
+      console.warn('get_seller_stats error:',statsErr.message);
+    }
+  } catch(e){ console.warn('get_seller_stats exception:',e); }
+
   const allSellers=(authData||[]).map(u=>({
     user_id:u.user_id,
     shop_name:u.shop_name||'',
@@ -300,7 +318,11 @@ async function loadSellers(){
     address:u.address||'-',
     pincode:u.pincode||'',
     created_at:u.created_at,
-    _status:u.email_confirmed_at?'confirmed':'pending'
+    _status:u.email_confirmed_at?'confirmed':'pending',
+    // Real stats from get_seller_stats()
+    orders: (statsMap[u.user_id]||{}).orders||0,
+    delivered_orders: (statsMap[u.user_id]||{}).delivered||0,
+    total_revenue: (statsMap[u.user_id]||{}).revenue||0
   }));
   const verified=allSellers.filter(s=>s._status==='confirmed');
   const unverified=allSellers.filter(s=>s._status==='pending');
@@ -567,23 +589,29 @@ function renderTop(sellers){
     setText('topOrdersValue', top[0].orders||top[0].total_orders||sorted.length);
     const el=$('topOrdersName'); if(el) el.outerHTML=`<div id="topOrdersName">${statChip(top[0])}</div>`;
   }
-  // Best Revenue
-  if(top[0]){
-    const rev=(top[0].orders||sorted.length)*500;
-    setText('topRevenueValue','₹'+(rev>=1000?Math.round(rev/1000)+'K':rev));
-    const el=$('topRevenueName'); if(el) el.outerHTML=`<div id="topRevenueName">${statChip(top[0])}</div>`;
+  // Best Revenue - use real total_revenue from get_seller_stats
+  const sortedByRevenue=[...sellers].sort((a,b)=>(b.total_revenue||0)-(a.total_revenue||0));
+  const topRevenueS=sortedByRevenue[0];
+  if(topRevenueS){
+    setText('topRevenueValue',rupee(topRevenueS.total_revenue||0));
+    const el=$('topRevenueName'); if(el) el.outerHTML=`<div id="topRevenueName">${statChip(topRevenueS)}</div>`;
   }
-  // Fast Delivery
-  if(top[1]||top[0]){
-    const fd=top[1]||top[0];
-    setText('topDeliveryValue','96%');
-    const el=$('topDeliveryName'); if(el) el.outerHTML=`<div id="topDeliveryName">${statChip(fd)}</div>`;
+  // Fast Delivery - seller with highest delivery rate
+  const sortedByDelivery=[...sellers].filter(s=>s.orders>0).sort((a,b)=>{
+    const ra=(b.delivered_orders||0)/b.orders; const rb=(a.delivered_orders||0)/a.orders; return ra-rb;
+  });
+  const topDelivS=sortedByDelivery[0];
+  if(topDelivS){
+    const dr=Math.round((topDelivS.delivered_orders||0)/topDelivS.orders*100);
+    setText('topDeliveryValue',dr+'%');
+    const el=$('topDeliveryName'); if(el) el.outerHTML=`<div id="topDeliveryName">${statChip(topDelivS)}</div>`;
   }
-  // Repeat Customer
-  if(top[2]||top[0]){
-    const rc=top[2]||top[0];
-    setText('topRepeatValue','+38%');
-    const el=$('topRepeatName'); if(el) el.outerHTML=`<div id="topRepeatName">${statChip(rc)}</div>`;
+  // Repeat Customer - show total delivered orders count as proxy
+  const sortedByDelivered=[...sellers].sort((a,b)=>(b.delivered_orders||0)-(a.delivered_orders||0));
+  const topRepeatS=sortedByDelivered[0];
+  if(topRepeatS){
+    setText('topRepeatValue',(topRepeatS.delivered_orders||0)+' delivered');
+    const el=$('topRepeatName'); if(el) el.outerHTML=`<div id="topRepeatName">${statChip(topRepeatS)}</div>`;
   }
 
   // --- Top 3 Cards: Silver / Gold / Diamond ---
@@ -636,10 +664,9 @@ function renderTop(sellers){
     const s=top[idx];
     const m=cardMeta[idx];
     if(!s) return `<div></div>`;
-    const orders=s.orders||Math.floor(300+Math.random()*200);
-    const growth='+'+Math.floor(20+Math.random()*40)+'%';
-    const score=Math.floor(80+Math.random()*19)+'/100';
-    const rev='₹'+Math.floor(40+Math.random()*60)+'K';
+    const orders=s.orders||0;
+    const delivRate=s.orders>0?Math.round((s.delivered_orders||0)/s.orders*100):0;
+    const rev=s.total_revenue>0?rupee(s.total_revenue):'₹0';
     const photoSrc=s.profile_photo||s.avatar_url||img(s.name);
     const dots=`<div style="position:absolute;bottom:12px;left:14px;display:grid;grid-template-columns:repeat(5,8px);gap:4px;opacity:.7">
       ${Array(10).fill(0).map(()=>`<div style="width:6px;height:6px;border-radius:50%;background:${m.dotColor}"></div>`).join('')}
@@ -647,11 +674,11 @@ function renderTop(sellers){
     const statsHtml=m.statsExtra
       ? `<div style="display:flex;gap:24px;justify-content:center">
           <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#071427">${orders}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Orders</div></div>
-          <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#16a34a">${growth}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Growth</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#16a34a">${rev}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Revenue</div></div>
         </div>`
       : `<div style="display:flex;gap:24px;justify-content:center">
           <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#071427">${orders}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Orders</div></div>
-          <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#16a34a">${idx===2?rev:growth}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">${idx===2?'Revenue':'Growth'}</div></div>
+          <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#1d4ed8">${delivRate}%</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Delivery Rate</div></div>
         </div>`;
     return `<div style="position:relative;background:${m.bg};border:${m.border};border-radius:24px;padding:26px 20px 36px;box-shadow:${m.shadow};text-align:center;overflow:hidden">
       <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:18px">

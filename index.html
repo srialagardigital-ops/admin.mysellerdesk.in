@@ -249,7 +249,118 @@
 <section id="districtPage" class="page" style="display:none"><section class="grid"><div class="panel"><div class="panel-head"><div><h3>District-wise Sellers</h3><p class="small">Seller distribution</p></div></div><canvas id="districtChart2"></canvas></div><div class="panel"><div class="panel-head"><div><h3>District Activity Heat Map</h3><p class="small">Darker blocks = more sellers</p></div></div><div class="heatmap-grid" id="heatMap"></div></div></section></section>
 <section id="subscriptionsPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Paid Sellers</div><div class="value" id="paidSellers">0</div><span class="trend up">Monthly + Yearly paid</span></div><div class="card"><div class="label">Monthly Paid</div><div class="value" id="monthlyPaid">0</div><span class="trend neutral">₹199 plan</span></div><div class="card"><div class="label">Yearly Paid</div><div class="value" id="yearlyPaid">0</div><span class="trend up">₹1,999 plan</span></div><div class="card"><div class="label">Revenue This Month</div><div class="value" id="revenueThisMonth">₹0</div><span class="trend up">Subscription income</span></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>Revenue Overview</h3><p class="small">Last 6 months</p></div></div><canvas id="revenueChart"></canvas></div><div class="panel"><div class="panel-head"><div><h3>Plan Distribution</h3><p class="small">Trial vs paid</p></div></div><canvas id="planChart2"></canvas></div></section><div class="panel"><div class="panel-head"><div><h3>Payment Details</h3><p class="small">Recent subscription payments</p></div></div><table class="table"><thead><tr><th>Seller</th><th>Plan</th><th>Amount</th><th>Status</th><th>Expiry</th></tr></thead><tbody id="paymentRows"></tbody></table></div></section>
 <section id="supportPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Open Tickets</div><div class="value" id="openTickets">0</div><span class="trend down">Need attention</span></div><div class="card"><div class="label">In Progress</div><div class="value" id="progressTickets">0</div><span class="trend neutral">Working</span></div><div class="card"><div class="label">Resolved Today</div><div class="value" id="resolvedTickets">0</div><span class="trend up">Good</span></div><div class="card"><div class="label">Avg Response Time</div><div class="value">-</div><span class="trend up">Need SLA data</span></div></section><section class="kanban"><div class="kanban-col"><div class="kanban-title">Open</div><div id="openTicketList"></div></div><div class="kanban-col"><div class="kanban-title">In Progress</div><div id="progressTicketList"></div></div><div class="kanban-col"><div class="kanban-title">Resolved</div><div id="resolvedTicketList"></div></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>All Tickets</h3><p class="small">Latest issues from sellers</p></div></div><table class="table"><thead><tr><th>ID</th><th>Issue</th><th>Seller</th><th>Priority</th><th>Status</th></tr></thead><tbody id="ticketRows"></tbody></table></div><div class="panel"><div class="panel-head"><div><h3>Quick Reply Templates</h3></div></div><div class="quick-replies"><div class="reply-chip">Payment received. Your plan will be activated shortly.</div><div class="reply-chip">Please refresh and login again after 2 minutes.</div><div class="reply-chip">We are checking your issue and will update soon.</div><div class="reply-chip">Your invoice has been generated and shared.</div></div></div></section></section>
-<section id="settingsPage" class="page" style="display:none"><section class="settings-grid"><div class="setting-card"><h4>Admin Profile</h4><p>Name, email, password and profile settings.</p></div><div class="setting-card"><h4>Plan Settings</h4><p>Monthly ₹199, yearly ₹1,999 and trial control.</p></div><div class="setting-card"><h4>Seller Control</h4><p>Block, unblock and manual plan activation.</p></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>Plan & Trial Control</h3></div></div><div class="setting-row"><div><b>Monthly Plan</b><p class="small">₹199 / month</p></div><button class="control-btn light-btn">Edit</button></div><div class="setting-row"><div><b>Yearly Plan</b><p class="small">₹1,999 / year</p></div><button class="control-btn light-btn">Edit</button></div><div class="setting-row"><div><b>Manual Plan Activation</b><p class="small">Use for payment issue</p></div><button class="control-btn primary-btn">Activate</button></div></div><div class="panel"><div class="panel-head"><div><h3>Data & Backup</h3></div></div><div class="setting-row"><div><b>Export All Sellers</b><p class="small">Download CSV</p></div><button class="control-btn primary-btn">Export</button></div><div class="setting-row"><div><b>Backup Data</b><p class="small">Create database backup</p></div><button class="control-btn orange-btn">Backup</button></div></div></section></section>
+<section id="settingsPage" class="page" style="display:none">
+
+<!-- Plan Management Header -->
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;background:#fff;border:1px solid #eef2f7;border-radius:22px;padding:16px 20px;box-shadow:0 8px 24px rgba(15,23,42,.05)">
+  <div>
+    <div style="font-size:15px;font-weight:900;color:#071427">📋 Plan Management</div>
+    <div style="font-size:12px;color:#64748b;margin-top:3px">Create plans, set price & duration. Maximum 5 plans active at a time.</div>
+  </div>
+  <button onclick="openPlanModal()" style="display:flex;align-items:center;gap:8px;background:#071427;color:#fff;border:0;border-radius:14px;padding:11px 18px;font-size:13px;font-weight:900;cursor:pointer">
+    + New Plan
+  </button>
+</div>
+
+<!-- Active Plans Count -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px">
+  <div class="card"><div class="label">Total Plans</div><div class="value" id="totalPlansCount">0</div><span class="trend neutral">Created</span></div>
+  <div class="card"><div class="label">Active Plans</div><div class="value" id="activePlansCount">0</div><span class="trend up">Max 5 allowed</span></div>
+  <div class="card"><div class="label">Inactive Plans</div><div class="value" id="inactivePlansCount">0</div><span class="trend down">Disabled</span></div>
+</div>
+
+<!-- Plans List -->
+<div class="panel" style="margin-bottom:18px">
+  <div class="panel-head">
+    <div><h3>All Plans</h3><p class="small">Toggle active/inactive, edit or delete plans</p></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="loadPlanConfigs()" style="border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer">↻ Refresh</button>
+    </div>
+  </div>
+  <div id="planConfigsList" style="display:grid;gap:12px;min-height:60px">
+    <div style="text-align:center;color:#94a3b8;padding:32px;font-size:13px">Loading plans...</div>
+  </div>
+</div>
+
+<!-- Assign Plan to Seller -->
+<div class="panel">
+  <div class="panel-head"><div><h3>Assign Plan to Seller</h3><p class="small">Manually activate a plan for a specific seller</p></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
+    <div>
+      <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Select Seller</label>
+      <select id="assignSellerSelect" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+        <option value="">— Select Seller —</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Select Plan</label>
+      <select id="assignPlanSelect" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+        <option value="">— Select Active Plan —</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Start Date</label>
+      <input type="date" id="assignStartDate" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+    </div>
+    <button onclick="assignPlanToSeller()" style="background:#1d4ed8;color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap">Assign Plan</button>
+  </div>
+  <div id="assignPlanMsg" style="display:none;margin-top:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700"></div>
+
+  <!-- Active Seller Subscriptions Table -->
+  <div style="margin-top:20px">
+    <div style="font-size:14px;font-weight:900;color:#071427;margin-bottom:12px">Current Seller Subscriptions</div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Seller</th><th>Plan</th><th>Start Date</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="sellerSubRows"><tr><td colspan="6" style="text-align:center;color:#94a3b8">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Plan Create/Edit Modal -->
+<div id="planModal" style="display:none;position:fixed;inset:0;background:rgba(7,20,39,.55);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:28px;padding:28px;max-width:500px;width:100%;box-shadow:0 28px 70px rgba(15,23,42,.2);position:relative;max-height:90vh;overflow-y:auto">
+    <button onclick="closePlanModal()" style="position:absolute;top:16px;right:16px;border:0;background:#f1f5f9;border-radius:999px;width:32px;height:32px;font-size:18px;cursor:pointer;color:#334155">✕</button>
+    <div style="font-size:18px;font-weight:900;color:#071427;margin-bottom:20px" id="planModalTitle">Create New Plan</div>
+    <input type="hidden" id="planModalId">
+    <div style="display:grid;gap:14px">
+      <div>
+        <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Plan Name *</label>
+        <input id="pmPlanName" placeholder="e.g. Starter Plan, Growth Plan" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Plan Key * (unique, lowercase, no spaces)</label>
+        <input id="pmPlanKey" placeholder="e.g. starter, growth, elite_offer" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Price (₹)</label>
+          <input id="pmPrice" type="number" placeholder="499" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Duration (Days)</label>
+          <input id="pmDuration" type="number" placeholder="30" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Features (one per line)</label>
+        <textarea id="pmFeatures" rows="4" placeholder="Unlimited orders&#10;PDF download&#10;WhatsApp messaging&#10;Priority support" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:11px 14px;font-size:13px;font-family:inherit;outline:none;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="pmIsActive" style="width:16px;height:16px;cursor:pointer">
+        <label for="pmIsActive" style="font-size:13px;font-weight:700;color:#334155;cursor:pointer">Set as Active (visible to sellers)</label>
+      </div>
+    </div>
+    <div id="planModalError" style="display:none;background:#fee2e2;color:#991b1b;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin-top:14px"></div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button onclick="closePlanModal()" style="flex:1;border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer">Cancel</button>
+      <button onclick="savePlan()" id="savePlanBtn" style="flex:2;background:#071427;color:#fff;border:0;border-radius:12px;padding:12px;font-size:14px;font-weight:900;cursor:pointer">Save Plan</button>
+    </div>
+  </div>
+</div>
+
+</section>
 </main></div>
 <script>
 // MySellerDesk Admin - Supabase Config
@@ -1037,6 +1148,259 @@ if(!document.getElementById('recalcSpinStyle')){
   document.head.appendChild(s);
 }
 
+
+
+// ══════════════════════════════════════════
+// PLAN MANAGEMENT SYSTEM
+// ══════════════════════════════════════════
+
+let _allPlanConfigs = [];
+
+async function loadPlanConfigs() {
+  const { data, error } = await sb.from('plan_configs').select('*').order('created_at', { ascending: false });
+  if (error) { console.error('loadPlanConfigs error:', error.message); return; }
+  _allPlanConfigs = data || [];
+  const total = _allPlanConfigs.length;
+  const active = _allPlanConfigs.filter(p => p.is_active).length;
+  const inactive = total - active;
+  setText('totalPlansCount', total);
+  setText('activePlansCount', active);
+  setText('inactivePlansCount', inactive);
+  renderPlanConfigs(_allPlanConfigs);
+  // Populate assign plan dropdown with active plans only
+  const planSel = document.getElementById('assignPlanSelect');
+  if (planSel) {
+    planSel.innerHTML = '<option value="">— Select Active Plan —</option>' +
+      _allPlanConfigs.filter(p => p.is_active).map(p =>
+        `<option value="${p.plan_key}">${p.plan_name} — ₹${p.price} / ${p.duration_days} days</option>`
+      ).join('');
+  }
+}
+
+function renderPlanConfigs(plans) {
+  const el = document.getElementById('planConfigsList');
+  if (!el) return;
+  if (!plans || !plans.length) {
+    el.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:32px;font-size:13px">No plans yet. Click "+ New Plan" to create one.</div>';
+    return;
+  }
+  el.innerHTML = plans.map(p => {
+    const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'object' && p.features ? Object.values(p.features) : []);
+    const featureList = features.length ? features.slice(0,4).map(f => `<span style="font-size:11px;background:#f0fdf4;color:#166534;border-radius:6px;padding:2px 8px;font-weight:700">${f}</span>`).join(' ') : '';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:${p.is_active ? '#f0fdf4' : '#f8fafc'};border:1.5px solid ${p.is_active ? '#bbf7d0' : '#e5e7eb'};border-radius:16px;padding:16px 18px">
+      <div style="flex:1;min-width:200px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:900;color:#071427">${p.plan_name}</span>
+          <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:${p.is_active ? '#dcfce7' : '#fee2e2'};color:${p.is_active ? '#15803d' : '#b91c1c'}">${p.is_active ? '● ACTIVE' : '○ INACTIVE'}</span>
+        </div>
+        <div style="display:flex;gap:16px;font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">
+          <span>Key: <b style="color:#1d4ed8">${p.plan_key}</b></span>
+          <span>₹<b>${Number(p.price||0).toLocaleString('en-IN')}</b></span>
+          <span><b>${p.duration_days}</b> days</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${featureList}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="togglePlanActive('${p.id}', ${p.is_active})" style="border:0;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:900;cursor:pointer;background:${p.is_active ? '#fee2e2' : '#dcfce7'};color:${p.is_active ? '#b91c1c' : '#15803d'}">
+          ${p.is_active ? 'Deactivate' : 'Activate'}
+        </button>
+        <button onclick="openPlanModal('${p.id}')" style="border:1px solid #e5e7eb;background:#fff;color:#334155;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:900;cursor:pointer">Edit</button>
+        <button onclick="deletePlan('${p.id}', '${p.plan_name}')" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:900;cursor:pointer">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function togglePlanActive(id, currentActive) {
+  // If activating, check max 5 limit
+  if (!currentActive) {
+    const activeCount = _allPlanConfigs.filter(p => p.is_active && p.id !== id).length;
+    if (activeCount >= 5) {
+      alert('Maximum 5 active plans allowed! Please deactivate another plan first.');
+      return;
+    }
+  }
+  const { error } = await sb.from('plan_configs').update({ is_active: !currentActive }).eq('id', id);
+  if (error) { alert('Error: ' + error.message); return; }
+  await loadPlanConfigs();
+}
+
+async function deletePlan(id, name) {
+  if (!confirm(`"${name}" plan-ஐ delete பண்ணணுமா? இது undo ஆகாது.`)) return;
+  const { error } = await sb.from('plan_configs').delete().eq('id', id);
+  if (error) { alert('Delete error: ' + error.message); return; }
+  await loadPlanConfigs();
+}
+
+function openPlanModal(editId) {
+  const modal = document.getElementById('planModal');
+  const errEl = document.getElementById('planModalError');
+  if (errEl) errEl.style.display = 'none';
+  if (editId && editId !== 'undefined') {
+    const p = _allPlanConfigs.find(x => x.id === editId);
+    if (!p) return;
+    document.getElementById('planModalTitle').textContent = 'Edit Plan';
+    document.getElementById('planModalId').value = p.id;
+    document.getElementById('pmPlanName').value = p.plan_name || '';
+    document.getElementById('pmPlanKey').value = p.plan_key || '';
+    document.getElementById('pmPrice').value = p.price || '';
+    document.getElementById('pmDuration').value = p.duration_days || '';
+    const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'object' && p.features ? Object.values(p.features) : []);
+    document.getElementById('pmFeatures').value = features.join('
+');
+    document.getElementById('pmIsActive').checked = !!p.is_active;
+  } else {
+    document.getElementById('planModalTitle').textContent = 'Create New Plan';
+    document.getElementById('planModalId').value = '';
+    document.getElementById('pmPlanName').value = '';
+    document.getElementById('pmPlanKey').value = '';
+    document.getElementById('pmPrice').value = '';
+    document.getElementById('pmDuration').value = '30';
+    document.getElementById('pmFeatures').value = '';
+    document.getElementById('pmIsActive').checked = false;
+  }
+  modal.style.display = 'flex';
+}
+
+function closePlanModal() {
+  document.getElementById('planModal').style.display = 'none';
+}
+
+async function savePlan() {
+  const errEl = document.getElementById('planModalError');
+  errEl.style.display = 'none';
+  const id = document.getElementById('planModalId').value;
+  const plan_name = document.getElementById('pmPlanName').value.trim();
+  const plan_key = document.getElementById('pmPlanKey').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const price = parseFloat(document.getElementById('pmPrice').value) || 0;
+  const duration_days = parseInt(document.getElementById('pmDuration').value) || 30;
+  const featuresRaw = document.getElementById('pmFeatures').value.trim();
+  const features = featuresRaw ? featuresRaw.split('
+').map(f=>f.trim()).filter(Boolean) : [];
+  const is_active = document.getElementById('pmIsActive').checked;
+
+  if (!plan_name || !plan_key) {
+    errEl.textContent = '⚠️ Plan Name and Plan Key required.'; errEl.style.display = 'block'; return;
+  }
+  if (is_active) {
+    const currentActive = _allPlanConfigs.filter(p => p.is_active && p.id !== id).length;
+    if (currentActive >= 5) {
+      errEl.textContent = '⚠️ Maximum 5 active plans allowed! Deactivate one first.'; errEl.style.display = 'block'; return;
+    }
+  }
+
+  const btn = document.getElementById('savePlanBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const payload = { plan_name, plan_key, price, duration_days, features, is_active };
+  let error;
+  if (id) {
+    ({ error } = await sb.from('plan_configs').update(payload).eq('id', id));
+  } else {
+    ({ error } = await sb.from('plan_configs').insert(payload));
+  }
+  btn.disabled = false; btn.textContent = 'Save Plan';
+
+  if (error) {
+    errEl.textContent = '❌ Error: ' + (error.message.includes('unique') ? 'Plan Key already exists!' : error.message);
+    errEl.style.display = 'block'; return;
+  }
+  closePlanModal();
+  await loadPlanConfigs();
+}
+
+async function loadSellerSubscriptions() {
+  const { data, error } = await sb.from('subscriptions')
+    .select('id,user_id,plan,started_at,expires_at,is_active,status')
+    .order('started_at', { ascending: false })
+    .limit(50);
+  if (error) { console.error('loadSellerSubscriptions:', error.message); return; }
+  // Get seller names
+  const uids = [...new Set((data||[]).map(s=>s.user_id).filter(Boolean))];
+  let shopMap = {};
+  if (uids.length) {
+    const { data: sdata } = await sb.from('settings').select('user_id,shop_name').in('user_id', uids);
+    (sdata||[]).forEach(s => { shopMap[s.user_id] = s.shop_name; });
+  }
+  const tbody = document.getElementById('sellerSubRows');
+  if (!tbody) return;
+  if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8">No subscriptions yet</td></tr>'; return; }
+  tbody.innerHTML = (data||[]).map(s => {
+    const sellerName = shopMap[s.user_id] || s.user_id || '-';
+    const startDate = s.started_at ? new Date(s.started_at).toLocaleDateString('en-IN') : '-';
+    const expiryDate = s.expires_at ? new Date(s.expires_at).toLocaleDateString('en-IN') : '-';
+    const isActive = s.is_active !== false;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const expiry = s.expires_at ? new Date(s.expires_at) : null;
+    const expired = expiry && expiry < today;
+    const statusLabel = expired ? 'Expired' : (isActive ? 'Active' : 'Inactive');
+    const statusCls = expired ? 'expired' : (isActive ? 'paid' : 'trial');
+    return `<tr>
+      <td><b>${sellerName}</b></td>
+      <td><span style="font-weight:800;color:#1d4ed8">${s.plan||'-'}</span></td>
+      <td>${startDate}</td>
+      <td>${expiryDate}</td>
+      <td><span class="badge ${statusCls}">${statusLabel}</span></td>
+      <td><button onclick="revokeSubscription('${s.id}')" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:900;cursor:pointer">Revoke</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function assignPlanToSeller() {
+  const msgEl = document.getElementById('assignPlanMsg');
+  msgEl.style.display = 'none';
+  const userId = document.getElementById('assignSellerSelect').value;
+  const planKey = document.getElementById('assignPlanSelect').value;
+  const startDateVal = document.getElementById('assignStartDate').value;
+  if (!userId || !planKey || !startDateVal) {
+    msgEl.textContent = '⚠️ Seller, Plan and Start Date எல்லாம் select பண்ணுங்க.';
+    msgEl.style.background = '#fee2e2'; msgEl.style.color = '#991b1b';
+    msgEl.style.display = 'block'; return;
+  }
+  const plan = _allPlanConfigs.find(p => p.plan_key === planKey);
+  if (!plan) { msgEl.textContent = '❌ Plan not found.'; msgEl.style.display = 'block'; return; }
+  const startDate = new Date(startDateVal);
+  const expiryDate = new Date(startDate);
+  expiryDate.setDate(expiryDate.getDate() + (plan.duration_days || 30));
+
+  // Upsert subscription
+  const { error } = await sb.from('subscriptions').upsert({
+    user_id: userId,
+    plan: planKey,
+    plan_type: plan.plan_name,
+    amount: plan.price,
+    started_at: startDate.toISOString(),
+    expires_at: expiryDate.toISOString(),
+    is_active: true,
+    status: 'active'
+  }, { onConflict: 'user_id' });
+
+  if (error) {
+    msgEl.textContent = '❌ Error: ' + error.message;
+    msgEl.style.background = '#fee2e2'; msgEl.style.color = '#991b1b';
+    msgEl.style.display = 'block'; return;
+  }
+  msgEl.textContent = '✅ Plan assigned successfully! Seller dashboard-ல் update ஆகும்.';
+  msgEl.style.background = '#dcfce7'; msgEl.style.color = '#15803d';
+  msgEl.style.display = 'block';
+  await loadSellerSubscriptions();
+}
+
+async function revokeSubscription(subId) {
+  if (!confirm('இந்த subscription revoke பண்ணணுமா?')) return;
+  const { error } = await sb.from('subscriptions').update({ is_active: false, status: 'revoked' }).eq('id', subId);
+  if (error) { alert('Error: ' + error.message); return; }
+  await loadSellerSubscriptions();
+}
+
+async function loadSellerDropdown() {
+  const { data } = await sb.rpc('get_seller_details');
+  const sel = document.getElementById('assignSellerSelect');
+  if (!sel || !data) return;
+  sel.innerHTML = '<option value="">— Select Seller —</option>' +
+    (data||[]).map(s => `<option value="${s.user_id}">${s.shop_name||s.email}</option>`).join('');
+}
+
 startAuthGate();
 </script>
 
@@ -1052,6 +1416,11 @@ document.addEventListener('DOMContentLoaded', function(){
       var page=document.getElementById(a.dataset.page);
       if(page) page.style.display='block';
       if (window.lucide) window.lucide.createIcons();
+      if(a.dataset.page === 'settingsPage'){
+        loadPlanConfigs();
+        loadSellerDropdown();
+        loadSellerSubscriptions();
+      }
     });
   });
 });

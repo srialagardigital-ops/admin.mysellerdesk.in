@@ -310,6 +310,16 @@ async function loadSellers(){
     }
   } catch(e){ console.warn('get_seller_stats exception:',e); }
 
+  // Fetch logo from settings table for all sellers
+  let logoMap={};
+  try {
+    const uids=(authData||[]).map(u=>u.user_id).filter(Boolean);
+    if(uids.length){
+      const {data:logoData}=await sb.from('settings').select('user_id,logo').in('user_id',uids);
+      (logoData||[]).forEach(s=>{ if(s.logo) logoMap[s.user_id]=s.logo; });
+    }
+  } catch(e){ console.warn('logo fetch error:',e); }
+
   const allSellers=(authData||[]).map(u=>({
     user_id:u.user_id,
     shop_name:u.shop_name||'',
@@ -323,6 +333,7 @@ async function loadSellers(){
     pincode:u.pincode||'',
     created_at:u.created_at,
     _status:u.email_confirmed_at?'confirmed':'pending',
+    logo: logoMap[u.user_id]||'',
     // Real stats from get_seller_stats()
     orders: (statsMap[u.user_id]||{}).orders||0,
     delivered_orders: (statsMap[u.user_id]||{}).delivered||0,
@@ -335,7 +346,7 @@ async function loadSellers(){
   setText('totalSellers',allSellers.length);setText('activeSellers',verified.length);
   window.__allSellers=allSellers; window.__sellerFilter='all';
   renderSellerTable(allSellers);
-  const recentRows=verified.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${img(s.name||s.email)}">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,'-')}</td><td><span class="badge paid">Verified</span></td></tr>`).join('')||'<tr><td colspan="4">No verified sellers found</td></tr>';
+  const recentRows=verified.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${s.logo||img(s.name||s.email)}" onerror="this.src='${img(s.name||s.email)}'">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,'-')}</td><td><span class="badge paid">Verified</span></td></tr>`).join('')||'<tr><td colspan="4">No verified sellers found</td></tr>';
   if($('recentSellerRows'))$('recentSellerRows').innerHTML=recentRows;
   renderTop(verified.length?verified:allSellers); drawDistrict(allSellers); bindSellerTabs(); return allSellers
 }
@@ -350,7 +361,7 @@ function renderSellerTable(list){
     const status=sellerStatus(s);
     const phone=String(s.phone||'').replace(/[^0-9]/g,'');
     const district=s.city||s.district||'-';
-    const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(avatarSeed);
+    const profilePic=s.logo||s.profile_photo||s.avatar_url||s.photo_url||img(avatarSeed);
     const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
     const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
     return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
@@ -390,7 +401,7 @@ function openSellerPopup(idx){
   const status=sellerStatus(s);
   const address=s.address||'-';
   const signupDate=s.created_at?new Date(s.created_at).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}):'-';
-  const profilePic=s.profile_photo||s.avatar_url||s.photo_url||img(shopName);
+  const profilePic=s.logo||s.profile_photo||s.avatar_url||s.photo_url||img(shopName);
   let modal=$('sellerModal');
   if(!modal){
     modal=document.createElement('div');
@@ -580,7 +591,7 @@ function renderTop(sellers){
   // Helper: render stat card photo+name chip
   function statChip(s, photoElId){
     if(!s) return '';
-    const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.email||'Seller');
+    const photoSrc=s.logo||s.profile_photo||s.avatar_url||img(s.name||s.email||'Seller');
     const label=s.name||s.shop_name||s.email||'-';
     // Inject large background photo into card
     if(photoElId){
@@ -675,7 +686,7 @@ function renderTop(sellers){
     const orders=s.orders||0;
     const delivRate=s.orders>0?Math.round((s.delivered_orders||0)/s.orders*100):0;
     const rev=s.total_revenue>0?rupee(s.total_revenue):'₹0';
-    const photoSrc=s.profile_photo||s.avatar_url||img(s.name);
+    const photoSrc=s.logo||s.profile_photo||s.avatar_url||img(s.name);
     const dots=`<div style="position:absolute;bottom:12px;left:14px;display:grid;grid-template-columns:repeat(5,8px);gap:4px;opacity:.7">
       ${Array(10).fill(0).map(()=>`<div style="width:6px;height:6px;border-radius:50%;background:${m.dotColor}"></div>`).join('')}
     </div>`;
@@ -740,7 +751,7 @@ function renderTop(sellers){
   const lbHtml=primesellers.map((s,i)=>{
     const rank=i+4; // actual rank
     const orders=s.orders||'-';
-    const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
+    const photoSrc=s.logo||s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
     const name=safe(s.name||s.shop_name,'Seller');
     const city=safe(s.city,'-');
     return `<div style="flex:0 0 170px;background:#fff;border:1px solid #eef2f7;border-radius:20px;padding:20px 14px 18px;text-align:center;box-shadow:0 8px 24px rgba(15,23,42,.07);position:relative">
@@ -802,7 +813,7 @@ function renderPerfTable(list){
   tbody.innerHTML=list.map(s=>{
     const globalRank=allSorted.findIndex(x=>(x.user_id||x.email)===( s.user_id||s.email))+1;
     const b=perfBadgeForRank(globalRank);
-    const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
+    const photoSrc=s.logo||s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
     const name=safe(s.name||s.shop_name,'Seller');
     const status=s._status==='confirmed'?'confirmed':'pending';
     const joined=s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-';

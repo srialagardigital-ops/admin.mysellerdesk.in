@@ -132,29 +132,33 @@
 
 <!-- TOP STAT CARDS -->
 <section class="cards" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
-  <div class="card" style="border-top:3px solid #f97316">
-    <div class="label">🏆 Best Orders Seller</div>
+  <div class="card" style="border-top:3px solid #f97316;position:relative;overflow:hidden">
+    <div class="label" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="m9 12 2 2 4-4"/></svg> Best Orders Seller</div>
     <div class="value" id="topOrdersValue">0</div>
     <div id="topOrdersName"></div>
     <div style="font-size:11px;color:#64748b;margin-top:6px">Total Orders</div>
+    <div id="topOrdersPhoto" style="position:absolute;bottom:-10px;right:-10px;width:90px;height:90px;border-radius:16px;overflow:hidden;opacity:0.13;pointer-events:none"></div>
   </div>
-  <div class="card" style="border-top:3px solid #16a34a">
-    <div class="label">💰 Best Revenue Seller</div>
+  <div class="card" style="border-top:3px solid #16a34a;position:relative;overflow:hidden">
+    <div class="label" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Best Revenue Seller</div>
     <div class="value" id="topRevenueValue">₹0</div>
     <div id="topRevenueName"></div>
     <div style="font-size:11px;color:#64748b;margin-top:6px">Total Revenue</div>
+    <div id="topRevenuePhoto" style="position:absolute;bottom:-10px;right:-10px;width:90px;height:90px;border-radius:16px;overflow:hidden;opacity:0.13;pointer-events:none"></div>
   </div>
-  <div class="card" style="border-top:3px solid #1d4ed8">
-    <div class="label">⚡ Fast Delivery Seller</div>
+  <div class="card" style="border-top:3px solid #1d4ed8;position:relative;overflow:hidden">
+    <div class="label" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Fast Delivery Seller</div>
     <div class="value" id="topDeliveryValue">0%</div>
     <div id="topDeliveryName"></div>
     <div style="font-size:11px;color:#64748b;margin-top:6px">Delivery Rate</div>
+    <div id="topDeliveryPhoto" style="position:absolute;bottom:-10px;right:-10px;width:90px;height:90px;border-radius:16px;overflow:hidden;opacity:0.13;pointer-events:none"></div>
   </div>
-  <div class="card" style="border-top:3px solid #7c3aed">
-    <div class="label">🔁 Repeat Customer Seller</div>
+  <div class="card" style="border-top:3px solid #7c3aed;position:relative;overflow:hidden">
+    <div class="label" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> Repeat Customer Seller</div>
     <div class="value" id="topRepeatValue">0%</div>
     <div id="topRepeatName"></div>
     <div style="font-size:11px;color:#64748b;margin-top:6px">Repeat Rate</div>
+    <div id="topRepeatPhoto" style="position:absolute;bottom:-10px;right:-10px;width:90px;height:90px;border-radius:16px;overflow:hidden;opacity:0.13;pointer-events:none"></div>
   </div>
 </section>
 
@@ -573,10 +577,15 @@ function renderTop(sellers){
   const top=sorted.slice(0,10);
 
   // Helper: render stat card photo+name chip
-  function statChip(s){
+  function statChip(s, photoElId){
     if(!s) return '';
     const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.email||'Seller');
     const label=s.name||s.shop_name||s.email||'-';
+    // Inject large background photo into card
+    if(photoElId){
+      const pel=document.getElementById(photoElId);
+      if(pel) pel.innerHTML=`<img src="${photoSrc}" onerror="this.src='${img(label)}'" style="width:100%;height:100%;object-fit:cover">`;
+    }
     return `<div style="display:flex;align-items:center;gap:8px;margin-top:10px">
       <img src="${photoSrc}" onerror="this.src='${img(label)}'"
         style="width:36px;height:36px;border-radius:10px;object-fit:cover;border:2px solid #e5e7eb;flex-shrink:0">
@@ -587,14 +596,14 @@ function renderTop(sellers){
   // Best Orders
   if(top[0]){
     setText('topOrdersValue', top[0].orders||top[0].total_orders||sorted.length);
-    const el=$('topOrdersName'); if(el) el.outerHTML=`<div id="topOrdersName">${statChip(top[0])}</div>`;
+    const el=$('topOrdersName'); if(el) el.outerHTML=`<div id="topOrdersName">${statChip(top[0],'topOrdersPhoto')}</div>`;
   }
   // Best Revenue - use real total_revenue from get_seller_stats
   const sortedByRevenue=[...sellers].sort((a,b)=>(b.total_revenue||0)-(a.total_revenue||0));
   const topRevenueS=sortedByRevenue[0];
   if(topRevenueS){
     setText('topRevenueValue',rupee(topRevenueS.total_revenue||0));
-    const el=$('topRevenueName'); if(el) el.outerHTML=`<div id="topRevenueName">${statChip(topRevenueS)}</div>`;
+    const el=$('topRevenueName'); if(el) el.outerHTML=`<div id="topRevenueName">${statChip(topRevenueS,'topRevenuePhoto')}</div>`;
   }
   // Fast Delivery - seller with highest delivery rate
   const sortedByDelivery=[...sellers].filter(s=>s.orders>0).sort((a,b)=>{
@@ -604,14 +613,14 @@ function renderTop(sellers){
   if(topDelivS){
     const dr=Math.round((topDelivS.delivered_orders||0)/topDelivS.orders*100);
     setText('topDeliveryValue',dr+'%');
-    const el=$('topDeliveryName'); if(el) el.outerHTML=`<div id="topDeliveryName">${statChip(topDelivS)}</div>`;
+    const el=$('topDeliveryName'); if(el) el.outerHTML=`<div id="topDeliveryName">${statChip(topDelivS,'topDeliveryPhoto')}</div>`;
   }
   // Repeat Customer - show total delivered orders count as proxy
   const sortedByDelivered=[...sellers].sort((a,b)=>(b.delivered_orders||0)-(a.delivered_orders||0));
   const topRepeatS=sortedByDelivered[0];
   if(topRepeatS){
     setText('topRepeatValue',(topRepeatS.delivered_orders||0)+' delivered');
-    const el=$('topRepeatName'); if(el) el.outerHTML=`<div id="topRepeatName">${statChip(topRepeatS)}</div>`;
+    const el=$('topRepeatName'); if(el) el.outerHTML=`<div id="topRepeatName">${statChip(topRepeatS,'topRepeatPhoto')}</div>`;
   }
 
   // --- Top 3 Cards: Silver / Gold / Diamond ---

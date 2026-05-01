@@ -1246,8 +1246,7 @@ function openPlanModal(editId) {
     document.getElementById('pmPrice').value = p.price || '';
     document.getElementById('pmDuration').value = p.duration_days || '';
     const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'object' && p.features ? Object.values(p.features) : []);
-    document.getElementById('pmFeatures').value = features.join('
-');
+    document.getElementById('pmFeatures').value = features.join('\n');
     document.getElementById('pmIsActive').checked = !!p.is_active;
   } else {
     document.getElementById('planModalTitle').textContent = 'Create New Plan';

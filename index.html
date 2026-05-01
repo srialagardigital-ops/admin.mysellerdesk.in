@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(btn){btn.disabled=true;btn.textContent='Checking...';}
     const { data, error } = await sb.auth.signInWithPassword({email,password});
     if(btn){btn.disabled=false;btn.textContent='Login';}
-    if(error){ authError('Email / password wrong.'); return; }
+    if(error){ authError(error.message||'Email / password wrong.'); return; }
     const loggedEmail=String(data?.user?.email||'').toLowerCase();
     if(!ALLOWED_ADMIN_EMAILS.includes(loggedEmail)){ await sb.auth.signOut(); authError('Access denied.'); return; }
     showDashboard();
@@ -573,6 +573,60 @@ function openSellerPopup(idx){
     </div>`;
   modal.style.display='flex';
   function row(icon,label,val){return`<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:#f8fafc;border-radius:16px"><span style="font-size:18px">${icon}</span><div><div style="font-size:11px;color:#64748b;font-weight:800;margin-bottom:2px">${label}</div><div style="font-size:14px;font-weight:700;color:#1e293b">${safe(val)}</div></div></div>`}
+}
+function openEditModal(idx){
+  const s=(window.__renderedSellers||[])[idx];
+  if(!s)return;
+  let modal=document.getElementById('editSellerModal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='editSellerModal';
+    modal.style.cssText='position:fixed;inset:0;background:rgba(7,20,39,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.style.display='none';});
+    document.body.appendChild(modal);
+  }
+  const shopName=s.shop_name||s.name||'';
+  const email=s.email||'';
+  const phone=s.mobile||s.phone||'';
+  const district=s.city||s.district||'';
+  const address=s.address||'';
+  modal.innerHTML=`<div style="background:#fff;border-radius:28px;padding:28px;max-width:460px;width:100%;box-shadow:0 28px 70px rgba(15,23,42,.2);position:relative">
+    <button onclick="document.getElementById('editSellerModal').style.display='none'" style="position:absolute;top:16px;right:16px;border:0;background:#f1f5f9;border-radius:999px;width:32px;height:32px;font-size:18px;cursor:pointer;color:#334155">✕</button>
+    <div style="font-size:20px;font-weight:900;color:#071427;margin-bottom:6px">✏️ Edit Seller</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:20px">${safe(email)}</div>
+    <div id="editSellerError" style="display:none;background:#fee2e2;color:#991b1b;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px"></div>
+    <div style="display:grid;gap:14px">
+      <div><label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Shop Name</label>
+        <input id="editShopName" value="${shopName.replace(/"/g,'&quot;')}" style="width:100%;border:1px solid #dbe3ef;border-radius:14px;padding:12px 14px;font-size:14px;outline:none"></div>
+      <div><label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Phone</label>
+        <input id="editPhone" value="${phone.replace(/"/g,'&quot;')}" style="width:100%;border:1px solid #dbe3ef;border-radius:14px;padding:12px 14px;font-size:14px;outline:none"></div>
+      <div><label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">District</label>
+        <input id="editDistrict" value="${district.replace(/"/g,'&quot;')}" style="width:100%;border:1px solid #dbe3ef;border-radius:14px;padding:12px 14px;font-size:14px;outline:none"></div>
+      <div><label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Address</label>
+        <input id="editAddress" value="${address.replace(/"/g,'&quot;')}" style="width:100%;border:1px solid #dbe3ef;border-radius:14px;padding:12px 14px;font-size:14px;outline:none"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button onclick="document.getElementById('editSellerModal').style.display='none'" style="flex:1;border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:14px;padding:12px;font-size:14px;font-weight:800;cursor:pointer">Cancel</button>
+      <button id="editSellerSaveBtn" onclick="saveEditSeller('${s.user_id}')" style="flex:2;background:#071427;color:#fff;border:0;border-radius:14px;padding:12px;font-size:14px;font-weight:900;cursor:pointer">💾 Save Changes</button>
+    </div>
+  </div>`;
+  modal.style.display='flex';
+}
+async function saveEditSeller(userId){
+  const btn=document.getElementById('editSellerSaveBtn');
+  const errEl=document.getElementById('editSellerError');
+  const shopName=document.getElementById('editShopName').value.trim();
+  const phone=document.getElementById('editPhone').value.trim();
+  const district=document.getElementById('editDistrict').value.trim();
+  const address=document.getElementById('editAddress').value.trim();
+  if(!shopName){errEl.textContent='Shop name required!';errEl.style.display='block';return;}
+  if(btn){btn.disabled=true;btn.textContent='Saving...';}
+  errEl.style.display='none';
+  const {error}=await sb.from('settings').update({shop_name:shopName,phone,district,address}).eq('user_id',userId);
+  if(btn){btn.disabled=false;btn.textContent='💾 Save Changes';}
+  if(error){errEl.textContent='Error: '+error.message;errEl.style.display='block';return;}
+  document.getElementById('editSellerModal').style.display='none';
+  await loadSellers();
 }
 function bindSellerTabs(){
   document.querySelectorAll('[data-seller-filter]').forEach(btn=>{
@@ -1274,8 +1328,7 @@ async function savePlan() {
   const price = parseFloat(document.getElementById('pmPrice').value) || 0;
   const duration_days = parseInt(document.getElementById('pmDuration').value) || 30;
   const featuresRaw = document.getElementById('pmFeatures').value.trim();
-  const features = featuresRaw ? featuresRaw.split('
-').map(f=>f.trim()).filter(Boolean) : [];
+  const features = featuresRaw ? featuresRaw.split('\n').map(f=>f.trim()).filter(Boolean) : [];
   const is_active = document.getElementById('pmIsActive').checked;
 
   if (!plan_name || !plan_key) {
@@ -1400,7 +1453,7 @@ async function loadSellerDropdown() {
     (data||[]).map(s => `<option value="${s.user_id}">${s.shop_name||s.email}</option>`).join('');
 }
 
-startAuthGate();
+document.addEventListener('DOMContentLoaded', startAuthGate);
 </script>
 
 <script>
@@ -1422,12 +1475,6 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     });
   });
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  if(window.lucide) lucide.createIcons();
 });
 </script>
 

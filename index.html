@@ -194,7 +194,7 @@
       <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">⭐ #4-10 Prime</span>
     </div>
   </div>
-  <div id="leaderboard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;padding-top:20px;scrollbar-width:thin"></div>
+  <div id="leaderboard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin"></div>
 </div>
 
 <!-- ALL SELLERS PERFORMANCE TABLE WITH SEARCH & FILTER -->
@@ -250,6 +250,43 @@
 <section id="subscriptionsPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Paid Sellers</div><div class="value" id="paidSellers">0</div><span class="trend up">Monthly + Yearly paid</span></div><div class="card"><div class="label">Monthly Paid</div><div class="value" id="monthlyPaid">0</div><span class="trend neutral">₹199 plan</span></div><div class="card"><div class="label">Yearly Paid</div><div class="value" id="yearlyPaid">0</div><span class="trend up">₹1,999 plan</span></div><div class="card"><div class="label">Revenue This Month</div><div class="value" id="revenueThisMonth">₹0</div><span class="trend up">Subscription income</span></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>Revenue Overview</h3><p class="small">Last 6 months</p></div></div><canvas id="revenueChart"></canvas></div><div class="panel"><div class="panel-head"><div><h3>Plan Distribution</h3><p class="small">Trial vs paid</p></div></div><canvas id="planChart2"></canvas></div></section><div class="panel"><div class="panel-head"><div><h3>Payment Details</h3><p class="small">Recent subscription payments</p></div></div><table class="table"><thead><tr><th>Seller</th><th>Plan</th><th>Amount</th><th>Status</th><th>Expiry</th></tr></thead><tbody id="paymentRows"></tbody></table></div></section>
 <section id="supportPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Open Tickets</div><div class="value" id="openTickets">0</div><span class="trend down">Need attention</span></div><div class="card"><div class="label">In Progress</div><div class="value" id="progressTickets">0</div><span class="trend neutral">Working</span></div><div class="card"><div class="label">Resolved Today</div><div class="value" id="resolvedTickets">0</div><span class="trend up">Good</span></div><div class="card"><div class="label">Avg Response Time</div><div class="value">-</div><span class="trend up">Need SLA data</span></div></section><section class="kanban"><div class="kanban-col"><div class="kanban-title">Open</div><div id="openTicketList"></div></div><div class="kanban-col"><div class="kanban-title">In Progress</div><div id="progressTicketList"></div></div><div class="kanban-col"><div class="kanban-title">Resolved</div><div id="resolvedTicketList"></div></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>All Tickets</h3><p class="small">Latest issues from sellers</p></div></div><table class="table"><thead><tr><th>ID</th><th>Issue</th><th>Seller</th><th>Priority</th><th>Status</th></tr></thead><tbody id="ticketRows"></tbody></table></div><div class="panel"><div class="panel-head"><div><h3>Quick Reply Templates</h3></div></div><div class="quick-replies"><div class="reply-chip">Payment received. Your plan will be activated shortly.</div><div class="reply-chip">Please refresh and login again after 2 minutes.</div><div class="reply-chip">We are checking your issue and will update soon.</div><div class="reply-chip">Your invoice has been generated and shared.</div></div></div></section></section>
 <section id="settingsPage" class="page" style="display:none">
+
+<!-- BANNER MANAGEMENT SECTION -->
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;background:#fff;border:1px solid #eef2f7;border-radius:22px;padding:16px 20px;box-shadow:0 8px 24px rgba(15,23,42,.05)">
+  <div>
+    <div style="font-size:15px;font-weight:900;color:#071427">🖼️ Seller Dashboard Banner</div>
+    <div style="font-size:12px;color:#64748b;margin-top:3px">Seller login page-ல் left side-ல் slideshow ஆக தெரியும். Maximum 3 banners. (1920×1080 or 16:9 ratio best)</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div id="bannerSaveStatus" style="display:none;font-size:12px;font-weight:800;padding:7px 14px;border-radius:10px"></div>
+    <button onclick="saveBanners()" style="display:flex;align-items:center;gap:8px;background:#071427;color:#fff;border:0;border-radius:14px;padding:11px 18px;font-size:13px;font-weight:900;cursor:pointer">
+      💾 Save Banners
+    </button>
+  </div>
+</div>
+
+<div class="panel" style="margin-bottom:18px">
+  <div class="panel-head" style="margin-bottom:16px">
+    <div><h3>Banner Slides</h3><p class="small">Up to 3 banners. Image URL or Supabase Storage URL paste பண்ணுங்க.</p></div>
+    <button onclick="addBannerSlot()" id="addBannerBtn" style="border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer">+ Add Banner</button>
+  </div>
+
+  <div id="bannerSlotList" style="display:grid;gap:14px">
+    <!-- Slots injected by JS -->
+    <div style="text-align:center;color:#94a3b8;padding:24px;font-size:13px">Loading banners...</div>
+  </div>
+
+  <!-- Preview -->
+  <div style="margin-top:20px;border-top:1px solid #eef2f7;padding-top:18px">
+    <div style="font-size:13px;font-weight:800;color:#334155;margin-bottom:10px">📱 Preview (how it looks on seller login page)</div>
+    <div style="position:relative;width:100%;max-width:480px;border-radius:16px;overflow:hidden;background:#071427;aspect-ratio:16/9;box-shadow:0 12px 32px rgba(15,23,42,.18)">
+      <div id="bannerPreviewImg" style="width:100%;height:100%;background:linear-gradient(135deg,#071427,#1d4ed8);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;transition:opacity .5s">
+        Banner preview here
+      </div>
+      <div id="bannerPreviewDots" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Plan Management Header -->
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;background:#fff;border:1px solid #eef2f7;border-radius:22px;padding:16px 20px;box-shadow:0 8px 24px rgba(15,23,42,.05)">
@@ -1453,6 +1490,136 @@ async function loadSellerDropdown() {
     (data||[]).map(s => `<option value="${s.user_id}">${s.shop_name||s.email}</option>`).join('');
 }
 
+
+// ===================== BANNER MANAGEMENT =====================
+let _bannerSlots = []; // [{url:'', link:'', active:true}]
+let _bannerPreviewTimer = null;
+let _bannerPreviewIdx = 0;
+
+async function loadBanners() {
+  const { data, error } = await sb.from('app_settings').select('value').eq('key', 'dashboard_banners').maybeSingle();
+  let banners = [];
+  if (data && data.value) {
+    try { banners = JSON.parse(data.value); } catch(e) { banners = []; }
+  }
+  // Ensure array, max 3
+  if (!Array.isArray(banners)) banners = [];
+  _bannerSlots = banners.slice(0,3);
+  renderBannerSlots();
+}
+
+function renderBannerSlots() {
+  const list = document.getElementById('bannerSlotList');
+  if (!list) return;
+  const addBtn = document.getElementById('addBannerBtn');
+  if (addBtn) addBtn.style.display = _bannerSlots.length >= 3 ? 'none' : 'inline-flex';
+
+  if (!_bannerSlots.length) {
+    list.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:32px;border:2px dashed #e5e7eb;border-radius:16px;font-size:13px">
+      Banner இல்லை. "+ Add Banner" click பண்ணி add பண்ணுங்க.
+    </div>`;
+    updateBannerPreview();
+    return;
+  }
+
+  list.innerHTML = _bannerSlots.map((b, i) => `
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:#f8fafc;border:1px solid #eef2f7;border-radius:16px;padding:14px">
+      <!-- Thumbnail -->
+      <div style="width:90px;height:54px;border-radius:10px;overflow:hidden;background:#e5e7eb;flex-shrink:0">
+        ${b.url ? `<img src="${b.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94a3b8">No image</div>`}
+      </div>
+      <!-- URL Input -->
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;font-weight:900;background:#071427;color:#fff;padding:3px 9px;border-radius:999px;white-space:nowrap">Slide ${i+1}</span>
+          <input type="text" placeholder="https://... image URL paste பண்ணுங்க"
+            value="${b.url||''}"
+            oninput="_bannerSlots[${i}].url=this.value;updateBannerPreview()"
+            style="flex:1;border:1px solid #dbe3ef;border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:#64748b;font-weight:700;min-width:80px">Link (optional)</span>
+          <input type="text" placeholder="https://... click பண்ணும் போது போக வேண்டிய URL"
+            value="${b.link||''}"
+            oninput="_bannerSlots[${i}].link=this.value"
+            style="flex:1;border:1px solid #dbe3ef;border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none">
+        </div>
+      </div>
+      <!-- Remove -->
+      <button onclick="removeBannerSlot(${i})" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap">✕ Remove</button>
+    </div>
+  `).join('');
+  updateBannerPreview();
+}
+
+function addBannerSlot() {
+  if (_bannerSlots.length >= 3) return;
+  _bannerSlots.push({ url: '', link: '' });
+  renderBannerSlots();
+}
+
+function removeBannerSlot(i) {
+  _bannerSlots.splice(i, 1);
+  renderBannerSlots();
+}
+
+function updateBannerPreview() {
+  clearInterval(_bannerPreviewTimer);
+  const previewEl = document.getElementById('bannerPreviewImg');
+  const dotsEl = document.getElementById('bannerPreviewDots');
+  if (!previewEl || !dotsEl) return;
+
+  const valid = _bannerSlots.filter(b => b.url && b.url.trim());
+  if (!valid.length) {
+    previewEl.innerHTML = '<span style="color:#94a3b8;font-size:13px">Banner preview here</span>';
+    previewEl.style.background = 'linear-gradient(135deg,#071427,#1d4ed8)';
+    dotsEl.innerHTML = '';
+    return;
+  }
+
+  _bannerPreviewIdx = 0;
+  const showSlide = (idx) => {
+    const b = valid[idx];
+    previewEl.innerHTML = `<img src="${b.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span style=color:#94a3b8;font-size:13px>Image load error</span>'">`;
+    previewEl.style.background = '#000';
+    dotsEl.innerHTML = valid.map((_,di) =>
+      `<div style="width:${di===idx?'18px':'7px'};height:7px;border-radius:999px;background:${di===idx?'#fff':'rgba(255,255,255,0.4)'};transition:.3s"></div>`
+    ).join('');
+  };
+  showSlide(0);
+  if (valid.length > 1) {
+    _bannerPreviewTimer = setInterval(() => {
+      _bannerPreviewIdx = (_bannerPreviewIdx + 1) % valid.length;
+      showSlide(_bannerPreviewIdx);
+    }, 3000);
+  }
+}
+
+async function saveBanners() {
+  const statusEl = document.getElementById('bannerSaveStatus');
+  statusEl.style.display = 'block';
+  statusEl.style.background = '#e0f2fe'; statusEl.style.color = '#0369a1';
+  statusEl.textContent = '⏳ Saving...';
+
+  const toSave = _bannerSlots.filter(b => b.url && b.url.trim());
+  const payload = JSON.stringify(toSave);
+
+  const { error } = await sb.from('app_settings').upsert(
+    { key: 'dashboard_banners', value: payload },
+    { onConflict: 'key' }
+  );
+
+  if (error) {
+    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+    statusEl.textContent = '❌ Error: ' + error.message;
+  } else {
+    statusEl.style.background = '#dcfce7'; statusEl.style.color = '#15803d';
+    statusEl.textContent = '✅ Banners saved! Seller dashboard-ல் உடனே reflect ஆகும்.';
+    setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
+  }
+}
+// ===================== END BANNER MANAGEMENT =====================
+
 document.addEventListener('DOMContentLoaded', startAuthGate);
 </script>
 
@@ -1472,6 +1639,7 @@ document.addEventListener('DOMContentLoaded', function(){
         loadPlanConfigs();
         loadSellerDropdown();
         loadSellerSubscriptions();
+        loadBanners();
       }
     });
   });

@@ -130,13 +130,26 @@
 <section id="ordersPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Today Orders</div><div class="value" id="ordersToday2">0</div><span class="trend up">Order ID created</span></div><div class="card"><div class="label">Processing</div><div class="value" id="processingOrders">0</div><span class="trend neutral">Live orders</span></div><div class="card"><div class="label">Delivered</div><div class="value" id="deliveredOrders">0</div><span class="trend up">Completed</span></div><div class="card"><div class="label">Cancelled</div><div class="value" id="cancelledOrders">0</div><span class="trend down">Need attention</span></div></section><div class="panel"><div class="panel-head"><div><h3>Recent Orders</h3><p class="small">All sellers order activity</p></div></div><table class="table"><thead><tr><th>Order ID</th><th>Seller</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentOrderRows"></tbody></table></div></section>
 <section id="topPage" class="page" style="display:none">
 
+<!-- BADGE RECALCULATE BAR -->
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;background:#fff;border:1px solid #eef2f7;border-radius:22px;padding:16px 20px;box-shadow:0 8px 24px rgba(15,23,42,.05)">
+  <div>
+    <div style="font-size:15px;font-weight:900;color:#071427">🏅 Monthly Badge Rankings</div>
+    <div style="font-size:12px;color:#64748b;margin-top:3px">This month orders count வச்சு badge assign பண்ணும். Month தொடங்கும் போது Recalculate பண்ணுங்க.</div>
+  </div>
+  <button id="recalcBadgeBtn" class="control-btn orange-btn" style="display:flex;align-items:center;gap:8px;padding:11px 18px;font-size:13px;border-radius:14px" onclick="recalculateBadges()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
+    Recalculate Badges
+  </button>
+  <div id="recalcStatus" style="display:none;font-size:12px;font-weight:800;padding:8px 14px;border-radius:12px"></div>
+</div>
+
 <!-- TOP STAT CARDS -->
 <section class="cards" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
   <div class="card" style="border-top:3px solid #f97316;position:relative;overflow:hidden">
     <div class="label" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="m9 12 2 2 4-4"/></svg> Best Orders Seller</div>
     <div class="value" id="topOrdersValue">0</div>
     <div id="topOrdersName"></div>
-    <div style="font-size:11px;color:#64748b;margin-top:6px">Total Orders</div>
+    <div style="font-size:11px;color:#64748b;margin-top:6px">This Month Orders</div>
     <div id="topOrdersPhoto" style="position:absolute;top:50%;right:0;transform:translateY(-50%);width:80px;height:80px;border-radius:16px 0 0 16px;overflow:hidden;opacity:1;pointer-events:none;box-shadow:-4px 0 18px rgba(15,23,42,.10)"></div>
   </div>
   <div class="card" style="border-top:3px solid #16a34a;position:relative;overflow:hidden">
@@ -310,7 +323,24 @@ async function loadSellers(){
     }
   } catch(e){ console.warn('get_seller_stats exception:',e); }
 
-  // Fetch logo from settings table for all sellers
+  // Fetch all orders to compute this-month count per seller
+  let monthOrdersMap = {};
+  try {
+    const now = new Date();
+    const mStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const mEnd   = new Date(now.getFullYear(), now.getMonth()+1, 1).toISOString();
+    const {data: mOrders, error: mErr} = await sb.from('orders')
+      .select('user_id,created_at')
+      .gte('created_at', mStart)
+      .lt('created_at', mEnd);
+    if(!mErr && mOrders){
+      mOrders.forEach(o => {
+        if(o.user_id) monthOrdersMap[o.user_id] = (monthOrdersMap[o.user_id]||0) + 1;
+      });
+    }
+  } catch(e){ console.warn('monthOrders fetch error:',e); }
+
+
   let logoMap={};
   try {
     const uids=(authData||[]).map(u=>u.user_id).filter(Boolean);
@@ -336,6 +366,7 @@ async function loadSellers(){
     logo: logoMap[u.user_id]||'',
     // Real stats from get_seller_stats()
     orders: (statsMap[u.user_id]||{}).orders||0,
+    thisMonthOrders: monthOrdersMap[u.user_id]||0,
     delivered_orders: (statsMap[u.user_id]||{}).delivered||0,
     total_revenue: (statsMap[u.user_id]||{}).revenue||0
   }));
@@ -584,8 +615,8 @@ async function loadTickets(){
 function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
 function drawPlans(v){chart('planChart',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});chart('planChart2',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}}); chart('revenueChart',{type:'line',data:{labels:['This Month'],datasets:[{data:[Number(String($('revenueThisMonth')?.textContent||'0').replace(/[^0-9]/g,''))],borderWidth:3,tension:.4}]},options:common})}
 function renderTop(sellers){
-  // --- Stat cards (simulate from order count since no revenue/delivery tables yet) ---
-  const sorted=[...sellers].sort((a,b)=>(b.orders||0)-(a.orders||0));
+  // --- Sort by thisMonth orders (from settings.badge_month_count if available, else fall back to total orders) ---
+  const sorted=[...sellers].sort((a,b)=>(b.thisMonthOrders||b.orders||0)-(a.thisMonthOrders||a.orders||0));
   const top=sorted.slice(0,10);
 
   // Helper: render stat card photo+name chip
@@ -605,7 +636,7 @@ function renderTop(sellers){
 
   // Best Orders
   if(top[0]){
-    setText('topOrdersValue', top[0].orders||top[0].total_orders||sorted.length);
+    setText('topOrdersValue', top[0].thisMonthOrders||top[0].orders||0);
     const el=$('topOrdersName'); if(el) el.outerHTML=`<div id="topOrdersName">${statChip(top[0],'topOrdersPhoto')}</div>`;
   }
   // Best Revenue - use real total_revenue from get_seller_stats
@@ -750,7 +781,7 @@ function renderTop(sellers){
   const primesellers=top.slice(3); // only #4 to #10
   const lbHtml=primesellers.map((s,i)=>{
     const rank=i+4; // actual rank
-    const orders=s.orders||'-';
+    const orders=s.thisMonthOrders||s.orders||'-';
     const photoSrc=s.logo||s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
     const name=safe(s.name||s.shop_name,'Seller');
     const city=safe(s.city,'-');
@@ -902,6 +933,110 @@ async function init(){
     }).subscribe();
   setInterval(()=>{ loadCounts(); loadActivity(); }, 30000);
 }
+async function recalculateBadges(){
+  const btn = $('recalcBadgeBtn');
+  const status = $('recalcStatus');
+  if(btn){ btn.disabled=true; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg> Calculating...'; }
+  if(status){ status.style.display='none'; }
+
+  try {
+    // Step 1: This month date range
+    const now = new Date();
+    const mStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const mEnd   = new Date(now.getFullYear(), now.getMonth()+1, 1).toISOString();
+
+    // Step 2: Fetch this month's orders
+    const {data: mOrders, error: mErr} = await sb.from('orders')
+      .select('user_id,created_at')
+      .gte('created_at', mStart)
+      .lt('created_at', mEnd);
+    if(mErr) throw new Error('Orders fetch failed: ' + mErr.message);
+
+    // Step 3: Count orders per seller
+    const countMap = {};
+    (mOrders||[]).forEach(o => {
+      if(o.user_id) countMap[o.user_id] = (countMap[o.user_id]||0) + 1;
+    });
+
+    // Step 4: Get all seller user_ids from settings
+    const {data: allSettings, error: sErr} = await sb.from('settings').select('user_id');
+    if(sErr) throw new Error('Settings fetch failed: ' + sErr.message);
+
+    // Step 5: Sort sellers by this-month order count
+    const sellers = (allSettings||[]).map(s => ({
+      user_id: s.user_id,
+      thisMonthCount: countMap[s.user_id]||0
+    }));
+    sellers.sort((a,b) => b.thisMonthCount - a.thisMonthCount);
+
+    // Step 6: Assign badge by rank
+    function assignBadge(rank){
+      if(rank===1) return 'diamond';
+      if(rank===2) return 'gold';
+      if(rank===3) return 'silver';
+      if(rank<=10) return 'prime';
+      return 'prime';
+    }
+
+    // Step 7: Build upsert rows for all sellers
+    const updates = sellers.map((s, idx) => ({
+      user_id: s.user_id,
+      badge: assignBadge(idx+1),
+      badge_month_count: s.thisMonthCount,
+      badge_updated_at: new Date().toISOString()
+    }));
+
+    // Step 8: Upsert into settings table in batches of 50
+    const batchSize = 50;
+    for(let i=0; i<updates.length; i+=batchSize){
+      const batch = updates.slice(i, i+batchSize);
+      const {error: upErr} = await sb.from('settings')
+        .upsert(batch, {onConflict:'user_id'});
+      if(upErr) throw new Error('Settings update failed: ' + upErr.message);
+    }
+
+    // Step 9: Show success + refresh top page
+    const monthName = now.toLocaleString('en-IN',{month:'long',year:'numeric'});
+    if(status){
+      status.style.display='block';
+      status.style.background='#dcfce7'; status.style.color='#15803d';
+      const diamond = sellers[0];
+      status.textContent=`✅ ${updates.length} sellers updated for ${monthName}. 💎 Diamond → ${diamond?diamond.user_id:'N/A'} (${diamond?diamond.thisMonthCount:0} orders)`;
+    }
+
+    // Reload the top performers display with fresh data
+    if(window.__allSellers){
+      // Refresh thisMonthOrders in cached sellers list
+      window.__allSellers.forEach(s => {
+        s.thisMonthOrders = countMap[s.user_id]||0;
+      });
+      const verified = window.__allSellers.filter(s=>s._status==='confirmed');
+      renderTop(verified.length ? verified : window.__allSellers);
+    }
+
+  } catch(err){
+    if(status){
+      status.style.display='block';
+      status.style.background='#fee2e2'; status.style.color='#b91c1c';
+      status.textContent='❌ Error: '+err.message;
+    }
+    console.error('recalculateBadges error:', err);
+  } finally {
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg> Recalculate Badges';
+    }
+  }
+}
+
+// Spin animation for recalc button
+if(!document.getElementById('recalcSpinStyle')){
+  const s=document.createElement('style');
+  s.id='recalcSpinStyle';
+  s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(s);
+}
+
 startAuthGate();
 </script>
 

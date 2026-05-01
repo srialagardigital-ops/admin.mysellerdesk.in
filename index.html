@@ -167,9 +167,9 @@
 </div>
 
 <!-- LEADERBOARD HORIZONTAL SCROLL CARDS -->
-<div class="panel">
+<div class="panel" style="margin-bottom:18px">
   <div class="panel-head" style="flex-wrap:wrap;gap:10px;margin-bottom:16px">
-    <div><h3>🏅 Prime Sellers</h3><p class="small">Top 10 ranked sellers</p></div>
+    <div><h3>🏅 Prime Sellers</h3><p class="small">#4 to #10 ranked sellers</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">💎 #1 Diamond</span>
       <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥇 #2 Gold</span>
@@ -178,6 +178,54 @@
     </div>
   </div>
   <div id="leaderboard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin"></div>
+</div>
+
+<!-- ALL SELLERS PERFORMANCE TABLE WITH SEARCH & FILTER -->
+<div class="panel">
+  <div class="panel-head" style="flex-wrap:wrap;gap:12px;margin-bottom:16px">
+    <div><h3>📋 All Sellers Performance</h3><p class="small">Search, filter & view every seller</p></div>
+  </div>
+  <!-- Search + Filter Bar -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+    <div style="flex:1;min-width:200px;position:relative">
+      <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#94a3b8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="perfSearch" type="text" placeholder="Search seller name, email, city..."
+        style="width:100%;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px 10px 36px;font-size:13px;outline:none;font-family:inherit"
+        oninput="filterPerfTable()">
+    </div>
+    <select id="perfFilterDistrict" onchange="filterPerfTable()"
+      style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;outline:none;background:#fff;font-family:inherit;color:#334155">
+      <option value="">All Districts</option>
+    </select>
+    <select id="perfFilterStatus" onchange="filterPerfTable()"
+      style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;outline:none;background:#fff;font-family:inherit;color:#334155">
+      <option value="">All Status</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="pending">Pending</option>
+    </select>
+    <select id="perfSort" onchange="filterPerfTable()"
+      style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;outline:none;background:#fff;font-family:inherit;color:#334155">
+      <option value="orders">Sort: Orders ↓</option>
+      <option value="name">Sort: Name A-Z</option>
+      <option value="date">Sort: Newest First</option>
+    </select>
+    <span id="perfCount" style="font-size:12px;font-weight:800;color:#64748b;white-space:nowrap"></span>
+  </div>
+  <!-- Table -->
+  <div style="overflow-x:auto">
+    <table class="table" style="min-width:600px">
+      <thead><tr>
+        <th>Rank</th>
+        <th>Seller</th>
+        <th>District</th>
+        <th>Orders</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th>Badge</th>
+      </tr></thead>
+      <tbody id="perfTableBody"></tbody>
+    </table>
+  </div>
 </div>
 
 </section>
@@ -683,7 +731,84 @@ function renderTop(sellers){
 
   if($('dashTopList'))$('dashTopList').innerHTML=dashHtml;
   if($('leaderboard'))$('leaderboard').innerHTML=lbHtml;
+
+  // --- All Sellers Performance Table ---
+  window.__perfSellers = sellers; // store full list for filter
+  // Populate district dropdown
+  const districts=[...new Set(sellers.map(s=>s.city||s.district).filter(d=>d&&d!=='-'))].sort();
+  const distSel=$('perfFilterDistrict');
+  if(distSel){
+    distSel.innerHTML='<option value="">All Districts</option>'+districts.map(d=>`<option value="${d}">${d}</option>`).join('');
+  }
+  renderPerfTable(sellers);
+
   if(window.lucide) lucide.createIcons();
+}
+
+function perfBadgeForRank(rank){
+  if(rank===1) return {label:'💎 Diamond',bg:'#dbeafe',color:'#1d4ed8'};
+  if(rank===2) return {label:'🥇 Gold',bg:'#fef3c7',color:'#92400e'};
+  if(rank===3) return {label:'🥈 Silver',bg:'#e5e7eb',color:'#374151'};
+  if(rank<=10) return {label:'⭐ Prime',bg:'#f3e8ff',color:'#7c3aed'};
+  return {label:'👤 Seller',bg:'#f1f5f9',color:'#475569'};
+}
+
+function renderPerfTable(list){
+  const tbody=$('perfTableBody');
+  if(!tbody) return;
+  if(!list||!list.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#64748b;padding:24px">No sellers found</td></tr>';
+    if($('perfCount')) $('perfCount').textContent='0 sellers';
+    return;
+  }
+  if($('perfCount')) $('perfCount').textContent=list.length+' sellers';
+  // Rank is based on original sorted position in __perfSellers
+  const allSorted=(window.__perfSellers||list);
+  tbody.innerHTML=list.map(s=>{
+    const globalRank=allSorted.findIndex(x=>(x.user_id||x.email)===( s.user_id||s.email))+1;
+    const b=perfBadgeForRank(globalRank);
+    const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
+    const name=safe(s.name||s.shop_name,'Seller');
+    const status=s._status==='confirmed'?'confirmed':'pending';
+    const joined=s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-';
+    return `<tr>
+      <td><span style="font-size:13px;font-weight:900;color:#071427">#${globalRank}</span></td>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <img src="${photoSrc}" onerror="this.src='${img(name)}'"
+          style="width:38px;height:38px;border-radius:10px;object-fit:cover;border:1.5px solid #e2e8f0;flex-shrink:0">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#071427">${name}</div>
+          <div style="font-size:11px;color:#64748b">${safe(s.email,'-')}</div>
+        </div>
+      </div></td>
+      <td style="font-size:13px;color:#334155">${safe(s.city,'-')}</td>
+      <td><span style="font-size:15px;font-weight:900;color:#071427">${s.orders||'-'}</span></td>
+      <td><span class="badge ${status==='confirmed'?'verify-confirmed':'verify-pending'}">${status==='confirmed'?'Confirmed':'Pending'}</span></td>
+      <td style="font-size:12px;color:#64748b">${joined}</td>
+      <td><span style="background:${b.bg};color:${b.color};font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">${b.label}</span></td>
+    </tr>`;
+  }).join('');
+  if(window.lucide) lucide.createIcons();
+}
+
+function filterPerfTable(){
+  const search=($('perfSearch')||{value:''}).value.toLowerCase();
+  const district=($('perfFilterDistrict')||{value:''}).value;
+  const status=($('perfFilterStatus')||{value:''}).value;
+  const sortBy=($('perfSort')||{value:'orders'}).value;
+  let list=[...(window.__perfSellers||[])];
+  if(search) list=list.filter(s=>{
+    const n=(s.name||s.shop_name||'').toLowerCase();
+    const e=(s.email||'').toLowerCase();
+    const c=(s.city||'').toLowerCase();
+    return n.includes(search)||e.includes(search)||c.includes(search);
+  });
+  if(district) list=list.filter(s=>(s.city||s.district)===district);
+  if(status) list=list.filter(s=>s._status===status);
+  if(sortBy==='name') list.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  else if(sortBy==='date') list.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  else list.sort((a,b)=>(b.orders||0)-(a.orders||0));
+  renderPerfTable(list);
 }
 
 function nav(){

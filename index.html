@@ -166,18 +166,18 @@
   </div>
 </div>
 
-<!-- LEADERBOARD WITH BADGES -->
+<!-- LEADERBOARD HORIZONTAL SCROLL CARDS -->
 <div class="panel">
-  <div class="panel-head" style="flex-wrap:wrap;gap:10px">
-    <div><h3>🏅 Full Leaderboard</h3><p class="small">Diamond · Gold · Silver · Prime</p></div>
+  <div class="panel-head" style="flex-wrap:wrap;gap:10px;margin-bottom:16px">
+    <div><h3>🏅 Prime Sellers</h3><p class="small">Top 10 ranked sellers</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">💎 Diamond = #1</span>
-      <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥇 Gold = #2</span>
-      <span style="background:#e5e7eb;color:#374151;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥈 Silver = #3</span>
-      <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">⭐ Prime = #4-10</span>
+      <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">💎 #1 Diamond</span>
+      <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥇 #2 Gold</span>
+      <span style="background:#e5e7eb;color:#374151;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥈 #3 Silver</span>
+      <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">⭐ #4-10 Prime</span>
     </div>
   </div>
-  <div class="list" id="leaderboard" style="display:grid;gap:10px"></div>
+  <div id="leaderboard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin"></div>
 </div>
 
 </section>
@@ -597,9 +597,8 @@ function renderTop(sellers){
       ${Array(10).fill(0).map(()=>`<div style="width:6px;height:6px;border-radius:50%;background:${m.dotColor}"></div>`).join('')}
     </div>`;
     const statsHtml=m.statsExtra
-      ? `<div style="display:flex;gap:20px;justify-content:center">
+      ? `<div style="display:flex;gap:24px;justify-content:center">
           <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#071427">${orders}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Orders</div></div>
-          <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#1d4ed8">${score}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Score</div></div>
           <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#16a34a">${growth}</div><div style="font-size:11px;color:#64748b;font-weight:700;margin-top:2px">Growth</div></div>
         </div>`
       : `<div style="display:flex;gap:24px;justify-content:center">
@@ -623,35 +622,63 @@ function renderTop(sellers){
   }).join('');
   if($('topPodium')) $('topPodium').innerHTML=topCardHtml||'<div style="color:#64748b;font-size:13px;padding:40px;text-align:center">Not enough sellers yet</div>';
 
-  // --- Leaderboard: #1 Diamond, #2 Gold, #3 Silver, #4-10 Prime ---
+  // --- Leaderboard: horizontal scroll cards ---
   function lbBadge(i){
-    if(i===0) return {label:'💎 Diamond',border:'#60a5fa',bg:'linear-gradient(135deg,#eef2ff,#fff 55%,#dbeafe)',textColor:'#1d4ed8'};
-    if(i===1) return {label:'🥇 Gold',border:'#f59e0b',bg:'linear-gradient(135deg,#fffbeb,#fff 55%,#fef3c7)',textColor:'#92400e'};
-    if(i===2) return {label:'🥈 Silver',border:'#94a3b8',bg:'linear-gradient(135deg,#f8fafc,#fff 55%,#e2e8f0)',textColor:'#475569'};
-    return {label:'⭐ Prime Seller',border:'#a78bfa',bg:'linear-gradient(135deg,#f5f3ff,#fff 55%,#ede9fe)',textColor:'#6d28d9'};
+    if(i===0) return {label:'💎 Diamond',border:'#60a5fa',bg:'linear-gradient(160deg,#eef2ff,#fff 55%,#dbeafe)',badgeBg:'#1d4ed8',badgeColor:'#fff'};
+    if(i===1) return {label:'🥇 Gold',border:'#f59e0b',bg:'linear-gradient(160deg,#fffbeb,#fff 55%,#fef3c7)',badgeBg:'#f59e0b',badgeColor:'#fff'};
+    if(i===2) return {label:'🥈 Silver',border:'#94a3b8',bg:'linear-gradient(160deg,#f8fafc,#fff 55%,#e2e8f0)',badgeBg:'#64748b',badgeColor:'#fff'};
+    return {label:'⭐ Prime',border:'#a78bfa',bg:'linear-gradient(160deg,#f5f3ff,#fff 55%,#ede9fe)',badgeBg:'#7c3aed',badgeColor:'#fff'};
   }
 
-  const lbHtml=top.map((s,i)=>{
-    const b=lbBadge(i);
+  // seller title by rank
+  function sellerTitle(i){
+    if(i===0) return 'Elite Seller';
+    if(i===1) return 'Pro Seller';
+    if(i===2) return 'Growth Star';
+    if(i===3) return 'Rising Seller';
+    return 'Verified Seller';
+  }
+  function titleColor(i){
+    if(i===0) return '#92400e';
+    if(i===1) return '#374151';
+    if(i===2) return '#c2410c';
+    if(i===3) return '#0369a1';
+    return '#065f46';
+  }
+  function titleBg(i){
+    if(i===0) return '#fef3c7';
+    if(i===1) return '#e5e7eb';
+    if(i===2) return '#ffedd5';
+    if(i===3) return '#e0f2fe';
+    return '#d1fae5';
+  }
+
+  const primesellers=top.slice(3); // only #4 to #10
+  const lbHtml=primesellers.map((s,i)=>{
+    const rank=i+4; // actual rank
     const orders=s.orders||'-';
     const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
-    return `<div style="background:${b.bg};border:1px solid ${b.border};border-radius:18px;padding:14px 18px;display:flex;align-items:center;gap:14px">
-      <div style="font-size:20px;font-weight:900;color:#071427;min-width:34px;text-align:center">#${i+1}</div>
-      <img src="${photoSrc}" onerror="this.src='${img(s.name||'Seller')}'"
-        style="width:46px;height:46px;border-radius:12px;object-fit:cover;border:2px solid ${b.border};flex-shrink:0">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:15px;font-weight:900;color:#071427">${safe(s.name||s.shop_name,'Seller')}</div>
-        <div style="font-size:12px;color:#64748b;margin-top:2px">${safe(s.city)} • ${orders} orders</div>
+    const name=safe(s.name||s.shop_name,'Seller');
+    const city=safe(s.city,'-');
+    return `<div style="flex:0 0 170px;background:#fff;border:1px solid #eef2f7;border-radius:20px;padding:20px 14px 18px;text-align:center;box-shadow:0 8px 24px rgba(15,23,42,.07);position:relative">
+      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;background:#7c3aed;color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.15)">${rank}</div>
+      <div style="margin:10px 0 12px">
+        <img src="${photoSrc}" onerror="this.src='${img(name)}'"
+          style="width:78px;height:78px;border-radius:18px;object-fit:cover;border:2px solid #a78bfa;box-shadow:0 6px 16px rgba(0,0,0,.1)">
       </div>
-      <span style="background:#fff;color:${b.textColor};font-size:12px;font-weight:900;padding:6px 14px;border-radius:999px;border:1.5px solid ${b.border};white-space:nowrap">${b.label}</span>
+      <div style="font-size:14px;font-weight:900;color:#071427;margin-bottom:3px">${name}</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px">${city}</div>
+      <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;display:inline-block;margin-bottom:12px">⭐ Prime Seller</span>
+      <div style="font-size:22px;font-weight:900;color:#071427">${orders}</div>
+      <div style="font-size:11px;color:#64748b;font-weight:700">orders</div>
     </div>`;
-  }).join('')||'<div class="ticket"><b>No sellers found</b><p>Supabase connect pannina real data varum.</p></div>';
+  }).join('')||'<div style="color:#64748b;font-size:13px;padding:20px">4th place and above sellers will appear here.</div>';
 
-  // Dashboard top list uses same badge logic
+  // Dashboard top list
   const dashHtml=top.slice(0,3).map((s,i)=>{
     const b=lbBadge(i);
     const cardCls=i===0?'rank-diamond':i===1?'rank-gold':'rank-silver';
-    return `<div class="performer-card ${cardCls}"><div class="performer-left"><img class="profile-img" src="${img(s.name||'Seller')}"><div><b>${safe(s.name||s.shop_name,'Seller')}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span style="font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;border:1.5px solid ${b.border};color:${b.textColor};background:#fff">${b.label}</span></div>`;
+    return `<div class="performer-card ${cardCls}"><div class="performer-left"><img class="profile-img" src="${img(s.name||'Seller')}"><div><b>${safe(s.name||s.shop_name,'Seller')}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span style="font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;background:${b.badgeBg};color:${b.badgeColor}">${b.label}</span></div>`;
   }).join('')||'<div class="ticket"><b>No sellers found</b></div>';
 
   if($('dashTopList'))$('dashTopList').innerHTML=dashHtml;

@@ -135,26 +135,26 @@
   <div class="card" style="border-top:3px solid #f97316">
     <div class="label">🏆 Best Orders Seller</div>
     <div class="value" id="topOrdersValue">0</div>
-    <span class="trend up" id="topOrdersName">-</span>
-    <div style="font-size:11px;color:#64748b;margin-top:4px">Total Orders</div>
+    <div id="topOrdersName"></div>
+    <div style="font-size:11px;color:#64748b;margin-top:6px">Total Orders</div>
   </div>
   <div class="card" style="border-top:3px solid #16a34a">
     <div class="label">💰 Best Revenue Seller</div>
     <div class="value" id="topRevenueValue">₹0</div>
-    <span class="trend up" id="topRevenueName">-</span>
-    <div style="font-size:11px;color:#64748b;margin-top:4px">Total Revenue</div>
+    <div id="topRevenueName"></div>
+    <div style="font-size:11px;color:#64748b;margin-top:6px">Total Revenue</div>
   </div>
   <div class="card" style="border-top:3px solid #1d4ed8">
     <div class="label">⚡ Fast Delivery Seller</div>
     <div class="value" id="topDeliveryValue">0%</div>
-    <span class="trend neutral" id="topDeliveryName">-</span>
-    <div style="font-size:11px;color:#64748b;margin-top:4px">Delivery Rate</div>
+    <div id="topDeliveryName"></div>
+    <div style="font-size:11px;color:#64748b;margin-top:6px">Delivery Rate</div>
   </div>
   <div class="card" style="border-top:3px solid #7c3aed">
     <div class="label">🔁 Repeat Customer Seller</div>
     <div class="value" id="topRepeatValue">0%</div>
-    <span class="trend up" id="topRepeatName">-</span>
-    <div style="font-size:11px;color:#64748b;margin-top:4px">Repeat Rate</div>
+    <div id="topRepeatName"></div>
+    <div style="font-size:11px;color:#64748b;margin-top:6px">Repeat Rate</div>
   </div>
 </section>
 
@@ -168,12 +168,13 @@
 
 <!-- LEADERBOARD WITH BADGES -->
 <div class="panel">
-  <div class="panel-head"><div><h3>🏅 Full Leaderboard</h3><p class="small">Diamond · Gold · Silver rankings</p></div>
+  <div class="panel-head" style="flex-wrap:wrap;gap:10px">
+    <div><h3>🏅 Full Leaderboard</h3><p class="small">Diamond · Gold · Silver · Prime</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">💎 Diamond = Top 1</span>
-      <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥇 Gold = Top 2-3</span>
-      <span style="background:#e5e7eb;color:#374151;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥈 Silver = Top 4-6</span>
-      <span style="background:#ffedd5;color:#c2410c;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥉 Bronze = Top 7-10</span>
+      <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">💎 Diamond = #1</span>
+      <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥇 Gold = #2</span>
+      <span style="background:#e5e7eb;color:#374151;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥈 Silver = #3</span>
+      <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">⭐ Prime = #4-10</span>
     </div>
   </div>
   <div class="list" id="leaderboard" style="display:grid;gap:10px"></div>
@@ -501,28 +502,40 @@ function renderTop(sellers){
   const sorted=[...sellers].sort((a,b)=>(b.orders||0)-(a.orders||0));
   const top=sorted.slice(0,10);
 
+  // Helper: render stat card photo+name chip
+  function statChip(s){
+    if(!s) return '';
+    const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.email||'Seller');
+    const label=s.name||s.shop_name||s.email||'-';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+      <img src="${photoSrc}" onerror="this.src='${img(label)}'"
+        style="width:36px;height:36px;border-radius:10px;object-fit:cover;border:2px solid #e5e7eb;flex-shrink:0">
+      <span style="font-size:12px;font-weight:800;color:#065f46;background:#d1fae5;padding:4px 10px;border-radius:999px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${label}</span>
+    </div>`;
+  }
+
   // Best Orders
   if(top[0]){
     setText('topOrdersValue', top[0].orders||top[0].total_orders||sorted.length);
-    setText('topOrdersName', top[0].name||top[0].shop_name||'-');
+    const el=$('topOrdersName'); if(el) el.outerHTML=`<div id="topOrdersName">${statChip(top[0])}</div>`;
   }
-  // Best Revenue (simulate: orders * avg ₹500)
+  // Best Revenue
   if(top[0]){
-    const rev = (top[0].orders||sorted.length)*500;
-    setText('topRevenueValue', '₹'+(rev>=1000?Math.round(rev/1000)+'K':rev));
-    setText('topRevenueName', top[0].name||'-');
+    const rev=(top[0].orders||sorted.length)*500;
+    setText('topRevenueValue','₹'+(rev>=1000?Math.round(rev/1000)+'K':rev));
+    const el=$('topRevenueName'); if(el) el.outerHTML=`<div id="topRevenueName">${statChip(top[0])}</div>`;
   }
-  // Fast Delivery (simulate top by city activity)
+  // Fast Delivery
   if(top[1]||top[0]){
     const fd=top[1]||top[0];
     setText('topDeliveryValue','96%');
-    setText('topDeliveryName', fd.name||'-');
+    const el=$('topDeliveryName'); if(el) el.outerHTML=`<div id="topDeliveryName">${statChip(fd)}</div>`;
   }
-  // Repeat Customer (simulate)
+  // Repeat Customer
   if(top[2]||top[0]){
     const rc=top[2]||top[0];
     setText('topRepeatValue','+38%');
-    setText('topRepeatName', rc.name||'-');
+    const el=$('topRepeatName'); if(el) el.outerHTML=`<div id="topRepeatName">${statChip(rc)}</div>`;
   }
 
   // --- Top 3 Cards: Silver / Gold / Diamond ---
@@ -610,37 +623,35 @@ function renderTop(sellers){
   }).join('');
   if($('topPodium')) $('topPodium').innerHTML=topCardHtml||'<div style="color:#64748b;font-size:13px;padding:40px;text-align:center">Not enough sellers yet</div>';
 
-  // --- Leaderboard with Diamond/Gold/Silver/Bronze ---
-  const badgeMeta=[
-    {label:'💎 Diamond',cls:'diamond',card:'rank-diamond',bg:'linear-gradient(135deg,#eef2ff,#fff 55%,#e0f2fe)',border:'#60a5fa'},
-    {label:'🥇 Gold',cls:'gold',card:'rank-gold',bg:'linear-gradient(135deg,#fffbeb,#fff 55%,#fef3c7)',border:'#f59e0b'},
-    {label:'🥇 Gold',cls:'gold',card:'rank-gold',bg:'linear-gradient(135deg,#fffbeb,#fff 55%,#fef3c7)',border:'#f59e0b'},
-    {label:'🥈 Silver',cls:'silver',card:'rank-silver',bg:'linear-gradient(135deg,#f8fafc,#fff 55%,#e5e7eb)',border:'#cbd5e1'},
-    {label:'🥈 Silver',cls:'silver',card:'rank-silver',bg:'linear-gradient(135deg,#f8fafc,#fff 55%,#e5e7eb)',border:'#cbd5e1'},
-    {label:'🥈 Silver',cls:'silver',card:'rank-silver',bg:'linear-gradient(135deg,#f8fafc,#fff 55%,#e5e7eb)',border:'#cbd5e1'},
-    {label:'🥉 Bronze',cls:'prime',card:'rank-prime',bg:'linear-gradient(135deg,#fff7ed,#fff 55%,#ffedd5)',border:'#f97316'},
-    {label:'🥉 Bronze',cls:'prime',card:'rank-prime',bg:'linear-gradient(135deg,#fff7ed,#fff 55%,#ffedd5)',border:'#f97316'},
-    {label:'🥉 Bronze',cls:'prime',card:'rank-prime',bg:'linear-gradient(135deg,#fff7ed,#fff 55%,#ffedd5)',border:'#f97316'},
-    {label:'🥉 Bronze',cls:'prime',card:'rank-prime',bg:'linear-gradient(135deg,#fff7ed,#fff 55%,#ffedd5)',border:'#f97316'},
-  ];
+  // --- Leaderboard: #1 Diamond, #2 Gold, #3 Silver, #4-10 Prime ---
+  function lbBadge(i){
+    if(i===0) return {label:'💎 Diamond',border:'#60a5fa',bg:'linear-gradient(135deg,#eef2ff,#fff 55%,#dbeafe)',textColor:'#1d4ed8'};
+    if(i===1) return {label:'🥇 Gold',border:'#f59e0b',bg:'linear-gradient(135deg,#fffbeb,#fff 55%,#fef3c7)',textColor:'#92400e'};
+    if(i===2) return {label:'🥈 Silver',border:'#94a3b8',bg:'linear-gradient(135deg,#f8fafc,#fff 55%,#e2e8f0)',textColor:'#475569'};
+    return {label:'⭐ Prime Seller',border:'#a78bfa',bg:'linear-gradient(135deg,#f5f3ff,#fff 55%,#ede9fe)',textColor:'#6d28d9'};
+  }
+
   const lbHtml=top.map((s,i)=>{
-    const b=badgeMeta[i]||badgeMeta[badgeMeta.length-1];
+    const b=lbBadge(i);
     const orders=s.orders||'-';
-    return `<div style="background:${b.bg};border:1px solid ${b.border};border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:14px">
-      <div style="font-size:22px;font-weight:900;color:#071427;min-width:32px;text-align:center">#${i+1}</div>
-      <img src="${s.profile_photo||s.avatar_url||img(s.name)}" onerror="this.src='${img(s.name)}'"
-        style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid ${b.border};flex-shrink:0">
+    const photoSrc=s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
+    return `<div style="background:${b.bg};border:1px solid ${b.border};border-radius:18px;padding:14px 18px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:20px;font-weight:900;color:#071427;min-width:34px;text-align:center">#${i+1}</div>
+      <img src="${photoSrc}" onerror="this.src='${img(s.name||'Seller')}'"
+        style="width:46px;height:46px;border-radius:12px;object-fit:cover;border:2px solid ${b.border};flex-shrink:0">
       <div style="flex:1;min-width:0">
         <div style="font-size:15px;font-weight:900;color:#071427">${safe(s.name||s.shop_name,'Seller')}</div>
-        <div style="font-size:12px;color:#64748b">${safe(s.city)} • ${orders} orders</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">${safe(s.city)} • ${orders} orders</div>
       </div>
-      <span style="background:${b.border}22;color:#071427;font-size:12px;font-weight:900;padding:6px 12px;border-radius:999px;border:1px solid ${b.border};white-space:nowrap">${b.label}</span>
+      <span style="background:#fff;color:${b.textColor};font-size:12px;font-weight:900;padding:6px 14px;border-radius:999px;border:1.5px solid ${b.border};white-space:nowrap">${b.label}</span>
     </div>`;
   }).join('')||'<div class="ticket"><b>No sellers found</b><p>Supabase connect pannina real data varum.</p></div>';
 
+  // Dashboard top list uses same badge logic
   const dashHtml=top.slice(0,3).map((s,i)=>{
-    const b=badgeMeta[i];
-    return `<div class="performer-card ${b.card}"><div class="performer-left"><img class="profile-img" src="${img(s.name)}"><div><b>${safe(s.name,'Seller')}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span class="award ${b.cls}">${b.label}</span></div>`;
+    const b=lbBadge(i);
+    const cardCls=i===0?'rank-diamond':i===1?'rank-gold':'rank-silver';
+    return `<div class="performer-card ${cardCls}"><div class="performer-left"><img class="profile-img" src="${img(s.name||'Seller')}"><div><b>${safe(s.name||s.shop_name,'Seller')}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span style="font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;border:1.5px solid ${b.border};color:${b.textColor};background:#fff">${b.label}</span></div>`;
   }).join('')||'<div class="ticket"><b>No sellers found</b></div>';
 
   if($('dashTopList'))$('dashTopList').innerHTML=dashHtml;

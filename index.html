@@ -1281,7 +1281,7 @@ const FIXED_PLANS = [
     price_color: '#64748b',
     btn_label: 'Start Trial',
     btn_style: 'border:2px solid #64748b;background:transparent;color:#64748b;',
-    card_border: '#e5e7eb', popular: false,
+    card_border: '#64748b', popular: false,
     default_price: 0,
     default_duration: 7,
     default_features: ['limited_orders','basic_dashboard','bill_shipping'],
@@ -1296,7 +1296,7 @@ const FIXED_PLANS = [
     price_color: '#10b981',
     btn_label: 'Start Free',
     btn_style: 'border:2px solid #10b981;background:transparent;color:#10b981;',
-    card_border: '#d1fae5', popular: false,
+    card_border: '#10b981', popular: false,
     default_price: 0,
     default_duration: 30,
     default_features: ['limited_orders','basic_dashboard','bill_shipping'],
@@ -1326,7 +1326,7 @@ const FIXED_PLANS = [
     price_color: '#7c3aed',
     btn_label: 'Get Elite',
     btn_style: 'background:#7c3aed;color:#fff;border:0;',
-    card_border: '#e9d5ff', popular: false,
+    card_border: '#7c3aed', popular: false,
     default_price: 1999,
     default_duration: 365,
     default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','advanced_analytics','detailed_reports','priority_support','faster_performance','early_access','adv_whatsapp','custom_branding','dedicated_manager'],
@@ -1341,7 +1341,7 @@ const FIXED_PLANS = [
     price_color: '#dc2626',
     btn_label: 'Grab Offer',
     btn_style: 'background:#dc2626;color:#fff;border:0;',
-    card_border: '#fecaca', popular: false,
+    card_border: '#dc2626', popular: false,
     default_price: 99,
     default_duration: 30,
     default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','export_reports'],
@@ -1414,7 +1414,7 @@ function renderPlanConfigs() {
 
     const enabledFeatures = ALL_FEATURES.filter(f => features.includes(f.key));
     const durationLabel = duration >= 365 ? '/ year' : duration == 30 ? '/ month' : `/ ${duration} days`;
-    const cardBorder = fp.popular ? `2.5px solid ${fp.card_border}` : `1px solid ${isActive ? fp.card_border : '#e5e7eb'}`;
+    const cardBorder = fp.popular ? `2.5px solid ${fp.card_border}` : `2px solid ${fp.card_border}`;
     const cardShadow = fp.popular ? `0 20px 50px rgba(249,115,22,.18)` : `0 8px 24px rgba(15,23,42,.06)`;
     const opacity = isActive ? '1' : '0.6';
     const dbId = p ? p.id : '';

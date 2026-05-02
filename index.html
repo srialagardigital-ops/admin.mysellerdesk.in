@@ -108,7 +108,7 @@
 <div id="dashboardPage" class="page">
 <section class="cards"><div class="card"><div class="label">Total Sellers</div><div class="value" id="totalSellers">0</div><span class="trend up">All signups</span></div><div class="card"><div class="label">Active Sellers</div><div class="value" id="activeSellers">0</div><span class="trend up">Email confirmed + login</span></div><div class="card split-card"><div class="split-metric"><div class="label">Total Orders</div><div class="value" id="totalOrders">0</div><span class="trend neutral">All time handled</span></div><div class="split-metric"><div class="label">Today Orders</div><div class="value" id="ordersToday">0</div><span class="trend up">Created today</span></div></div><div class="card"><div class="label">Pending Verification</div><div class="value" id="pendingVerification">0</div><span class="trend down">Need follow-up</span></div></section>
 <section class="grid"><div class="panel"><div class="panel-head"><div><h3>District-wise Sellers</h3><p class="small">Supabase sellers data</p></div></div><canvas id="districtChart"></canvas></div><div class="panel"><div class="panel-head"><div><h3>Live Activity</h3><p class="small">Payments, signups, logins update</p></div><span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;">Live Now</span></div><div class="live-feed" id="liveFeed"><div class="ticket"><b>Loading...</b><p>Fetching from Supabase</p></div></div></div></section>
-<section class="grid"><div class="panel"><div class="panel-head"><div><h3>Recent Sellers</h3><p class="small">Latest signup status</p></div></div><table class="table"><thead><tr><th>Seller</th><th>District</th><th>Orders</th><th>Status</th></tr></thead><tbody id="recentSellerRows"></tbody></table></div><div class="panel"><div class="panel-head"><div><h3>Top Performing Sellers</h3><p class="small">Based on available seller data</p></div></div><div class="list" id="dashTopList"></div></div></section>
+
 </div>
 <section id="sellersPage" class="page" style="display:none">
 <section class="followup-grid">
@@ -525,7 +525,12 @@ async function loadSellers(){
   setText('totalSellers',allSellers.length);setText('activeSellers',verified.length);
   window.__allSellers=allSellers; window.__sellerFilter='all';
   renderSellerTable(allSellers);
-  const recentRows=verified.slice(0,5).map(s=>`<tr><td><div class="seller-row"><img class="seller-img" src="${s.logo||img(s.name||s.email)}" onerror="this.src='${img(s.name||s.email)}'">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,'-')}</td><td><span class="badge paid">Verified</span></td></tr>`).join('')||'<tr><td colspan="4">No verified sellers found</td></tr>';
+  // Recent Sellers: show latest 5 sellers by signup date (all, not just verified)
+  const recentSorted=[...allSellers].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  const recentRows=recentSorted.slice(0,5).map(s=>{
+    const isVerified=s._status==='confirmed';
+    return `<tr><td><div class="seller-row"><img class="seller-img" src="${s.logo||img(s.name||s.email)}" onerror="this.src='${img(s.name||s.email)}'">${safe(s.name||s.email,'Unnamed Seller')}</div></td><td>${safe(s.city)}</td><td>${safe(s.orders,0)}</td><td><span class="badge ${isVerified?'paid':'trial'}">${isVerified?'Verified':'Pending'}</span></td></tr>`;
+  }).join('')||'<tr><td colspan="4">No sellers found</td></tr>';
   if($('recentSellerRows'))$('recentSellerRows').innerHTML=recentRows;
   renderTop(verified.length?verified:allSellers); drawDistrict(allSellers); bindSellerTabs(); return allSellers
 }
@@ -1005,7 +1010,8 @@ function renderTop(sellers){
   const dashHtml=top.slice(0,3).map((s,i)=>{
     const b=lbBadge(i);
     const cardCls=i===0?'rank-diamond':i===1?'rank-gold':'rank-silver';
-    return `<div class="performer-card ${cardCls}"><div class="performer-left"><img class="profile-img" src="${img(s.name||'Seller')}"><div><b>${safe(s.name||s.shop_name,'Seller')}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span style="font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;background:${b.badgeBg};color:${b.badgeColor}">${b.label}</span></div>`;
+    const sellerPhoto=s.logo||s.profile_photo||s.avatar_url||img(s.name||'Seller');
+    return `<div class="performer-card ${cardCls}"><div class="performer-left"><img class="profile-img" src="${sellerPhoto}" onerror="this.src='${img(s.name||'Seller')}'" style="width:46px;height:46px;border-radius:16px;object-fit:cover"><div><b>${safe(s.name||s.shop_name,'Seller')}</b><p class="small">${safe(s.city)} • Rank #${i+1}</p></div></div><span style="font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;background:${b.badgeBg};color:${b.badgeColor}">${b.label}</span></div>`;
   }).join('')||'<div class="ticket"><b>No sellers found</b></div>';
 
   if($('dashTopList'))$('dashTopList').innerHTML=dashHtml;
@@ -1127,13 +1133,17 @@ async function init(){
     }).subscribe();
   sb.channel('live-orders')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'orders'},()=>{
-      loadCounts();
+      loadCounts(); loadSellers();
     }).subscribe();
   sb.channel('live-profiles')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
-      loadCounts();
+      loadCounts(); loadSellers();
     }).subscribe();
-  setInterval(()=>{ loadCounts(); loadActivity(); }, 30000);
+  sb.channel('live-settings')
+    .on('postgres_changes',{event:'*',schema:'public',table:'settings'},()=>{
+      loadSellers(); loadActivity();
+    }).subscribe();
+  setInterval(()=>{ loadCounts(); loadActivity(); loadSellers(); }, 30000);
 }
 async function recalculateBadges(){
   const btn = $('recalcBadgeBtn');

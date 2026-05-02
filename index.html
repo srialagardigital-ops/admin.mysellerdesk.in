@@ -1416,17 +1416,17 @@ function renderPlanConfigs() {
         <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:16px">${durationLabel}</div>
         <!-- Features list -->
         <div style="text-align:left;display:grid;gap:5px;margin-bottom:14px">
-          ${enabledFeatures.slice(0,7).map(f => {
+          ${ALL_FEATURES.map(f => {
+            const enabled = enabledFeatures.some(ef => ef.key === f.key);
             let label = f.label;
             if (f.key === 'order_limitation' && p && p.order_limit_data) {
               const old = p.order_limit_data;
               label = old.type === 'limited' ? `Orders: ${old.count} / month` : 'Unlimited Orders';
             }
-            return `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;font-weight:600">
-              <span style="color:#10b981;font-weight:900;flex-shrink:0">✓</span>${label}
+            return `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:${enabled?'#374151':'#94a3b8'};font-weight:600">
+              <span style="font-weight:900;flex-shrink:0;color:${enabled?'#10b981':'#ef4444'}">${enabled?'✓':'✗'}</span>${label}
             </div>`;
           }).join('')}
-          ${enabledFeatures.length === 0 ? '<div style="font-size:11px;color:#cbd5e1">No features set</div>' : ''}
         </div>
         <!-- CTA Button (display only) -->
         <button style="width:100%;border-radius:12px;padding:10px;font-size:12px;font-weight:900;cursor:default;${fp.btn_style}">${fp.btn_label} →</button>

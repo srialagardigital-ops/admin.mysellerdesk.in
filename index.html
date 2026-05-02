@@ -294,15 +294,14 @@
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;background:#fff;border:1px solid #eef2f7;border-radius:22px;padding:18px 22px;box-shadow:0 8px 24px rgba(15,23,42,.05)">
   <div>
     <div style="font-size:16px;font-weight:900;color:#071427">📋 Plan Management</div>
-    <div style="font-size:12px;color:#64748b;margin-top:3px">Pricing cards same design-ல் show ஆகும். On/Off, Price, Duration, Features — எல்லாமே edit பண்ணலாம்.</div>
+    <div style="font-size:12px;color:#64748b;margin-top:3px">5 fixed plans — Name, Price, Duration, Features customize பண்ணலாம். On/Off toggle பண்ணலாம்.</div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
-    <span id="activePlansCount" style="font-size:13px;font-weight:800;background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:999px">0 Active</span>
     <button onclick="loadPlanConfigs()" style="border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:12px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer">↻ Refresh</button>
   </div>
 </div>
 
-<!-- Plan Cards Grid — same design as pricing page -->
+<!-- 5 Fixed Plan Cards -->
 <div id="planConfigsList" style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;align-items:start">
   <div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px;font-size:13px">Loading plans...</div>
 </div>
@@ -1276,146 +1275,221 @@ if(!document.getElementById('recalcSpinStyle')){
 
 let _allPlanConfigs = [];
 
-// All possible features with friendly labels
-const ALL_FEATURES = [
-  { key: 'limited_orders',         label: 'Limited Orders (25 / month)' },
-  { key: 'unlimited_orders',       label: 'Unlimited Orders' },
-  { key: 'basic_dashboard',        label: 'Basic Dashboard' },
-  { key: 'bill_shipping',          label: 'Bill + Shipping Label' },
-  { key: 'bill_shipping_no_wm',    label: 'Bill + Shipping (No Watermark)' },
-  { key: 'whatsapp_messaging',     label: 'WhatsApp Messaging' },
-  { key: 'basic_analytics',        label: 'Basic Analytics' },
-  { key: 'advanced_analytics',     label: 'Advanced Analytics' },
-  { key: 'revenue_analytics',      label: 'Revenue & Sales Analytics' },
-  { key: 'product_performance',    label: 'Product Performance Tracking' },
-  { key: 'city_order_analysis',    label: 'City-wise Order Analysis' },
-  { key: 'customer_insights',      label: 'Customer Insights (Basic)' },
-  { key: 'export_reports',         label: 'Export Reports (Excel / PDF)' },
-  { key: 'detailed_reports',       label: 'Detailed Reports' },
-  { key: 'priority_support',       label: 'Priority Support' },
-  { key: 'faster_performance',     label: 'Faster Performance' },
-  { key: 'early_access',           label: 'Early Access to New Features' },
-  { key: 'multi_user',             label: 'Multiple User Access (Soon)' },
-  { key: 'adv_whatsapp',           label: 'Advanced WhatsApp Automation' },
-  { key: 'custom_branding',        label: 'Custom Branding Support' },
-  { key: 'dedicated_manager',      label: 'Dedicated Account Manager' },
-  { key: 'api_access',             label: 'API / Integration Access (Soon)' },
-  { key: 'unlimited_performance',  label: 'Unlimited Performance' },
-  { key: 'priority_feature',       label: 'Priority Feature Requests' },
+// 5 FIXED PLANS — always these, admin only edits price/duration/features/active
+const FIXED_PLANS = [
+  {
+    slot: 'trial',
+    default_name: 'Trial Plan',
+    badge: 'TRIAL',
+    badge_bg: '#64748b', badge_color: '#fff',
+    subtitle: 'Try before you buy',
+    icon: '🚀',
+    price_color: '#64748b',
+    btn_label: 'Start Trial',
+    btn_style: 'border:2px solid #64748b;background:transparent;color:#64748b;',
+    card_border: '#e5e7eb', popular: false,
+    default_price: 0,
+    default_duration: 7,
+    default_features: ['limited_orders','basic_dashboard','bill_shipping'],
+  },
+  {
+    slot: 'free',
+    default_name: 'Free Plan',
+    badge: 'FREE',
+    badge_bg: '#10b981', badge_color: '#fff',
+    subtitle: 'For new sellers getting started',
+    icon: '🎁',
+    price_color: '#10b981',
+    btn_label: 'Start Free',
+    btn_style: 'border:2px solid #10b981;background:transparent;color:#10b981;',
+    card_border: '#d1fae5', popular: false,
+    default_price: 0,
+    default_duration: 30,
+    default_features: ['limited_orders','basic_dashboard','bill_shipping'],
+  },
+  {
+    slot: 'growth',
+    default_name: 'Growth',
+    badge: '🔥 MOST POPULAR',
+    badge_bg: '#f97316', badge_color: '#fff',
+    subtitle: 'For serious sellers',
+    icon: '📈',
+    price_color: '#f97316',
+    btn_label: 'Upgrade to Growth',
+    btn_style: 'background:#f97316;color:#fff;border:0;',
+    card_border: '#f97316', popular: true,
+    default_price: 199,
+    default_duration: 30,
+    default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','product_performance','city_order_analysis','export_reports'],
+  },
+  {
+    slot: 'elite',
+    default_name: 'Elite',
+    badge: 'ELITE',
+    badge_bg: '#7c3aed', badge_color: '#fff',
+    subtitle: 'For advanced & high volume sellers',
+    icon: '💎',
+    price_color: '#7c3aed',
+    btn_label: 'Get Elite',
+    btn_style: 'background:#7c3aed;color:#fff;border:0;',
+    card_border: '#e9d5ff', popular: false,
+    default_price: 1999,
+    default_duration: 365,
+    default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','advanced_analytics','detailed_reports','priority_support','faster_performance','early_access','adv_whatsapp','custom_branding','dedicated_manager'],
+  },
+  {
+    slot: 'offer',
+    default_name: 'OFFER',
+    badge: '⚡ LIMITED OFFER',
+    badge_bg: '#dc2626', badge_color: '#fff',
+    subtitle: 'Special limited time deal',
+    icon: '🎯',
+    price_color: '#dc2626',
+    btn_label: 'Grab Offer',
+    btn_style: 'background:#dc2626;color:#fff;border:0;',
+    card_border: '#fecaca', popular: false,
+    default_price: 99,
+    default_duration: 30,
+    default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','export_reports'],
+  },
 ];
 
-// Plan card colors/themes by index order
-const PLAN_THEMES = [
-  { badge_bg:'#10b981', badge_color:'#fff', price_color:'#10b981', btn_bg:'transparent', btn_color:'#10b981', btn_border:'#10b981', card_border:'#e5e7eb', popular:false, icon:'🚀' },
-  { badge_bg:'#059669', badge_color:'#fff', price_color:'#059669', btn_bg:'transparent', btn_color:'#059669', btn_border:'#059669', card_border:'#d1fae5', popular:false, icon:'📋' },
-  { badge_bg:'#f97316', badge_color:'#fff', price_color:'#f97316', btn_bg:'#f97316',    btn_color:'#fff',    btn_border:'#f97316', card_border:'#f97316', popular:true,  icon:'📈' },
-  { badge_bg:'#7c3aed', badge_color:'#fff', price_color:'#7c3aed', btn_bg:'#7c3aed',    btn_color:'#fff',    btn_border:'#7c3aed', card_border:'#e9d5ff', popular:false, icon:'👑' },
-  { badge_bg:'#d97706', badge_color:'#fff', price_color:'#d97706', btn_bg:'#d97706',    btn_color:'#fff',    btn_border:'#d97706', card_border:'#fde68a', popular:false, icon:'💎' },
+const ALL_FEATURES = [
+  { key: 'limited_orders',        label: 'Limited Orders (25/month)' },
+  { key: 'unlimited_orders',      label: 'Unlimited Orders' },
+  { key: 'basic_dashboard',       label: 'Basic Dashboard' },
+  { key: 'bill_shipping',         label: 'Bill + Shipping Label' },
+  { key: 'bill_shipping_no_wm',   label: 'Bill + Shipping (No Watermark)' },
+  { key: 'whatsapp_messaging',    label: 'WhatsApp Messaging' },
+  { key: 'basic_analytics',       label: 'Basic Analytics' },
+  { key: 'advanced_analytics',    label: 'Advanced Analytics' },
+  { key: 'revenue_analytics',     label: 'Revenue & Sales Analytics' },
+  { key: 'product_performance',   label: 'Product Performance Tracking' },
+  { key: 'city_order_analysis',   label: 'City-wise Order Analysis' },
+  { key: 'customer_insights',     label: 'Customer Insights (Basic)' },
+  { key: 'export_reports',        label: 'Export Reports (Excel / PDF)' },
+  { key: 'detailed_reports',      label: 'Detailed Reports' },
+  { key: 'priority_support',      label: 'Priority Support' },
+  { key: 'faster_performance',    label: 'Faster Performance' },
+  { key: 'early_access',          label: 'Early Access to New Features' },
+  { key: 'multi_user',            label: 'Multiple User Access (Soon)' },
+  { key: 'adv_whatsapp',          label: 'Advanced WhatsApp Automation' },
+  { key: 'custom_branding',       label: 'Custom Branding Support' },
+  { key: 'dedicated_manager',     label: 'Dedicated Account Manager' },
+  { key: 'api_access',            label: 'API / Integration Access (Soon)' },
+  { key: 'unlimited_performance', label: 'Unlimited Performance' },
+  { key: 'priority_feature',      label: 'Priority Feature Requests' },
 ];
 
 async function loadPlanConfigs() {
-  const { data, error } = await sb.from('plan_configs').select('*').order('created_at', { ascending: true });
-  if (error) { console.error('loadPlanConfigs error:', error.message); return; }
+  const { data, error } = await sb.from('plan_configs').select('*');
+  if (error) { console.error('loadPlanConfigs error:', error.message); }
   _allPlanConfigs = data || [];
-  const active = _allPlanConfigs.filter(p => p.is_active).length;
-  const el = document.getElementById('activePlansCount');
-  if(el) el.textContent = active + ' Active';
-  renderPlanConfigs(_allPlanConfigs);
+  renderPlanConfigs();
   // Populate assign plan dropdown
   const planSel = document.getElementById('assignPlanSelect');
   if (planSel) {
+    const active = _allPlanConfigs.filter(p => p.is_active);
     planSel.innerHTML = '<option value="">— Select Active Plan —</option>' +
-      _allPlanConfigs.filter(p => p.is_active).map(p =>
-        `<option value="${p.plan_key}">${p.plan_name} — ₹${p.price} / ${p.duration_days} days</option>`
-      ).join('');
+      active.map(p => `<option value="${p.plan_key}">${p.plan_name} — ₹${p.price} / ${p.duration_days} days</option>`).join('');
   }
 }
 
+function getPlanData(slot) {
+  return _allPlanConfigs.find(p => p.plan_key === slot) || null;
+}
+
 function getPlanFeatures(p) {
-  // features stored as array of keys OR array of label strings
+  if (!p) return [];
   if (Array.isArray(p.features)) return p.features;
   if (typeof p.features === 'object' && p.features) return Object.values(p.features);
   return [];
 }
 
-function renderPlanConfigs(plans) {
+function renderPlanConfigs() {
   const el = document.getElementById('planConfigsList');
   if (!el) return;
-  if (!plans || !plans.length) {
-    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px;font-size:13px">No plans yet. Click "+ New Plan" to create one.</div>';
-    return;
-  }
 
-  el.innerHTML = plans.map((p, i) => {
-    const theme = PLAN_THEMES[i % PLAN_THEMES.length];
-    const featureKeys = getPlanFeatures(p);
-    // Match keys or labels
-    const enabledFeatures = ALL_FEATURES.filter(f =>
-      featureKeys.includes(f.key) || featureKeys.includes(f.label)
-    );
-    const disabledFeatures = ALL_FEATURES.filter(f =>
-      !featureKeys.includes(f.key) && !featureKeys.includes(f.label)
-    ).slice(0, 4);
+  el.innerHTML = FIXED_PLANS.map((fp, i) => {
+    const p = getPlanData(fp.slot);
+    const isActive = p ? p.is_active : false;
+    const price = p ? Number(p.price || 0) : fp.default_price;
+    const duration = p ? p.duration_days : fp.default_duration;
+    const name = p ? (p.plan_name || fp.default_name) : fp.default_name;
+    const features = p ? getPlanFeatures(p) : fp.default_features;
 
-    const badge = p.badge_label || (i === 2 ? '🔥 MOST POPULAR' : '');
-    const subtitle = p.subtitle || '';
-    const durationLabel = p.duration_days >= 365 ? '/ year' : p.duration_days == 30 ? '/ month' : `/ ${p.duration_days} days`;
-    const cardBorder = theme.popular ? `2px solid ${theme.card_border}` : `1px solid ${p.is_active ? theme.card_border : '#e5e7eb'}`;
-    const cardShadow = theme.popular ? `0 20px 50px rgba(249,115,22,.18)` : `0 8px 24px rgba(15,23,42,.06)`;
-    const opacity = p.is_active ? '1' : '0.55';
+    const enabledFeatures = ALL_FEATURES.filter(f => features.includes(f.key));
+    const durationLabel = duration >= 365 ? '/ year' : duration == 30 ? '/ month' : `/ ${duration} days`;
+    const cardBorder = fp.popular ? `2.5px solid ${fp.card_border}` : `1px solid ${isActive ? fp.card_border : '#e5e7eb'}`;
+    const cardShadow = fp.popular ? `0 20px 50px rgba(249,115,22,.18)` : `0 8px 24px rgba(15,23,42,.06)`;
+    const opacity = isActive ? '1' : '0.6';
+    const dbId = p ? p.id : '';
 
-    return `<div style="background:#fff;border-radius:20px;border:${cardBorder};box-shadow:${cardShadow};padding:0;overflow:hidden;opacity:${opacity};transition:.3s;position:relative;display:flex;flex-direction:column">
+    return `<div style="background:#fff;border-radius:22px;border:${cardBorder};box-shadow:${cardShadow};overflow:hidden;opacity:${opacity};transition:.3s;display:flex;flex-direction:column">
       <!-- Badge -->
-      ${badge ? `<div style="text-align:center;padding:10px 14px 0"><span style="background:${theme.badge_bg};color:${theme.badge_color};font-size:11px;font-weight:900;padding:5px 14px;border-radius:999px;display:inline-block;letter-spacing:.3px">${badge}</span></div>` : '<div style="height:30px"></div>'}
-      <!-- Body -->
-      <div style="padding:18px 18px 14px;text-align:center;flex:1">
-        <div style="font-size:26px;margin-bottom:4px">${theme.icon}</div>
-        <div style="font-size:17px;font-weight:900;color:#071427;margin-bottom:4px">${safe(p.plan_name,'Plan')}</div>
-        <div style="font-size:11px;color:#64748b;margin-bottom:12px;min-height:16px">${safe(subtitle,'&nbsp;')}</div>
-        <div style="font-size:30px;font-weight:900;color:${theme.price_color};line-height:1">₹${Number(p.price||0).toLocaleString('en-IN')}</div>
-        <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:14px">${durationLabel}</div>
-        <!-- Features -->
-        <div style="text-align:left;margin-bottom:14px;display:grid;gap:5px">
-          ${enabledFeatures.slice(0,6).map(f => `<div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#374151;font-weight:600"><span style="color:#10b981;font-size:13px;flex-shrink:0">✓</span>${f.label}</div>`).join('')}
-          ${disabledFeatures.slice(0,3).map(f => `<div style="display:flex;align-items:center;gap:7px;font-size:11px;color:#cbd5e1;font-weight:600"><span style="color:#fca5a5;font-size:13px;flex-shrink:0">✕</span>${f.label}</div>`).join('')}
+      <div style="text-align:center;padding:12px 14px 0">
+        <span style="background:${fp.badge_bg};color:${fp.badge_color};font-size:10px;font-weight:900;padding:5px 14px;border-radius:999px;display:inline-block;letter-spacing:.5px">${fp.badge}</span>
+      </div>
+      <!-- Plan body -->
+      <div style="padding:16px 16px 12px;text-align:center;flex:1">
+        <div style="font-size:28px;margin-bottom:6px">${fp.icon}</div>
+        <div style="font-size:17px;font-weight:900;color:#071427;margin-bottom:3px">${safe(name)}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:14px;min-height:14px">${fp.subtitle}</div>
+        <div style="font-size:32px;font-weight:900;color:${fp.price_color};line-height:1">₹${price.toLocaleString('en-IN')}</div>
+        <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:16px">${durationLabel}</div>
+        <!-- Features list -->
+        <div style="text-align:left;display:grid;gap:5px;margin-bottom:14px">
+          ${enabledFeatures.slice(0,6).map(f =>
+            `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;font-weight:600">
+              <span style="color:#10b981;font-weight:900;flex-shrink:0">✓</span>${f.label}
+            </div>`
+          ).join('')}
+          ${enabledFeatures.length === 0 ? '<div style="font-size:11px;color:#cbd5e1">No features set</div>' : ''}
+          ${enabledFeatures.length > 6 ? `<div style="font-size:11px;color:#94a3b8;font-weight:700">+${enabledFeatures.length-6} more features</div>` : ''}
         </div>
+        <!-- CTA Button (display only) -->
+        <button style="width:100%;border-radius:12px;padding:10px;font-size:12px;font-weight:900;cursor:default;${fp.btn_style}">${fp.btn_label} →</button>
       </div>
       <!-- Admin Controls -->
-      <div style="padding:12px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;display:flex;flex-direction:column;gap:8px">
-        <!-- On/Off Toggle -->
+      <div style="padding:10px 12px;border-top:1px solid #f1f5f9;background:#f8fafc;display:flex;flex-direction:column;gap:8px">
+        <!-- On/Off -->
         <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:11px;font-weight:800;color:${p.is_active?'#15803d':'#94a3b8'}">${p.is_active?'● Active':'○ Inactive'}</span>
-          <label style="position:relative;width:40px;height:22px;cursor:pointer" title="${p.is_active?'Deactivate':'Activate'} plan">
-            <input type="checkbox" ${p.is_active?'checked':''} onchange="togglePlanActive('${p.id}',${p.is_active})" style="opacity:0;width:0;height:0;position:absolute">
-            <span style="position:absolute;inset:0;border-radius:999px;background:${p.is_active?'#10b981':'#e5e7eb'};transition:.3s;cursor:pointer;display:block">
-              <span style="position:absolute;left:${p.is_active?'20':'2'}px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:.3s;display:block"></span>
+          <span style="font-size:11px;font-weight:800;color:${isActive?'#15803d':'#94a3b8'}">${isActive?'● Active':'○ Inactive'}</span>
+          <label style="position:relative;width:40px;height:22px;cursor:pointer">
+            <input type="checkbox" ${isActive?'checked':''} onchange="toggleFixedPlan('${fp.slot}','${dbId}',${isActive})" style="opacity:0;width:0;height:0;position:absolute">
+            <span style="position:absolute;inset:0;border-radius:999px;background:${isActive?'#10b981':'#e5e7eb'};transition:.3s;display:block">
+              <span style="position:absolute;left:${isActive?'20':'2'}px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:.3s;display:block"></span>
             </span>
           </label>
         </div>
-        <!-- Edit / Delete -->
-        <div style="display:flex;gap:7px">
-          <button onclick="openPlanModal('${p.id}')" style="flex:1;border:1px solid #e5e7eb;background:#fff;color:#334155;border-radius:9px;padding:7px;font-size:11px;font-weight:900;cursor:pointer">✏️ Edit</button>
-          <button onclick="deletePlan('${p.id}','${(p.plan_name||'').replace(/'/g,"\'")}')" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:900;cursor:pointer">🗑️</button>
-        </div>
+        <!-- Edit button -->
+        <button onclick="openPlanModal('${fp.slot}')" style="width:100%;border:1px solid #e5e7eb;background:#fff;color:#334155;border-radius:9px;padding:8px;font-size:12px;font-weight:900;cursor:pointer">✏️ Edit Plan</button>
       </div>
     </div>`;
   }).join('');
 }
 
-async function togglePlanActive(id, currentActive) {
-  if (!currentActive) {
-    const activeCount = _allPlanConfigs.filter(p => p.is_active && p.id !== id).length;
-    if (activeCount >= 5) { alert('Maximum 5 active plans allowed!'); return; }
+async function toggleFixedPlan(slot, dbId, currentActive) {
+  const fp = FIXED_PLANS.find(f => f.slot === slot);
+  if (!fp) return;
+  const newActive = !currentActive;
+  if (dbId) {
+    const { error } = await sb.from('plan_configs').update({ is_active: newActive }).eq('id', dbId);
+    if (error) { alert('Error: ' + error.message); return; }
+  } else {
+    // Create the record first
+    const { error } = await sb.from('plan_configs').insert({
+      plan_key: slot,
+      plan_name: fp.default_name,
+      price: fp.default_price,
+      duration_days: fp.default_duration,
+      features: fp.default_features,
+      is_active: newActive,
+      badge_label: fp.badge,
+      subtitle: fp.subtitle,
+    });
+    if (error) { alert('Error: ' + error.message); return; }
   }
-  const { error } = await sb.from('plan_configs').update({ is_active: !currentActive }).eq('id', id);
-  if (error) { alert('Error: ' + error.message); return; }
-  await loadPlanConfigs();
-}
-
-async function deletePlan(id, name) {
-  if (!confirm(`"${name}" plan delete பண்ணணுமா?`)) return;
-  const { error } = await sb.from('plan_configs').delete().eq('id', id);
-  if (error) { alert('Delete error: ' + error.message); return; }
   await loadPlanConfigs();
 }
 
@@ -1428,20 +1502,16 @@ function updatePmToggleUI() {
   const cb = document.getElementById('pmIsActive');
   const track = document.getElementById('pmToggleTrack');
   const thumb = document.getElementById('pmToggleThumb');
-  if (cb.checked) {
-    track.style.background = '#10b981';
-    thumb.style.left = '25px';
-  } else {
-    track.style.background = '#e5e7eb';
-    thumb.style.left = '3px';
-  }
+  if (!track || !thumb) return;
+  if (cb.checked) { track.style.background='#10b981'; thumb.style.left='25px'; }
+  else { track.style.background='#e5e7eb'; thumb.style.left='3px'; }
 }
 
 function renderFeatureCheckboxes(enabledKeys) {
   const grid = document.getElementById('pmFeaturesGrid');
   if (!grid) return;
   grid.innerHTML = ALL_FEATURES.map(f => {
-    const checked = enabledKeys.includes(f.key) || enabledKeys.includes(f.label);
+    const checked = enabledKeys.includes(f.key);
     return `<label style="display:flex;align-items:center;gap:8px;background:${checked?'#f0fdf4':'#f8fafc'};border:1.5px solid ${checked?'#bbf7d0':'#e5e7eb'};border-radius:10px;padding:8px 10px;cursor:pointer;transition:.2s" id="fl_${f.key}">
       <input type="checkbox" value="${f.key}" ${checked?'checked':''} onchange="updateFeatureLabel('${f.key}')" style="width:15px;height:15px;cursor:pointer;accent-color:#10b981">
       <span style="font-size:12px;font-weight:700;color:#374151">${f.label}</span>
@@ -1453,40 +1523,36 @@ function updateFeatureLabel(key) {
   const lbl = document.getElementById('fl_' + key);
   const cb = lbl ? lbl.querySelector('input') : null;
   if (!lbl || !cb) return;
-  if (cb.checked) { lbl.style.background='#f0fdf4'; lbl.style.borderColor='#bbf7d0'; }
-  else { lbl.style.background='#f8fafc'; lbl.style.borderColor='#e5e7eb'; }
+  lbl.style.background = cb.checked ? '#f0fdf4' : '#f8fafc';
+  lbl.style.borderColor = cb.checked ? '#bbf7d0' : '#e5e7eb';
 }
 
-function openPlanModal(editId) {
+function openPlanModal(slot) {
+  const fp = FIXED_PLANS.find(f => f.slot === slot);
+  if (!fp) return;
+  const p = getPlanData(slot);
   const modal = document.getElementById('planModal');
   const errEl = document.getElementById('planModalError');
   if (errEl) errEl.style.display = 'none';
-  let enabledKeys = [];
-  if (editId && editId !== 'undefined') {
-    const p = _allPlanConfigs.find(x => x.id === editId);
-    if (!p) return;
-    document.getElementById('planModalTitle').textContent = 'Edit Plan';
-    document.getElementById('planModalId').value = p.id;
-    document.getElementById('pmPlanName').value = p.plan_name || '';
-    document.getElementById('pmPlanKey').value = p.plan_key || '';
-    document.getElementById('pmPrice').value = p.price || '';
-    document.getElementById('pmDuration').value = p.duration_days || '';
-    document.getElementById('pmBadge').value = p.badge_label || '';
-    document.getElementById('pmSubtitle').value = p.subtitle || '';
-    document.getElementById('pmIsActive').checked = !!p.is_active;
-    enabledKeys = getPlanFeatures(p);
-  } else {
-    document.getElementById('planModalTitle').textContent = 'Create New Plan';
-    document.getElementById('planModalId').value = '';
-    document.getElementById('pmPlanName').value = '';
-    document.getElementById('pmPlanKey').value = '';
-    document.getElementById('pmPrice').value = '';
-    document.getElementById('pmDuration').value = '30';
-    document.getElementById('pmBadge').value = '';
-    document.getElementById('pmSubtitle').value = '';
-    document.getElementById('pmIsActive').checked = false;
-  }
+
+  // Set modal header color to match plan theme
+  const header = document.getElementById('planModalHeader');
+  if (header) header.style.background = fp.popular ? '#fff7ed' : '#f8fafc';
+
+  document.getElementById('planModalTitle').textContent = `✏️ Edit — ${fp.default_name}`;
+  document.getElementById('planModalId').value = slot; // store slot as id reference
+  document.getElementById('pmPlanName').value = p ? (p.plan_name || fp.default_name) : fp.default_name;
+  document.getElementById('pmPlanKey').value = slot;
+  document.getElementById('pmPlanKey').readOnly = true;
+  document.getElementById('pmPlanKey').style.background = '#f1f5f9';
+  document.getElementById('pmPrice').value = p ? p.price : fp.default_price;
+  document.getElementById('pmDuration').value = p ? p.duration_days : fp.default_duration;
+  document.getElementById('pmBadge').value = fp.badge;
+  document.getElementById('pmSubtitle').value = fp.subtitle;
+  document.getElementById('pmIsActive').checked = p ? !!p.is_active : false;
   updatePmToggleUI();
+
+  const enabledKeys = p ? getPlanFeatures(p) : fp.default_features;
   renderFeatureCheckboxes(enabledKeys);
   modal.style.display = 'flex';
 }
@@ -1498,43 +1564,38 @@ function closePlanModal() {
 async function savePlan() {
   const errEl = document.getElementById('planModalError');
   errEl.style.display = 'none';
-  const id = document.getElementById('planModalId').value;
+  const slot = document.getElementById('planModalId').value; // slot key
   const plan_name = document.getElementById('pmPlanName').value.trim();
-  const plan_key = document.getElementById('pmPlanKey').value.trim().toLowerCase().replace(/\s+/g,'_');
   const price = parseFloat(document.getElementById('pmPrice').value) || 0;
   const duration_days = parseInt(document.getElementById('pmDuration').value) || 30;
-  const badge_label = document.getElementById('pmBadge').value.trim();
-  const subtitle = document.getElementById('pmSubtitle').value.trim();
   const is_active = document.getElementById('pmIsActive').checked;
-  // Collect checked features
   const features = Array.from(document.querySelectorAll('#pmFeaturesGrid input[type=checkbox]:checked')).map(cb => cb.value);
 
-  if (!plan_name || !plan_key) {
-    errEl.textContent = '⚠️ Plan Name and Plan Key required.'; errEl.style.display = 'block'; return;
-  }
-  if (is_active) {
-    const currentActive = _allPlanConfigs.filter(p => p.is_active && p.id !== id).length;
-    if (currentActive >= 5) {
-      errEl.textContent = '⚠️ Maximum 5 active plans allowed!'; errEl.style.display = 'block'; return;
-    }
-  }
+  if (!plan_name) { errEl.textContent = '⚠️ Plan Name required.'; errEl.style.display = 'block'; return; }
+
   const btn = document.getElementById('savePlanBtn');
   btn.disabled = true; btn.textContent = 'Saving...';
-  const payload = { plan_name, plan_key, price, duration_days, features, is_active, badge_label, subtitle };
+
+  const existing = getPlanData(slot);
+  const fp = FIXED_PLANS.find(f => f.slot === slot);
+  const payload = { plan_name, plan_key: slot, price, duration_days, features, is_active, badge_label: fp ? fp.badge : '', subtitle: fp ? fp.subtitle : '' };
+
   let error;
-  if (id) {
-    ({ error } = await sb.from('plan_configs').update(payload).eq('id', id));
+  if (existing) {
+    ({ error } = await sb.from('plan_configs').update(payload).eq('id', existing.id));
   } else {
     ({ error } = await sb.from('plan_configs').insert(payload));
   }
   btn.disabled = false; btn.textContent = '💾 Save Plan';
+
   if (error) {
-    errEl.textContent = '❌ ' + (error.message.includes('unique') ? 'Plan Key already exists!' : error.message);
+    errEl.textContent = '❌ ' + error.message;
     errEl.style.display = 'block'; return;
   }
   closePlanModal();
   await loadPlanConfigs();
 }
+
 
 async function loadSellerSubscriptions() {
   const { data, error } = await sb.from('subscriptions')

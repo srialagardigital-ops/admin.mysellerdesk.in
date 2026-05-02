@@ -1284,7 +1284,7 @@ const FIXED_PLANS = [
     card_border: '#64748b', popular: false,
     default_price: 0,
     default_duration: 7,
-    default_features: ['limited_orders','basic_dashboard','bill_shipping'],
+    default_features: ['order_limitation','bill_shipping'],
   },
   {
     slot: 'free',
@@ -1299,12 +1299,12 @@ const FIXED_PLANS = [
     card_border: '#10b981', popular: false,
     default_price: 0,
     default_duration: 30,
-    default_features: ['limited_orders','basic_dashboard','bill_shipping'],
+    default_features: ['order_limitation','bill_shipping'],
   },
   {
     slot: 'growth',
     default_name: 'Growth',
-    badge: '🔥 MOST POPULAR',
+    badge: 'GROWTH',
     badge_bg: '#f97316', badge_color: '#fff',
     subtitle: 'For serious sellers',
     icon: '📈',
@@ -1314,7 +1314,7 @@ const FIXED_PLANS = [
     card_border: '#f97316', popular: true,
     default_price: 199,
     default_duration: 30,
-    default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','product_performance','city_order_analysis','export_reports'],
+    default_features: ['order_limitation','bill_shipping','whatsapp_messaging','revenue_analytics','product_performance','export_reports'],
   },
   {
     slot: 'elite',
@@ -1329,7 +1329,7 @@ const FIXED_PLANS = [
     card_border: '#7c3aed', popular: false,
     default_price: 1999,
     default_duration: 365,
-    default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','advanced_analytics','detailed_reports','priority_support','faster_performance','early_access','adv_whatsapp','custom_branding','dedicated_manager'],
+    default_features: ['order_limitation','bill_shipping','whatsapp_messaging','revenue_analytics','product_performance','export_reports','priority_support'],
   },
   {
     slot: 'offer',
@@ -1344,35 +1344,18 @@ const FIXED_PLANS = [
     card_border: '#dc2626', popular: false,
     default_price: 99,
     default_duration: 30,
-    default_features: ['unlimited_orders','bill_shipping_no_wm','whatsapp_messaging','revenue_analytics','export_reports'],
+    default_features: ['order_limitation','bill_shipping','whatsapp_messaging','revenue_analytics','product_performance','export_reports','priority_support'],
   },
 ];
 
 const ALL_FEATURES = [
-  { key: 'limited_orders',        label: 'Limited Orders (25/month)' },
-  { key: 'unlimited_orders',      label: 'Unlimited Orders' },
-  { key: 'basic_dashboard',       label: 'Basic Dashboard' },
-  { key: 'bill_shipping',         label: 'Bill + Shipping Label' },
-  { key: 'bill_shipping_no_wm',   label: 'Bill + Shipping (No Watermark)' },
-  { key: 'whatsapp_messaging',    label: 'WhatsApp Messaging' },
-  { key: 'basic_analytics',       label: 'Basic Analytics' },
-  { key: 'advanced_analytics',    label: 'Advanced Analytics' },
-  { key: 'revenue_analytics',     label: 'Revenue & Sales Analytics' },
-  { key: 'product_performance',   label: 'Product Performance Tracking' },
-  { key: 'city_order_analysis',   label: 'City-wise Order Analysis' },
-  { key: 'customer_insights',     label: 'Customer Insights (Basic)' },
-  { key: 'export_reports',        label: 'Export Reports (Excel / PDF)' },
-  { key: 'detailed_reports',      label: 'Detailed Reports' },
-  { key: 'priority_support',      label: 'Priority Support' },
-  { key: 'faster_performance',    label: 'Faster Performance' },
-  { key: 'early_access',          label: 'Early Access to New Features' },
-  { key: 'multi_user',            label: 'Multiple User Access (Soon)' },
-  { key: 'adv_whatsapp',          label: 'Advanced WhatsApp Automation' },
-  { key: 'custom_branding',       label: 'Custom Branding Support' },
-  { key: 'dedicated_manager',     label: 'Dedicated Account Manager' },
-  { key: 'api_access',            label: 'API / Integration Access (Soon)' },
-  { key: 'unlimited_performance', label: 'Unlimited Performance' },
-  { key: 'priority_feature',      label: 'Priority Feature Requests' },
+  { key: 'order_limitation',   label: 'Order Limitation' },
+  { key: 'bill_shipping',      label: 'Bill & Shipping Label Print' },
+  { key: 'whatsapp_messaging', label: 'WhatsApp Messaging' },
+  { key: 'revenue_analytics',  label: 'Revenue & Sales Analytics' },
+  { key: 'product_performance',label: 'Product Performance Tracking' },
+  { key: 'export_reports',     label: 'Export Reports (Excel / PDF)' },
+  { key: 'priority_support',   label: 'Priority Support' },
 ];
 
 async function loadPlanConfigs() {
@@ -1433,13 +1416,17 @@ function renderPlanConfigs() {
         <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:16px">${durationLabel}</div>
         <!-- Features list -->
         <div style="text-align:left;display:grid;gap:5px;margin-bottom:14px">
-          ${enabledFeatures.slice(0,6).map(f =>
-            `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;font-weight:600">
-              <span style="color:#10b981;font-weight:900;flex-shrink:0">✓</span>${f.label}
-            </div>`
-          ).join('')}
+          ${enabledFeatures.slice(0,7).map(f => {
+            let label = f.label;
+            if (f.key === 'order_limitation' && p && p.order_limit_data) {
+              const old = p.order_limit_data;
+              label = old.type === 'limited' ? `Orders: ${old.count} / month` : 'Unlimited Orders';
+            }
+            return `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#374151;font-weight:600">
+              <span style="color:#10b981;font-weight:900;flex-shrink:0">✓</span>${label}
+            </div>`;
+          }).join('')}
           ${enabledFeatures.length === 0 ? '<div style="font-size:11px;color:#cbd5e1">No features set</div>' : ''}
-          ${enabledFeatures.length > 6 ? `<div style="font-size:11px;color:#94a3b8;font-weight:700">+${enabledFeatures.length-6} more features</div>` : ''}
         </div>
         <!-- CTA Button (display only) -->
         <button style="width:100%;border-radius:12px;padding:10px;font-size:12px;font-weight:900;cursor:default;${fp.btn_style}">${fp.btn_label} →</button>
@@ -1501,11 +1488,36 @@ function updatePmToggleUI() {
   else { track.style.background='#e5e7eb'; thumb.style.left='3px'; }
 }
 
-function renderFeatureCheckboxes(enabledKeys) {
+function renderFeatureCheckboxes(enabledKeys, orderLimitData) {
   const grid = document.getElementById('pmFeaturesGrid');
   if (!grid) return;
+
+  // orderLimitData = { type: 'limited'|'unlimited', count: number }
+  const olt = (orderLimitData && orderLimitData.type) || 'unlimited';
+  const olc = (orderLimitData && orderLimitData.count) || 25;
+
   grid.innerHTML = ALL_FEATURES.map(f => {
     const checked = enabledKeys.includes(f.key);
+    if (f.key === 'order_limitation') {
+      return `<div id="fl_order_limitation" style="grid-column:1/-1;background:${checked?'#f0fdf4':'#f8fafc'};border:1.5px solid ${checked?'#bbf7d0':'#e5e7eb'};border-radius:10px;padding:10px 12px;transition:.2s">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" value="order_limitation" ${checked?'checked':''} onchange="updateFeatureLabel('order_limitation')" style="width:15px;height:15px;cursor:pointer;accent-color:#10b981">
+          <span style="font-size:12px;font-weight:700;color:#374151">Order Limitation</span>
+        </label>
+        <div id="orderLimitOptions" style="display:${checked?'flex':'none'};align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:700;color:#374151">
+            <input type="radio" name="orderLimitType" value="unlimited" ${olt==='unlimited'?'checked':''} onchange="toggleOrderLimitInput()" style="accent-color:#10b981"> Unlimited
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:700;color:#374151">
+            <input type="radio" name="orderLimitType" value="limited" ${olt==='limited'?'checked':''} onchange="toggleOrderLimitInput()" style="accent-color:#f97316"> Limited
+          </label>
+          <div id="orderLimitCountWrap" style="display:${olt==='limited'?'flex':'none'};align-items:center;gap:6px">
+            <input type="number" id="orderLimitCount" value="${olc}" min="1" placeholder="e.g. 25" style="width:90px;border:1.5px solid #e5e7eb;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;font-family:inherit;outline:none" onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'">
+            <span style="font-size:12px;color:#64748b;font-weight:600">orders / month</span>
+          </div>
+        </div>
+      </div>`;
+    }
     return `<label style="display:flex;align-items:center;gap:8px;background:${checked?'#f0fdf4':'#f8fafc'};border:1.5px solid ${checked?'#bbf7d0':'#e5e7eb'};border-radius:10px;padding:8px 10px;cursor:pointer;transition:.2s" id="fl_${f.key}">
       <input type="checkbox" value="${f.key}" ${checked?'checked':''} onchange="updateFeatureLabel('${f.key}')" style="width:15px;height:15px;cursor:pointer;accent-color:#10b981">
       <span style="font-size:12px;font-weight:700;color:#374151">${f.label}</span>
@@ -1513,12 +1525,22 @@ function renderFeatureCheckboxes(enabledKeys) {
   }).join('');
 }
 
+function toggleOrderLimitInput() {
+  const type = document.querySelector('input[name="orderLimitType"]:checked')?.value;
+  const wrap = document.getElementById('orderLimitCountWrap');
+  if (wrap) wrap.style.display = type === 'limited' ? 'flex' : 'none';
+}
+
 function updateFeatureLabel(key) {
   const lbl = document.getElementById('fl_' + key);
-  const cb = lbl ? lbl.querySelector('input') : null;
+  const cb = lbl ? lbl.querySelector('input[type=checkbox]') : null;
   if (!lbl || !cb) return;
   lbl.style.background = cb.checked ? '#f0fdf4' : '#f8fafc';
   lbl.style.borderColor = cb.checked ? '#bbf7d0' : '#e5e7eb';
+  if (key === 'order_limitation') {
+    const opts = document.getElementById('orderLimitOptions');
+    if (opts) opts.style.display = cb.checked ? 'flex' : 'none';
+  }
 }
 
 function openPlanModal(slot) {
@@ -1547,7 +1569,8 @@ function openPlanModal(slot) {
   updatePmToggleUI();
 
   const enabledKeys = p ? getPlanFeatures(p) : fp.default_features;
-  renderFeatureCheckboxes(enabledKeys);
+  const orderLimitData = p ? (p.order_limit_data || null) : null;
+  renderFeatureCheckboxes(enabledKeys, orderLimitData);
   modal.style.display = 'flex';
 }
 
@@ -1565,6 +1588,14 @@ async function savePlan() {
   const is_active = document.getElementById('pmIsActive').checked;
   const features = Array.from(document.querySelectorAll('#pmFeaturesGrid input[type=checkbox]:checked')).map(cb => cb.value);
 
+  // Order limit data
+  let order_limit_data = null;
+  if (features.includes('order_limitation')) {
+    const type = document.querySelector('input[name="orderLimitType"]:checked')?.value || 'unlimited';
+    const count = type === 'limited' ? (parseInt(document.getElementById('orderLimitCount')?.value) || 25) : null;
+    order_limit_data = { type, count };
+  }
+
   if (!plan_name) { errEl.textContent = '⚠️ Plan Name required.'; errEl.style.display = 'block'; return; }
 
   const btn = document.getElementById('savePlanBtn');
@@ -1572,7 +1603,7 @@ async function savePlan() {
 
   const existing = getPlanData(slot);
   const fp = FIXED_PLANS.find(f => f.slot === slot);
-  const payload = { plan_name, plan_key: slot, price, duration_days, features, is_active, badge_label: fp ? fp.badge : '', subtitle: fp ? fp.subtitle : '' };
+  const payload = { plan_name, plan_key: slot, price, duration_days, features, is_active, badge_label: fp ? fp.badge : '', subtitle: fp ? fp.subtitle : '', order_limit_data };
 
   let error;
   if (existing) {

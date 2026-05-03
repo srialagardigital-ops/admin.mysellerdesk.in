@@ -291,8 +291,15 @@
 </div>
 
 <!-- Plan Management Header -->
-<div style="margin-bottom:24px">
+<div style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
   <div style="font-size:16px;font-weight:900;color:#071427">📋 Plan Management</div>
+  <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:12px 16px;box-shadow:0 4px 14px rgba(15,23,42,.05)">
+    <span style="font-size:12px;font-weight:900;color:#334155;white-space:nowrap">🎯 Default Signup Plan:</span>
+    <select id="defaultPlanSelect" onchange="saveDefaultPlan()" style="border:1.5px solid #e5e7eb;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;font-family:inherit;outline:none;color:#071427;cursor:pointer">
+      <option value="">— Select —</option>
+    </select>
+    <span id="defaultPlanSaved" style="display:none;font-size:11px;font-weight:800;color:#15803d;background:#dcfce7;padding:4px 10px;border-radius:999px">✓ Saved</span>
+  </div>
 </div>
 
 <!-- 5 Fixed Plan Cards -->
@@ -312,13 +319,14 @@
     </div>
     <div>
       <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Select Plan</label>
-      <select id="assignPlanSelect" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+      <select id="assignPlanSelect" onchange="updateExpiryPreview()" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
         <option value="">— Select Active Plan —</option>
       </select>
     </div>
     <div>
       <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Start Date</label>
-      <input type="date" id="assignStartDate" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+      <input type="date" id="assignStartDate" onchange="updateExpiryPreview()" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+      <div id="expiryPreview" style="font-size:11px;color:#64748b;font-weight:700;margin-top:5px"></div>
     </div>
     <button onclick="assignPlanToSeller()" style="background:#1d4ed8;color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap">Assign Plan</button>
   </div>
@@ -1363,12 +1371,37 @@ async function loadPlanConfigs() {
   if (error) { console.error('loadPlanConfigs error:', error.message); }
   _allPlanConfigs = data || [];
   renderPlanConfigs();
+
+  // Populate default plan dropdown
+  const defSel = document.getElementById('defaultPlanSelect');
+  if (defSel) {
+    defSel.innerHTML = '<option value="">— Select —</option>' +
+      FIXED_PLANS.map(fp => {
+        const p = getPlanData(fp.slot);
+        const name = p ? (p.plan_name || fp.default_name) : fp.default_name;
+        return `<option value="${fp.slot}">${name}</option>`;
+      }).join('');
+    // Load saved default
+    const { data: defData } = await sb.from('app_settings').select('value').eq('key','default_signup_plan').single();
+    if (defData) defSel.value = defData.value || '';
+  }
+
   // Populate assign plan dropdown
   const planSel = document.getElementById('assignPlanSelect');
   if (planSel) {
     const active = _allPlanConfigs.filter(p => p.is_active);
     planSel.innerHTML = '<option value="">— Select Active Plan —</option>' +
       active.map(p => `<option value="${p.plan_key}">${p.plan_name} — ₹${p.price} / ${p.duration_days} days</option>`).join('');
+  }
+}
+
+async function saveDefaultPlan() {
+  const val = document.getElementById('defaultPlanSelect')?.value || '';
+  const { error } = await sb.from('app_settings').upsert({ key: 'default_signup_plan', value: val }, { onConflict: 'key' });
+  const saved = document.getElementById('defaultPlanSaved');
+  if (!error && saved) {
+    saved.style.display = 'inline-block';
+    setTimeout(() => { saved.style.display = 'none'; }, 2500);
   }
 }
 
@@ -1712,6 +1745,28 @@ async function loadSellerDropdown() {
   if (!sel || !data) return;
   sel.innerHTML = '<option value="">— Select Seller —</option>' +
     (data||[]).map(s => `<option value="${s.user_id}">${s.shop_name||s.email}</option>`).join('');
+
+  // Set today as default start date
+  const dateInput = document.getElementById('assignStartDate');
+  if (dateInput && !dateInput.value) {
+    const today = new Date();
+    dateInput.value = today.toISOString().split('T')[0];
+    updateExpiryPreview();
+  }
+}
+
+function updateExpiryPreview() {
+  const planKey = document.getElementById('assignPlanSelect')?.value;
+  const startVal = document.getElementById('assignStartDate')?.value;
+  const previewEl = document.getElementById('expiryPreview');
+  if (!previewEl) return;
+  if (!planKey || !startVal) { previewEl.textContent = ''; return; }
+  const plan = _allPlanConfigs.find(p => p.plan_key === planKey);
+  if (!plan) { previewEl.textContent = ''; return; }
+  const start = new Date(startVal);
+  const expiry = new Date(start);
+  expiry.setDate(expiry.getDate() + (plan.duration_days || 30));
+  previewEl.textContent = `📅 Expiry: ${expiry.toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})} (${plan.duration_days} days)`;
 }
 
 

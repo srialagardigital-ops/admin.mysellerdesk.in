@@ -1090,6 +1090,12 @@ function nav(){
   const saved=sessionStorage.getItem('activePage')||'dashboardPage';
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   const sp=$(saved);if(sp)sp.style.display='block';
+  if(saved==='settingsPage'){
+    loadPlanConfigs();
+    loadSellerDropdown();
+    loadSellerSubscriptions();
+    loadBanners();
+  }
   document.querySelectorAll('.menu a').forEach(a=>{
     a.classList.toggle('active',a.dataset.page===saved);
     a.addEventListener('click',e=>{

@@ -741,13 +741,14 @@ async function loadActivity(){
     }
   } catch(e){}
 
-  if(activities.length===0){
-    // Fallback: build activity from sellers + orders + profiles tables
-    const [{data:sellers},{data:orders},{data:subs},{data:logins}] = await Promise.all([
+  // Always fetch from all tables (activity_logs used only as bonus if available)
+  {
+    const [{data:sellers},{data:orders},{data:subs},{data:newUsers},{data:logins}] = await Promise.all([
       sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}).limit(5),
       sb.from('orders').select('orderId,order_id,id,created_at,user_id').not('orderId','is',null).order('created_at',{ascending:false}).limit(3),
       sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2),
-      sb.from('profiles').select('id,full_name,email,last_sign_in_at').order('last_sign_in_at',{ascending:false}).limit(3)
+      sb.from('profiles').select('id,full_name,email,created_at').order('created_at',{ascending:false}).limit(5),
+      sb.from('profiles').select('id,full_name,email,last_sign_in_at').not('last_sign_in_at','is',null).order('last_sign_in_at',{ascending:false}).limit(3)
     ]);
 
     // Build user_id → shop_name map from settings
@@ -755,35 +756,45 @@ async function loadActivity(){
     (sellers||[]).forEach(s=>{ if(s.user_id && s.shop_name) shopNameMap[s.user_id] = s.shop_name; });
     const getShopName = uid => shopNameMap[uid] || null;
 
-    // Order number helper — short clean display
-    const ordersAll = orders || [];
+    const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
     const ordLabel = o => {
-      const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
       const raw = o.orderId || o.order_id || '';
-      // Only show confirmed orders (orderId exists and is not a UUID/internal id)
       if(!raw || isUUID(raw) || raw.startsWith('o_')) return null;
       return '#' + raw;
     };
 
-    (sellers||[]).forEach(s=>activities.push({type:'signup',shop:safe(s.shop_name,'Seller'),place:safe(s.district,''),time:s.created_at}));
-    ordersAll.forEach((o,idx)=>{
-      const ordId = ordLabel(o);
-      if(!ordId) return; // skip enquiry/unconfirmed orders
-      const shop = getShopName(o.user_id);
-      activities.push({type:'order',prefix:ordId,shop:shop||'',time:o.created_at});
+    // Signup: profiles table created_at = actual signup time
+    // Use shop_name if available (settings), else full_name/email from profiles
+    (newUsers||[]).forEach(p=>{
+      const shop = shopNameMap[p.id] || null;
+      const district = (sellers||[]).find(s=>s.user_id===p.id)?.district || '';
+      const name = shop || p.full_name || p.email || 'New Seller';
+      activities.push({type:'signup', shop:name, place:district, time:p.created_at});
     });
+
+    // Orders
+    (orders||[]).forEach(o=>{
+      const ordId = ordLabel(o);
+      if(!ordId) return;
+      const shop = getShopName(o.user_id) || '';
+      activities.push({type:'order',prefix:ordId,shop:shop,time:o.created_at});
+    });
+
+    // Subscriptions
     (subs||[]).forEach(s=>{
-      const shop = getShopName(s.user_id) || safe(s.user_id,'Seller');
-      const isPaid=String(s.status||'').toLowerCase().includes('paid')||String(s.status||'').toLowerCase().includes('active');
+      const shop = getShopName(s.user_id) || p?.full_name || safe(s.user_id,'Seller');
+      const isPaid = String(s.status||'').toLowerCase().includes('paid')||String(s.status||'').toLowerCase().includes('active');
       if(isPaid) activities.push({type:'payment',prefix:`₹${safe(s.amount,'?')} • ${safe(s.plan_type)} plan`,shop:shop,time:s.created_at});
       else if(String(s.status||'').toLowerCase().includes('trial')) activities.push({type:'trial',prefix:'Trial expiring',shop:shop,time:s.created_at});
     });
-    // Login activity from profiles.last_sign_in_at
+
+    // Logins from last_sign_in_at
     (logins||[]).forEach(p=>{
       if(!p.last_sign_in_at) return;
       const name = shopNameMap[p.id] || p.full_name || p.email || 'Seller';
-      activities.push({type:'login',title:name,time:p.last_sign_in_at});
+      activities.push({type:'login',shop:name,place:'',time:p.last_sign_in_at});
     });
+
     activities.sort((a,b)=>new Date(b.time)-new Date(a.time));
     activities=activities.slice(0,6);
   }
@@ -1211,9 +1222,15 @@ async function init(){
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'orders'},()=>{
       loadCounts(); loadSellers(); loadActivity();
     }).subscribe();
-  sb.channel('live-profiles')
-    .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>{
+  sb.channel('live-profiles-insert')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
+      // New signup!
       loadCounts(); loadSellers(); loadActivity();
+    }).subscribe();
+  sb.channel('live-profiles-update')
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},()=>{
+      // Login (last_sign_in_at updated)
+      loadActivity();
     }).subscribe();
   sb.channel('live-settings')
     .on('postgres_changes',{event:'*',schema:'public',table:'settings'},()=>{

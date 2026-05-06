@@ -683,7 +683,7 @@ function bindSellerTabs(){
   });
 }
 async function loadOrders(){
-  const{data,error}=await sb.from('orders').select('id,order_id,created_at,date,status,amount,user_id').order('created_at',{ascending:false}).limit(20);
+  const{data,error}=await sb.from('orders').select('id,orderId,order_id,created_at,date,status,amount,user_id').order('created_at',{ascending:false}).limit(20);
   if(error){$('recentOrderRows').innerHTML=`<tr><td colspan="5">${error.message}</td></tr>`;return[]}
   // Sort by date field (dd/mm/yyyy) first, fallback to created_at
   const getOrderTime = o => {
@@ -719,8 +719,9 @@ async function loadOrders(){
     const sellerName = shopMap[o.user_id] || (o.user_id ? o.user_id.slice(0,8)+'...' : '-');
     // Use exact order_id from DB — same as seller dashboard shows (e.g. #1001)
     const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
-    const rawId = o.order_id || o.id || '';
-    const displayOrdId = rawId && !isUUID(rawId) ? '#' + rawId : (o.id ? '#' + o.id.slice(0,8) : '-');
+    // orderId = camelCase (seller dashboard saves it this way e.g. "1001" or "PREFIX-1001")
+    const rawId = o.orderId || o.order_id || '';
+    const displayOrdId = rawId && !isUUID(rawId) && !rawId.startsWith('o_') ? '#' + rawId : (rawId ? 'Enquiry' : '-');
     return `<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${displayOrdId}</span></td><td>${sellerName}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
   }).join('')||'<tr><td colspan="5">No orders found</td></tr>';
   return arr
@@ -740,7 +741,7 @@ async function loadActivity(){
     // Fallback: build activity from sellers + orders + profiles tables
     const [{data:sellers},{data:orders},{data:subs},{data:logins}] = await Promise.all([
       sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}).limit(5),
-      sb.from('orders').select('order_id,id,created_at,user_id').order('created_at',{ascending:false}).limit(3),
+      sb.from('orders').select('orderId,order_id,id,created_at,user_id').not('orderId','is',null).order('created_at',{ascending:false}).limit(3),
       sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2),
       sb.from('profiles').select('id,full_name,email,last_sign_in_at').order('last_sign_in_at',{ascending:false}).limit(3)
     ]);
@@ -753,16 +754,18 @@ async function loadActivity(){
     // Order number helper — short clean display
     const ordersAll = orders || [];
     const ordLabel = o => {
-      const raw = o.order_id || o.id || '';
       const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
-      // Use exact order_id from DB same as seller dashboard (e.g. #1001)
-      return raw && !isUUID(raw) ? '#' + raw : (raw ? '#' + raw.slice(0,8) : 'Order');
+      const raw = o.orderId || o.order_id || '';
+      // Only show confirmed orders (orderId exists and is not a UUID/internal id)
+      if(!raw || isUUID(raw) || raw.startsWith('o_')) return null;
+      return '#' + raw;
     };
 
     (sellers||[]).forEach(s=>activities.push({type:'signup',shop:safe(s.shop_name,'Seller'),place:safe(s.district,''),time:s.created_at}));
     ordersAll.forEach((o,idx)=>{
-      const shop = getShopName(o.user_id);
       const ordId = ordLabel(o);
+      if(!ordId) return; // skip enquiry/unconfirmed orders
+      const shop = getShopName(o.user_id);
       activities.push({type:'order',prefix:ordId,shop:shop||'',time:o.created_at});
     });
     (subs||[]).forEach(s=>{
@@ -792,7 +795,7 @@ async function loadActivity(){
     else if(a.type.includes('login')){cls='live-login';icon='log-in';label='Seller Login'}
     else if(a.type.includes('trial')){cls='live-trial';icon='alarm-clock';label='Trial Expiring Soon'}
     else if(a.type.includes('order')){cls='live-order';icon='package-plus';label='New Order Created'}
-    const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'-';
+    const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'Just now';
     // Build highlighted title: shop name + place in color, rest normal
     let titleHtml = '';
     const HL = t => `<span style="font-weight:800;color:#1d4ed8">${t}</span>`;

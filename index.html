@@ -728,16 +728,37 @@ async function loadActivity(){
   if(activities.length===0){
     // Fallback: build activity from sellers + orders tables
     const [{data:sellers},{data:orders},{data:subs}] = await Promise.all([
-      sb.from('settings').select('shop_name,district,created_at').order('created_at',{ascending:false}).limit(5),
+      sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}).limit(5),
       sb.from('orders').select('order_id,id,created_at,user_id').order('created_at',{ascending:false}).limit(3),
       sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2)
     ]);
-    (sellers||[]).forEach(s=>activities.push({type:'signup',msg:`New seller signed up: ${safe(s.shop_name,'Seller')} from ${safe(s.district,'')}`,time:s.created_at}));
-    (orders||[]).forEach(o=>activities.push({type:'order',msg:`Order ${safe(o.order_id||o.id)} created by ${safe(o.user_id)}`,time:o.created_at}));
+
+    // Build user_id → shop_name map from settings
+    const shopNameMap = {};
+    (sellers||[]).forEach(s=>{ if(s.user_id && s.shop_name) shopNameMap[s.user_id] = s.shop_name; });
+    const getShopName = uid => shopNameMap[uid] || null;
+
+    // Order number helper — short clean display
+    const ordersAll = orders || [];
+    const ordLabel = (o, idx) => {
+      const raw = o.order_id || o.id || '';
+      // If it looks like a clean ID already (e.g. ORD-001), use it
+      if(/^ORD-/i.test(raw)) return raw;
+      // Otherwise show Order #N (1-indexed from newest)
+      return `Order #${idx + 1}`;
+    };
+
+    (sellers||[]).forEach(s=>activities.push({type:'signup',title:`${safe(s.shop_name,'Seller')} from ${safe(s.district,'')}`,time:s.created_at}));
+    ordersAll.forEach((o,idx)=>{
+      const shop = getShopName(o.user_id);
+      const ordId = ordLabel(o,idx);
+      activities.push({type:'order',title:shop?`${ordId} • ${shop}`:ordId,time:o.created_at});
+    });
     (subs||[]).forEach(s=>{
+      const shop = getShopName(s.user_id) || safe(s.user_id,'Seller');
       const isPaid=String(s.status||'').toLowerCase().includes('paid')||String(s.status||'').toLowerCase().includes('active');
-      if(isPaid) activities.push({type:'payment',msg:`Payment ₹${safe(s.amount,'?')} received - ${safe(s.plan_type)} plan by ${safe(s.user_id)}`,time:s.created_at});
-      else if(String(s.status||'').toLowerCase().includes('trial')) activities.push({type:'trial',msg:`Trial expiring soon for ${safe(s.user_id)}`,time:s.created_at});
+      if(isPaid) activities.push({type:'payment',title:`₹${safe(s.amount,'?')} • ${safe(s.plan_type)} plan — ${shop}`,time:s.created_at});
+      else if(String(s.status||'').toLowerCase().includes('trial')) activities.push({type:'trial',title:`Trial expiring — ${shop}`,time:s.created_at});
     });
     activities.sort((a,b)=>new Date(b.time)-new Date(a.time));
     activities=activities.slice(0,5);
@@ -755,7 +776,8 @@ async function loadActivity(){
     else if(a.type.includes('trial')){cls='live-trial';icon='alarm-clock';label='Trial Expiring Soon'}
     else if(a.type.includes('order')){cls='live-order';icon='package-plus';label='New Order Created'}
     const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'-';
-    return`<div class="live-item ${cls}"><div class="live-icon"><i data-lucide="${icon}"></i></div><div style="flex:1;min-width:0"><b>${a.msg}</b><p>${label} • ${ist}</p></div></div>`;
+    const displayTitle = a.title || a.msg;
+    return`<div class="live-item ${cls}"><div class="live-icon"><i data-lucide="${icon}"></i></div><div style="flex:1;min-width:0"><b>${displayTitle}</b><p>${label} • ${ist}</p></div></div>`;
   }).join('');
   if(window.lucide) setTimeout(()=>lucide.createIcons(), 50);
 }

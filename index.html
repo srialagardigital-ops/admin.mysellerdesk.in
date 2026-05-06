@@ -695,13 +695,19 @@ async function loadOrders(){
   // Fetch shop names separately from settings
   const uids=[...new Set(arr.map(o=>o.user_id).filter(Boolean))];
   let shopMap={};
-  if(uids.length){const{data:sdata}=await sb.from('settings').select('user_id,shop_name').in('user_id',uids);(sdata||[]).forEach(s=>{shopMap[s.user_id]=s.shop_name;});}
+  if(uids.length){
+    const{data:sdata}=await sb.from('settings').select('user_id,shop_name').in('user_id',uids);
+    (sdata||[]).forEach(s=>{ if(s.shop_name) shopMap[s.user_id]=s.shop_name; });
+    // Fallback: for any uid still missing, try profiles table
+    const missing=uids.filter(u=>!shopMap[u]);
+    if(missing.length){
+      const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
+      (pdata||[]).forEach(p=>{ shopMap[p.id]=p.full_name||p.email||(p.id?p.id.slice(0,8)+'...':'-'); });
+    }
+  }
   setText('processingOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('process')||String(o.status||'').toLowerCase().includes('packing')).length);
   setText('deliveredOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('deliver')||String(o.status||'').toLowerCase().includes('complete')).length);
   setText('cancelledOrders',arr.filter(o=>String(o.status||'').toLowerCase().includes('cancel')).length);
-  // ORD-001 format: number from oldest to newest
-  const sortedOld=[...arr].sort((a,b)=>getOrderTime(a)-getOrderTime(b));
-  const ordNum=o=>'ORD-'+String(sortedOld.findIndex(x=>(x.order_id||x.id)===(o.order_id||o.id))+1).padStart(3,'0');
   $('recentOrderRows').innerHTML=arr.map(o=>{
     let displayDate = '-';
     const fmtDT = d => d.toLocaleDateString('en-IN') + ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
@@ -710,7 +716,12 @@ async function loadOrders(){
       else { const ts=parseInt((o.id||'').split('_')[1]); displayDate = o.date + (ts>1000000000000?' '+new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):''); }
     } else if(o.created_at) displayDate = fmtDT(new Date(o.created_at));
     else if(o.id){const ts=parseInt((o.id||'').split('_')[1]);if(ts>1000000000000)displayDate=fmtDT(new Date(ts));}
-    return `<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${ordNum(o)}</span></td><td>${safe(shopMap[o.user_id]||o.user_id,'Seller')}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
+    const sellerName = shopMap[o.user_id] || (o.user_id ? o.user_id.slice(0,8)+'...' : '-');
+    // Use exact order_id from DB — same as seller dashboard shows (e.g. #1001)
+    const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
+    const rawId = o.order_id || o.id || '';
+    const displayOrdId = rawId && !isUUID(rawId) ? '#' + rawId : (o.id ? '#' + o.id.slice(0,8) : '-');
+    return `<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${displayOrdId}</span></td><td>${sellerName}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
   }).join('')||'<tr><td colspan="5">No orders found</td></tr>';
   return arr
 }
@@ -726,11 +737,12 @@ async function loadActivity(){
   } catch(e){}
 
   if(activities.length===0){
-    // Fallback: build activity from sellers + orders tables
-    const [{data:sellers},{data:orders},{data:subs}] = await Promise.all([
+    // Fallback: build activity from sellers + orders + profiles tables
+    const [{data:sellers},{data:orders},{data:subs},{data:logins}] = await Promise.all([
       sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}).limit(5),
       sb.from('orders').select('order_id,id,created_at,user_id').order('created_at',{ascending:false}).limit(3),
-      sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2)
+      sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2),
+      sb.from('profiles').select('id,full_name,email,last_sign_in_at').order('last_sign_in_at',{ascending:false}).limit(3)
     ]);
 
     // Build user_id → shop_name map from settings
@@ -740,28 +752,33 @@ async function loadActivity(){
 
     // Order number helper — short clean display
     const ordersAll = orders || [];
-    const ordLabel = (o, idx) => {
+    const ordLabel = o => {
       const raw = o.order_id || o.id || '';
-      // If it looks like a clean ID already (e.g. ORD-001), use it
-      if(/^ORD-/i.test(raw)) return raw;
-      // Otherwise show Order #N (1-indexed from newest)
-      return `Order #${idx + 1}`;
+      const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
+      // Use exact order_id from DB same as seller dashboard (e.g. #1001)
+      return raw && !isUUID(raw) ? '#' + raw : (raw ? '#' + raw.slice(0,8) : 'Order');
     };
 
-    (sellers||[]).forEach(s=>activities.push({type:'signup',title:`${safe(s.shop_name,'Seller')} from ${safe(s.district,'')}`,time:s.created_at}));
+    (sellers||[]).forEach(s=>activities.push({type:'signup',shop:safe(s.shop_name,'Seller'),place:safe(s.district,''),time:s.created_at}));
     ordersAll.forEach((o,idx)=>{
       const shop = getShopName(o.user_id);
-      const ordId = ordLabel(o,idx);
-      activities.push({type:'order',title:shop?`${ordId} • ${shop}`:ordId,time:o.created_at});
+      const ordId = ordLabel(o);
+      activities.push({type:'order',prefix:ordId,shop:shop||'',time:o.created_at});
     });
     (subs||[]).forEach(s=>{
       const shop = getShopName(s.user_id) || safe(s.user_id,'Seller');
       const isPaid=String(s.status||'').toLowerCase().includes('paid')||String(s.status||'').toLowerCase().includes('active');
-      if(isPaid) activities.push({type:'payment',title:`₹${safe(s.amount,'?')} • ${safe(s.plan_type)} plan — ${shop}`,time:s.created_at});
-      else if(String(s.status||'').toLowerCase().includes('trial')) activities.push({type:'trial',title:`Trial expiring — ${shop}`,time:s.created_at});
+      if(isPaid) activities.push({type:'payment',prefix:`₹${safe(s.amount,'?')} • ${safe(s.plan_type)} plan`,shop:shop,time:s.created_at});
+      else if(String(s.status||'').toLowerCase().includes('trial')) activities.push({type:'trial',prefix:'Trial expiring',shop:shop,time:s.created_at});
+    });
+    // Login activity from profiles.last_sign_in_at
+    (logins||[]).forEach(p=>{
+      if(!p.last_sign_in_at) return;
+      const name = shopNameMap[p.id] || p.full_name || p.email || 'Seller';
+      activities.push({type:'login',title:name,time:p.last_sign_in_at});
     });
     activities.sort((a,b)=>new Date(b.time)-new Date(a.time));
-    activities=activities.slice(0,5);
+    activities=activities.slice(0,6);
   }
 
   if(!activities.length){
@@ -776,8 +793,24 @@ async function loadActivity(){
     else if(a.type.includes('trial')){cls='live-trial';icon='alarm-clock';label='Trial Expiring Soon'}
     else if(a.type.includes('order')){cls='live-order';icon='package-plus';label='New Order Created'}
     const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'-';
-    const displayTitle = a.title || a.msg;
-    return`<div class="live-item ${cls}"><div class="live-icon"><i data-lucide="${icon}"></i></div><div style="flex:1;min-width:0"><b>${displayTitle}</b><p>${label} • ${ist}</p></div></div>`;
+    // Build highlighted title: shop name + place in color, rest normal
+    let titleHtml = '';
+    const HL = t => `<span style="font-weight:800;color:#1d4ed8">${t}</span>`;
+    const PL = t => `<span style="font-weight:800;color:#f97316">${t}</span>`;
+    if(a.shop && a.place){
+      // signup: "ShopName from District"
+      titleHtml = `${HL(a.shop)} <span style="font-weight:400;color:#64748b">from</span> ${PL(a.place)}`;
+    } else if(a.shop && a.prefix){
+      // order/payment/trial: "prefix • ShopName"
+      titleHtml = `<span style="color:#374151">${a.prefix}</span> <span style="color:#94a3b8">•</span> ${HL(a.shop)}`;
+    } else if(a.shop){
+      titleHtml = HL(a.shop);
+    } else if(a.prefix){
+      titleHtml = `<span style="color:#374151">${a.prefix}</span>`;
+    } else {
+      titleHtml = a.title || a.msg || '';
+    }
+    return`<div class="live-item ${cls}"><div class="live-icon"><i data-lucide="${icon}"></i></div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;margin-bottom:3px;line-height:1.4">${titleHtml}</div><p>${label} • ${ist}</p></div></div>`;
   }).join('');
   if(window.lucide) setTimeout(()=>lucide.createIcons(), 50);
 }
@@ -1160,14 +1193,19 @@ async function init(){
       loadCounts(); loadSellers(); loadActivity();
     }).subscribe();
   sb.channel('live-profiles')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
+    .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>{
       loadCounts(); loadSellers(); loadActivity();
     }).subscribe();
   sb.channel('live-settings')
     .on('postgres_changes',{event:'*',schema:'public',table:'settings'},()=>{
       loadSellers(); loadActivity();
     }).subscribe();
-  setInterval(()=>{ loadCounts(); loadActivity(); loadSellers(); }, 30000);
+  sb.channel('live-subs')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'subscriptions'},()=>{
+      loadCounts(); loadSubs(); loadActivity();
+    }).subscribe();
+  // Auto-refresh every 15 seconds — catches any missed realtime events
+  setInterval(()=>{ loadCounts(); loadActivity(); loadSellers(); }, 15000);
 }
 async function recalculateBadges(){
   const btn = $('recalcBadgeBtn');

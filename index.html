@@ -82,7 +82,7 @@
 <section class="cards" style="margin-bottom:0;flex-shrink:0"><div class="card"><div class="label">Total Sellers</div><div class="value" id="totalSellers">0</div><span class="trend up">All signups</span></div><div class="card"><div class="label">Active Sellers</div><div class="value" id="activeSellers">0</div><span class="trend up">Email confirmed + login</span></div><div class="card split-card"><div class="split-metric"><div class="label">Total Orders</div><div class="value" id="totalOrders">0</div><span class="trend neutral">All time handled</span></div><div class="split-metric"><div class="label">Today Orders</div><div class="value" id="ordersToday">0</div><span class="trend up">Created today</span></div></div><div class="card"><div class="label">Pending Verification</div><div class="value" id="pendingVerification">0</div><span class="trend down">Need follow-up</span></div></section>
 <section class="grid" style="margin-bottom:0;flex:1;min-height:0;">
   <div class="panel" style="display:flex;flex-direction:column;overflow:hidden;"><div class="panel-head" style="flex-shrink:0"><div><h3>District-wise Sellers</h3><p class="small">Supabase sellers data</p></div></div><div style="flex:1;min-height:0;position:relative;"><canvas id="districtChart" style="position:absolute;inset:0;width:100%!important;height:100%!important;"></canvas></div></div>
-  <div class="panel" style="display:flex;flex-direction:column;overflow:hidden;"><div class="panel-head" style="flex-shrink:0"><div><h3>Live Activity</h3><p class="small">Payments, signups, logins update</p></div><span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;">Live Now</span></div><div class="live-feed" id="liveFeed" style="flex:1;overflow:hidden;max-height:none;"><div class="ticket"><b>Loading...</b><p>Fetching from Supabase</p></div></div></div>
+  <div class="panel" style="display:flex;flex-direction:column;overflow:hidden;"><div class="panel-head" style="flex-shrink:0"><div><h3>Live Activity</h3><p class="small">Payments, signups, logins update</p></div><span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;">Live Now</span></div><div class="live-feed" id="liveFeed" style="flex:1;overflow-y:auto;max-height:none;"><div class="ticket"><b>Loading...</b><p>Fetching from Supabase</p></div></div></div>
 </section>
 </div>
 <section id="sellersPage" class="page" style="display:none">
@@ -757,7 +757,7 @@ async function loadActivity(){
     const ist=a.time?new Date(a.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true,day:'2-digit',month:'numeric',year:'numeric'}):'-';
     return`<div class="live-item ${cls}"><div class="live-icon"><i data-lucide="${icon}"></i></div><div style="flex:1;min-width:0"><b>${a.msg}</b><p>${label} • ${ist}</p></div></div>`;
   }).join('');
-  if(window.lucide)lucide.createIcons();
+  if(window.lucide) setTimeout(()=>lucide.createIcons(), 50);
 }
 async function loadTickets(){
   const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
@@ -1135,11 +1135,11 @@ async function init(){
     }).subscribe();
   sb.channel('live-orders')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'orders'},()=>{
-      loadCounts(); loadSellers();
+      loadCounts(); loadSellers(); loadActivity();
     }).subscribe();
   sb.channel('live-profiles')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'profiles'},()=>{
-      loadCounts(); loadSellers();
+      loadCounts(); loadSellers(); loadActivity();
     }).subscribe();
   sb.channel('live-settings')
     .on('postgres_changes',{event:'*',schema:'public',table:'settings'},()=>{

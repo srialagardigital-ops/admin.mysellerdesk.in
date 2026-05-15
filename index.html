@@ -481,7 +481,7 @@
 
 <!-- TOP 3 CARDS -->
 <div class="panel" style="margin-bottom:18px">
-  <div class="panel-head"><div><h3>✨ Top 3 Performers</h3><p class="small">Silver · Gold · Diamond</p></div></div>
+  <div class="panel-head"><div><h3>Top 3 Performers</h3><p class="small">Silver · Gold · Diamond</p></div></div>
   <div id="topPodium" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:10px 4px 4px">
     <div style="text-align:center;color:#64748b;font-size:13px;padding:40px">Loading...</div>
   </div>
@@ -490,12 +490,12 @@
 <!-- LEADERBOARD HORIZONTAL SCROLL CARDS -->
 <div class="panel" style="margin-bottom:18px">
   <div class="panel-head" style="flex-wrap:wrap;gap:10px;margin-bottom:16px">
-    <div><h3>🏅 Prime Sellers</h3><p class="small">#4 to #10 ranked sellers</p></div>
+    <div><h3>Prime Sellers</h3><p class="small">#4 to #10 ranked sellers</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">💎 #1 Diamond</span>
-      <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥇 #2 Gold</span>
-      <span style="background:#e5e7eb;color:#374151;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">🥈 #3 Silver</span>
-      <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">⭐ #4-10 Prime</span>
+      <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">#1 Diamond</span>
+      <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">#2 Gold</span>
+      <span style="background:#e5e7eb;color:#374151;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">#3 Silver</span>
+      <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">#4–10 Prime</span>
     </div>
   </div>
   <div id="leaderboard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin"></div>
@@ -504,7 +504,7 @@
 <!-- ALL SELLERS PERFORMANCE TABLE WITH SEARCH & FILTER -->
 <div class="panel">
   <div class="panel-head" style="flex-wrap:wrap;gap:12px;margin-bottom:16px">
-    <div><h3>📋 All Sellers Performance</h3><p class="small">Search, filter & view every seller</p></div>
+    <div><h3>All Sellers Performance</h3><p class="small">Search, filter & view every seller</p></div>
   </div>
   <!-- Search + Filter Bar -->
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
@@ -566,7 +566,7 @@
         </div>
         <div style="font-size:20px;font-weight:900;color:#fff">Support Tickets</div>
       </div>
-      <div style="font-size:13px;color:rgba(255,255,255,.5)">Seller issues track பண்ணி resolve பண்ணுங்க</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.5)">Track and resolve seller support issues</div>
     </div>
     <!-- Stat Pills -->
     <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -642,7 +642,7 @@
   <div style="padding:18px 22px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
     <div>
       <div style="font-size:16px;font-weight:900;color:#071427">All Tickets</div>
-      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Ticket-ஐ click பண்ணி reply & status மாத்தலாம்</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Click on a ticket to reply and update its status</div>
     </div>
   </div>
   <div style="overflow-x:auto">
@@ -681,7 +681,7 @@
 
       <!-- Issue Description -->
       <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:16px;padding:14px 16px">
-        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Issue Description</div>
+        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Issue Description</div>
         <div id="tktModalMsg" style="font-size:14px;color:#334155;line-height:1.7;white-space:pre-wrap"></div>
       </div>
 
@@ -696,7 +696,7 @@
 
       <!-- Custom Reply Box -->
       <div>
-        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">✏️ Custom Reply</div>
+        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Custom Reply</div>
         <textarea id="tktCustomReply" rows="3" placeholder="Custom reply type பண்ணலாம்..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;font-size:13px;font-family:inherit;outline:none;resize:vertical;transition:.2s;color:#334155" onfocus="this.style.borderColor='#6366f1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.08)'" onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"></textarea>
         <button onclick="copyCustomReply()" style="margin-top:8px;border:0;border-radius:12px;background:#6366f1;color:#fff;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer">📋 Copy Custom Reply</button>
       </div>
@@ -827,7 +827,7 @@
     <div id="planModalHeader" style="padding:24px 28px 20px;border-bottom:1px solid #eef2f7;display:flex;align-items:center;justify-content:space-between;">
       <div>
         <div style="font-size:19px;font-weight:900;color:#071427" id="planModalTitle">Edit Plan</div>
-        <div style="font-size:12px;color:#64748b;margin-top:3px">Plan details, price, duration மாத்தலாம். Features enable/disable பண்ணலாம்.</div>
+        <div style="font-size:12px;color:#64748b;margin-top:3px">Update plan details, price, and duration. Enable or disable features as needed.</div>
       </div>
       <button onclick="closePlanModal()" style="border:0;background:#f1f5f9;border-radius:999px;width:34px;height:34px;font-size:18px;cursor:pointer;color:#334155;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
@@ -875,7 +875,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:14px 16px">
         <div>
           <div style="font-size:13px;font-weight:900;color:#071427">Plan Active</div>
-          <div style="font-size:11px;color:#64748b;margin-top:2px">Sellers pricing page-ல் show ஆகும்</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">Visible on the seller pricing page</div>
         </div>
         <label style="position:relative;width:48px;height:26px;cursor:pointer">
           <input type="checkbox" id="pmIsActive" style="opacity:0;width:0;height:0;position:absolute">
@@ -888,7 +888,7 @@
     <div id="planModalError" style="display:none;background:#fee2e2;color:#991b1b;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin:0 28px 10px"></div>
     <div style="padding:0 28px 24px;display:flex;gap:10px">
       <button onclick="closePlanModal()" style="flex:1;border:1.5px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:14px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">Cancel</button>
-      <button onclick="savePlan()" id="savePlanBtn" style="flex:2;background:#071427;color:#fff;border:0;border-radius:14px;padding:13px;font-size:14px;font-weight:900;cursor:pointer">💾 Save Plan</button>
+      <button onclick="savePlan()" id="savePlanBtn" style="flex:2;background:#071427;color:#fff;border:0;border-radius:14px;padding:13px;font-size:14px;font-weight:900;cursor:pointer">Save Plan</button>
     </div>
   </div>
 </div>
@@ -911,7 +911,7 @@ function clearAuthError(){ const el=document.getElementById('authError'); if(el)
 function showLogin(){ const a=document.getElementById('authScreen'); const app=document.getElementById('adminApp'); if(a)a.style.display='flex'; if(app)app.style.display='none'; }
 function showDashboard(){ const a=document.getElementById('authScreen'); const app=document.getElementById('adminApp'); if(a)a.style.display='none'; if(app)app.style.display='flex'; if(!dashboardStarted){ dashboardStarted=true; init(); } }
 async function startAuthGate(){
-  if(SUPABASE_URL.includes('PASTE_')||SUPABASE_ANON_KEY.includes('PASTE_')){ showLogin(); authError('Supabase URL and anon key paste pannunga.'); return; }
+  if(SUPABASE_URL.includes('PASTE_')||SUPABASE_ANON_KEY.includes('PASTE_')){ showLogin(); authError('Please configure your Supabase URL and anon key.'); return; }
   const { data:{ user } } = await sb.auth.getUser();
   if(user && ALLOWED_ADMIN_EMAILS.includes(String(user.email||'').toLowerCase())){ showDashboard(); return; }
   if(user) await sb.auth.signOut();
@@ -1024,8 +1024,8 @@ async function loadSellers(){
   try {
     const uids=(authData||[]).map(u=>u.user_id).filter(Boolean);
     if(uids.length){
-      const {data:logoData}=await sb.from('settings').select('user_id,logo').in('user_id',uids);
-      (logoData||[]).forEach(s=>{ if(s.logo) logoMap[s.user_id]=s.logo; });
+      const {data:logoData}=await sb.from('settings').select('user_id,logo,account_status').in('user_id',uids);
+      (logoData||[]).forEach(s=>{ if(s.logo) logoMap[s.user_id]=s.logo; if(s.account_status) logoMap[s.user_id+'__status']=s.account_status; });
     }
   } catch(e){ console.warn('logo fetch error:',e); }
 
@@ -1046,7 +1046,8 @@ async function loadSellers(){
     orders: (statsMap[u.user_id]||{}).orders||0,
     thisMonthOrders: monthOrdersMap[u.user_id]||0,
     delivered_orders: (statsMap[u.user_id]||{}).delivered||0,
-    total_revenue: (statsMap[u.user_id]||{}).revenue||0
+    total_revenue: (statsMap[u.user_id]||{}).revenue||0,
+    account_status: logoMap[u.user_id+'__status']||''
   }));
   const verified=allSellers.filter(s=>s._status==='confirmed');
   const unverified=allSellers.filter(s=>s._status==='pending');
@@ -1075,7 +1076,7 @@ function renderSellerTable(list){
     const phone=String(s.phone||'').replace(/[^0-9]/g,'');
     const district=s.city||s.district||'-';
     const profilePic=s.logo||s.profile_photo||s.avatar_url||s.photo_url||img(avatarSeed);
-    const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', MySellerDesk signup complete pannirukkinga. Email verify pannitu login pannunga. Help venumna reply pannunga.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
+    const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', your MySellerDesk account has been created successfully. Please verify your email and log in. Reply if you need any assistance.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
     const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
     return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
       <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${idx})" data-seller-idx="${idx}">
@@ -1093,11 +1094,19 @@ function renderSellerTable(list){
       </td>
       <td>${safe(district)}</td>
       <td>${s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-'}</td>
-      <td><span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span></td>
+      <td>
+        <span class="badge ${status==='Confirmed'?'verify-confirmed':'verify-pending'}">${status}</span>
+        ${s.account_status==='on_hold'?'<span class="badge" style="background:#fff7ed;color:#c2410c;margin-left:4px;font-size:10px">On Hold</span>':''}
+      </td>
       <td><div class="action-row">
         <a class="tiny-btn" href="mailto:${email}?subject=Verify your MySellerDesk account&body=Hi ${shopName},%0D%0A%0D%0APlease verify your MySellerDesk account by clicking the confirmation link sent to your email.%0D%0A%0D%0AThank you!" target="_blank">Resend Email</a>
         <a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a>
         <button class="tiny-btn" style="background:#eef2ff;color:#3730a3;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="openEditModal(${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg> Edit</button>
+        ${s.account_status==='on_hold'
+          ? `<button class="tiny-btn" style="background:#dcfce7;color:#15803d;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','active',${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Activate</button>`
+          : `<button class="tiny-btn" style="background:#fff7ed;color:#c2410c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','on_hold',${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Hold</button>`
+        }
+        <button class="tiny-btn" style="background:#fee2e2;color:#b91c1c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="deleteSeller('${s.user_id}','${safe(displayLabel).replace(/'/g,&quot;&#39;&quot;)}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</button>
       </div></td>
     </tr>`;
   }).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
@@ -1163,7 +1172,7 @@ function openEditModal(idx){
   const address=s.address||'';
   modal.innerHTML=`<div style="background:#fff;border-radius:28px;padding:28px;max-width:460px;width:100%;box-shadow:0 28px 70px rgba(15,23,42,.2);position:relative">
     <button onclick="document.getElementById('editSellerModal').style.display='none'" style="position:absolute;top:16px;right:16px;border:0;background:#f1f5f9;border-radius:999px;width:32px;height:32px;font-size:18px;cursor:pointer;color:#334155">✕</button>
-    <div style="font-size:20px;font-weight:900;color:#071427;margin-bottom:6px">✏️ Edit Seller</div>
+    <div style="font-size:20px;font-weight:900;color:#071427;margin-bottom:6px">Edit Seller</div>
     <div style="font-size:13px;color:#64748b;margin-bottom:20px">${safe(email)}</div>
     <div id="editSellerError" style="display:none;background:#fee2e2;color:#991b1b;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px"></div>
     <div style="display:grid;gap:14px">
@@ -1178,7 +1187,7 @@ function openEditModal(idx){
     </div>
     <div style="display:flex;gap:10px;margin-top:20px">
       <button onclick="document.getElementById('editSellerModal').style.display='none'" style="flex:1;border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:14px;padding:12px;font-size:14px;font-weight:800;cursor:pointer">Cancel</button>
-      <button id="editSellerSaveBtn" onclick="saveEditSeller('${s.user_id}')" style="flex:2;background:#071427;color:#fff;border:0;border-radius:14px;padding:12px;font-size:14px;font-weight:900;cursor:pointer">💾 Save Changes</button>
+      <button id="editSellerSaveBtn" onclick="saveEditSeller('${s.user_id}')" style="flex:2;background:#071427;color:#fff;border:0;border-radius:14px;padding:12px;font-size:14px;font-weight:900;cursor:pointer">Save Changes</button>
     </div>
   </div>`;
   modal.style.display='flex';
@@ -1194,11 +1203,44 @@ async function saveEditSeller(userId){
   if(btn){btn.disabled=true;btn.textContent='Saving...';}
   errEl.style.display='none';
   const {error}=await sb.from('settings').update({shop_name:shopName,phone,district,address}).eq('user_id',userId);
-  if(btn){btn.disabled=false;btn.textContent='💾 Save Changes';}
+  if(btn){btn.disabled=false;btn.textContent='Save Changes';}
   if(error){errEl.textContent='Error: '+error.message;errEl.style.display='block';return;}
   document.getElementById('editSellerModal').style.display='none';
   await loadSellers();
 }
+async function setSellerAccountStatus(userId, newStatus, idx) {
+  const label = newStatus === 'on_hold' ? 'put this seller on hold' : 'activate this seller';
+  if (!confirm('Are you sure you want to ' + label + '?')) return;
+  // Update in the settings table (account_status column)
+  const { error } = await sb.from('settings').update({ account_status: newStatus }).eq('user_id', userId);
+  if (error) {
+    // Fallback: try profiles table
+    const { error: err2 } = await sb.from('profiles').update({ account_status: newStatus }).eq('id', userId);
+    if (err2) { alert('Error updating status: ' + err2.message); return; }
+  }
+  await loadSellers();
+}
+
+async function deleteSeller(userId, sellerName) {
+  if (!confirm('DELETE seller "' + sellerName + '"?\n\nThis will permanently remove their account data. This action cannot be undone.')) return;
+  const secondConfirm = confirm('Final confirmation: permanently delete "' + sellerName + '"?');
+  if (!secondConfirm) return;
+
+  // Delete from settings, subscriptions, and profiles (in safe order)
+  const errors = [];
+  const { error: e1 } = await sb.from('settings').delete().eq('user_id', userId);
+  if (e1) errors.push('settings: ' + e1.message);
+  const { error: e2 } = await sb.from('subscriptions').delete().eq('user_id', userId);
+  if (e2) errors.push('subscriptions: ' + e2.message);
+  const { error: e3 } = await sb.from('support_tickets').delete().eq('seller_id', userId);
+  if (e3) errors.push('tickets: ' + e3.message);
+
+  if (errors.length) {
+    alert('Partial errors during deletion:\n' + errors.join('\n') + '\n\nNote: Auth account may need to be deleted separately from Supabase dashboard.');
+  }
+  await loadSellers();
+}
+
 function bindSellerTabs(){
   document.querySelectorAll('[data-seller-filter]').forEach(btn=>{
     if(btn.dataset.bound==='1') return;
@@ -1364,7 +1406,7 @@ async function loadActivity(){
   }
 
   if(!activities.length){
-    $('liveFeed').innerHTML='<div class="ticket"><b>No live activity yet</b><p>Sellers or orders data varum podhu inga show aagum</p></div>';
+    $('liveFeed').innerHTML='<div class="ticket"><b>No live activity yet</b><p>Live activity from sellers and orders will appear here</p></div>';
     return;
   }
   $('liveFeed').innerHTML=activities.map(a=>{
@@ -1401,49 +1443,49 @@ async function loadActivity(){
 // ─── CATEGORY-BASED QUICK REPLIES ───────────────────────────────
 const QUICK_REPLIES = {
   'billing': [
-    { label:'💳 Payment Confirm', msg:'உங்கள் payment successfully received ஆச்சு. உங்கள் plan சீக்கிரம் activate ஆகும். கொஞ்சம் wait பண்ணுங்க! 🙏' },
-    { label:'🧾 Invoice Ready', msg:'உங்கள் invoice ready ஆச்சு. WhatsApp-ல் இப்போவே share பண்றோம். Check பண்ணுங்க! ✅' },
-    { label:'⏳ Payment Pending', msg:'உங்கள் payment process ஆகுது. 2-4 மணி நேரத்தில் confirm ஆகும். Patience 🙏' },
-    { label:'❌ Payment Failed', msg:'உங்கள் payment failed ஆச்சு. மீண்டும் try பண்ணுங்க அல்லது different payment method use பண்ணுங்க.' },
+    { label:'Payment Confirmed', msg:'Your payment has been successfully received. Your plan will be activated shortly. Thank you for your patience.' },
+    { label:'Invoice Ready', msg:'Your invoice is ready. We will share it with you on WhatsApp shortly. Please check your messages.' },
+    { label:'Payment Pending', msg:'Your payment is currently being processed. It will be confirmed within 2–4 hours. Thank you for your patience.' },
+    { label:'Payment Failed', msg:'Your payment could not be processed. Please try again or use a different payment method.' },
   ],
   'orders': [
-    { label:'📦 Order Confirmed', msg:'உங்கள் order successfully placed ஆச்சு! Order ID check பண்ணுங்க. நன்றி 🎉' },
-    { label:'🚚 Shipping Update', msg:'உங்கள் order dispatch ஆச்சு. Tracking details soon share பண்றோம்.' },
-    { label:'📍 Out for Delivery', msg:'உங்கள் order today deliver ஆகும். Phone-ல் available ஆ இருங்க! 🚚' },
-    { label:'✅ Delivered', msg:'Order successfully delivered! Satisfied இல்லன்னா 24 மணி நேரத்தில் contact பண்ணுங்க.' },
+    { label:'Order Confirmed', msg:'Your order has been successfully placed. Please check your Order ID for reference. Thank you!' },
+    { label:'Shipping Update', msg:'Your order has been dispatched. We will share the tracking details with you shortly.' },
+    { label:'Out for Delivery', msg:'Your order is out for delivery today. Please ensure you are available to receive it.' },
+    { label:'Delivered', msg:'Your order has been successfully delivered. If you have any concerns, please contact us within 24 hours.' },
   ],
   'login': [
-    { label:'🔄 Refresh & Retry', msg:'Browser refresh பண்ணி 2 minutes wait பண்ணி login try பண்ணுங்க. Problem solve ஆகும்!' },
-    { label:'🔑 Password Reset', msg:'Password reset link உங்கள் email-க்கு அனுப்பினோம். Check பண்ணுங்க (Spam folder கூட check பண்ணுங்க).' },
-    { label:'📱 App Update', msg:'App-ஐ latest version-க்கு update பண்ணுங்க. Play Store / App Store-ல் check பண்ணுங்க.' },
-    { label:'🖥️ Clear Cache', msg:'Browser cache clear பண்ணி try பண்ணுங்க. Settings → Privacy → Clear Cache.' },
+    { label:'Refresh & Retry', msg:'Please refresh your browser and wait 2 minutes before attempting to log in again. This should resolve the issue.' },
+    { label:'Password Reset', msg:'A password reset link has been sent to your email address. Please check your inbox and spam folder.' },
+    { label:'App Update', msg:'Please update the app to the latest version. Check the Play Store or App Store for the update.' },
+    { label:'Clear Cache', msg:'Please clear your browser cache and try again. Go to Settings → Privacy → Clear Cache.' },
   ],
   'bug': [
-    { label:'🔍 Investigating', msg:'உங்கள் issue-ஐ investigate பண்றோம். 24 மணி நேரத்தில் update தருவோம். 🙏' },
-    { label:'🛠️ Fix in Progress', msg:'இந்த bug-ஐ identify பண்ணோம். Fix deploy பண்றோம் — சீக்கிரம் resolve ஆகும்!' },
-    { label:'✅ Bug Fixed', msg:'Issue fix ஆச்சு! App refresh பண்ணி try பண்ணுங்க. Problem இருந்தா மீண்டும் contact பண்ணுங்க.' },
-    { label:'📸 Need Screenshot', msg:'Issue-ஐ better understand பண்ண screenshot அனுப்புங்க. WhatsApp-ல் send பண்ணுங்க.' },
+    { label:'Investigating', msg:'We are currently investigating your issue. We will provide an update within 24 hours. Thank you for your patience.' },
+    { label:'Fix in Progress', msg:'We have identified the bug and are deploying a fix. The issue will be resolved shortly.' },
+    { label:'Bug Fixed', msg:'The issue has been fixed. Please refresh the app and try again. Contact us if the problem persists.' },
+    { label:'Screenshot Required', msg:'To better understand the issue, please send us a screenshot via WhatsApp.' },
   ],
   'feature': [
-    { label:'📝 Request Noted', msg:'உங்கள் feature request note பண்ணினோம். Future update-ல் consider பண்றோம். நன்றி! 🙏' },
-    { label:'🚀 Coming Soon', msg:'இந்த feature develop ஆகுது! Next update-ல் release பண்றோம். Stay tuned 🎉' },
-    { label:'💡 Workaround', msg:'இப்போ இந்த feature இல்ல. Alternative way-ல் பண்ண possible — contact பண்ணுங்க explain பண்றோம்.' },
+    { label:'Request Noted', msg:'Your feature request has been noted. We will consider it for a future update. Thank you for the feedback.' },
+    { label:'Coming Soon', msg:'This feature is currently in development. It will be available in the next update. Stay tuned!' },
+    { label:'Workaround Available', msg:'This feature is not available yet. However, there is an alternative approach — please contact us and we will guide you.' },
   ],
   'other': [
-    { label:'👋 Acknowledged', msg:'உங்கள் message பாத்தோம். Team check பண்றோம் — சீக்கிரம் reply தருவோம்! 🙏' },
-    { label:'🔍 Need More Info', msg:'Issue clearly புரிய additional details வேணும். Please describe பண்ணுங்க.' },
-    { label:'✅ Resolved', msg:'உங்கள் issue resolve ஆச்சு! வேற ஏதாவது help வேணும்னா contact பண்ணுங்க 😊' },
-    { label:'📞 Call Back', msg:'உங்களை soon call பண்றோம். Phone available ஆ இருங்க. 📱' },
+    { label:'Acknowledged', msg:'We have received your message. Our team is reviewing it and will respond shortly. Thank you.' },
+    { label:'More Info Required', msg:'We need a few more details to understand the issue better. Could you please describe the problem in more detail?' },
+    { label:'Resolved', msg:'Your issue has been resolved. Please feel free to contact us if you need any further assistance.' },
+    { label:'Schedule Callback', msg:'We will call you shortly. Please ensure your phone is available.' },
   ],
 };
 
 const CAT_META = {
-  'billing':  { label:'💳 Billing & Payments',   bg:'#fef3c7', color:'#92400e' },
-  'orders':   { label:'📦 Orders & Tracking',    bg:'#dbeafe', color:'#1e40af' },
-  'login':    { label:'👤 Account & Login',       bg:'#ede9fe', color:'#5b21b6' },
-  'bug':      { label:'🐛 Bug / Technical',       bg:'#fee2e2', color:'#991b1b' },
-  'feature':  { label:'💡 Feature Request',       bg:'#d1fae5', color:'#065f46' },
-  'other':    { label:'📌 Other',                 bg:'#f1f5f9', color:'#334155' },
+  'billing':  { label:'Billing & Payments',   bg:'#fef3c7', color:'#92400e' },
+  'orders':   { label:'Orders & Tracking',    bg:'#dbeafe', color:'#1e40af' },
+  'login':    { label:'Account & Login',       bg:'#ede9fe', color:'#5b21b6' },
+  'bug':      { label:'Bug / Technical',       bg:'#fee2e2', color:'#991b1b' },
+  'feature':  { label:'Feature Request',       bg:'#d1fae5', color:'#065f46' },
+  'other':    { label:'Other',                 bg:'#f1f5f9', color:'#334155' },
 };
 
 function detectCategory(t){
@@ -1501,7 +1543,7 @@ function openTicketModal(t, sellerName, tktNumStr){
         <div style="font-size:10px;font-weight:900;color:${catMeta.color};margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">${r.label}</div>
         <div style="font-size:12px;color:#334155;line-height:1.6">${r.msg}</div>
       </div>
-      <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0;margin-top:2px">📋 Copy</span>
+      <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0;margin-top:2px">Copy</span>
     </div>
   `).join('');
 
@@ -1514,13 +1556,13 @@ function openTicketModal(t, sellerName, tktNumStr){
   const note = $('tktModalWorkflowNote');
   wf.innerHTML = '';
   if(isRes){
-    wf.innerHTML=`<span style="font-size:13px;font-weight:800;color:#15803d;background:#dcfce7;padding:8px 16px;border-radius:999px">✅ Ticket Resolved</span>
-    <button onclick="modalUpdateStatus('open')" style="border:0;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:13px;font-weight:900;padding:9px 18px;cursor:pointer">↩ Reopen</button>`;
-    note.textContent = 'இந்த ticket resolved ஆச்சு. Reopen பண்ணணும்னா button click பண்ணுங்க.';
+    wf.innerHTML=`<span style="font-size:13px;font-weight:800;color:#15803d;background:#dcfce7;padding:8px 16px;border-radius:999px">Ticket Resolved</span>
+    <button onclick="modalUpdateStatus('open')" style="border:0;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:13px;font-weight:900;padding:9px 18px;cursor:pointer">Reopen</button>`;
+    note.textContent = 'This ticket has been resolved. Click the button below to reopen it if needed.';
   } else if(isProg){
-    wf.innerHTML=`<button onclick="modalUpdateStatus('resolved')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,.3)">✅ Mark as Resolved</button>
+    wf.innerHTML=`<button onclick="modalUpdateStatus('resolved')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,.3)">Mark as Resolved</button>
     <button onclick="modalUpdateStatus('open')" style="border:0;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer">↩ Back to Open</button>`;
-    note.textContent = '💡 Reply copy பண்ணி WhatsApp-ல் seller-கிட்ட அனுப்பிட்டு Resolved click பண்ணுங்க.';
+    note.textContent = 'Copy a reply and send it to the seller via WhatsApp, then mark the ticket as Resolved.';
   } else {
     wf.innerHTML=`<button onclick="modalUpdateStatus('in_progress')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(249,115,22,.3)">▶ Move to In Progress</button>
     <button onclick="modalUpdateStatus('resolved')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,.3)">✅ Direct Resolve</button>`;
@@ -1551,7 +1593,7 @@ function copyReply(el, msg){
 
 function copyCustomReply(){
   const val = ($('tktCustomReply')||{}).value||'';
-  if(!val.trim()){ alert('Reply type பண்ணுங்க!'); return; }
+  if(!val.trim()){ alert('Please type a reply before copying.'); return; }
   navigator.clipboard && navigator.clipboard.writeText(val);
   const btn = event.target;
   const orig = btn.textContent;
@@ -1606,7 +1648,7 @@ async function _renderTickets(arr){
       (pdata||[]).forEach(p=>{ sellerNameMap[p.id]=p.full_name||p.email||p.id; });
     }
   }
-  const getSellerName=t=>{ const uid=t.seller_id||t.user_id; if(!uid)return'-'; return sellerNameMap[uid]||(uid.length>12?uid.slice(0,8)+'...':uid); };
+  const getSellerName=t=>{ const uid=t.seller_id||t.user_id; if(!uid)return'-'; return sellerNameMap[uid]||'Unknown Seller'; };
 
   const sortedByDate=[...arr].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
   const tktNum=t=>{ if(t.ticket_number)return String(t.ticket_number); return 'TKT-'+String(sortedByDate.findIndex(x=>x.id===t.id)+1).padStart(3,'0'); };
@@ -1639,10 +1681,10 @@ async function _renderTickets(arr){
     const tktN=tktNum(t);
     const tData=JSON.stringify(t).replace(/"/g,'&quot;');
     const statusBtns=`<div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">
-      <button onclick="event.stopPropagation();openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" style="border:0;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">💬 Reply & Manage</button>
-      ${!isProgress&&!isResolved?`<button onclick="event.stopPropagation();updateTicketStatus('${t.id}','in_progress')" style="border:0;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">▶ Progress</button>`:''}
-      ${!isResolved?`<button onclick="event.stopPropagation();updateTicketStatus('${t.id}','resolved')" style="border:0;border-radius:999px;background:#dcfce7;color:#15803d;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">✓ Resolve</button>`:''}
-      ${isResolved?`<span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:900;padding:4px 10px;border-radius:999px">✓ Resolved</span>`:''}
+      <button onclick="event.stopPropagation();openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" style="border:0;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">Reply & Manage</button>
+      ${!isProgress&&!isResolved?`<button onclick="event.stopPropagation();updateTicketStatus('${t.id}','in_progress')" style="border:0;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">In Progress</button>`:''}
+      ${!isResolved?`<button onclick="event.stopPropagation();updateTicketStatus('${t.id}','resolved')" style="border:0;border-radius:999px;background:#dcfce7;color:#15803d;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">Resolve</button>`:''}
+      ${isResolved?`<span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:900;padding:4px 10px;border-radius:999px">Resolved</span>`:''}
     </div>`;
     return `<div style="background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:13px 14px;box-shadow:0 2px 8px rgba(15,23,42,.05);transition:.2s;cursor:pointer" onclick="openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" onmouseover="this.style.boxShadow='0 6px 18px rgba(15,23,42,.1)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(15,23,42,.05)'">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -1683,7 +1725,7 @@ async function _renderTickets(arr){
       <td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td>
       <td onclick="event.stopPropagation()">
         <div style="display:flex;gap:5px">
-          <button onclick="openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" style="border:0;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:900;padding:5px 11px;cursor:pointer">💬 Reply</button>
+          <button onclick="openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" style="border:0;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:900;padding:5px 11px;cursor:pointer">Reply</button>
           ${!isResolved?`<button onclick="updateTicketStatus('${t.id}','resolved')" style="border:0;border-radius:999px;background:#dcfce7;color:#15803d;font-size:11px;font-weight:900;padding:5px 11px;cursor:pointer">✓</button>`:''}
         </div>
       </td>
@@ -2006,11 +2048,11 @@ async function init(){
   bindSellerTabs();
   if(window.lucide)lucide.createIcons();
   if(SUPABASE_URL.includes('PASTE_')||SUPABASE_ANON_KEY.includes('PASTE_')){
-    console.warn('Supabase URL and anon key paste pannunga. No sample data will be shown.');
-    ['sellerRows','recentSellerRows','recentOrderRows','paymentRows','ticketRows'].forEach(id=>{ const el=$(id); if(el) el.innerHTML='<tr><td colspan="6">Supabase connect pannina real data varum.</td></tr>'; });
-    if($('liveFeed')) $('liveFeed').innerHTML='<div class="ticket"><b>Waiting for Supabase</b><p>URL and anon key paste pannunga.</p></div>';
-    if($('dashTopList')) $('dashTopList').innerHTML='<div class="ticket"><b>No seller data</b><p>Supabase connect pannina real data varum.</p></div>';
-    if($('leaderboard')) $('leaderboard').innerHTML='<div class="ticket"><b>No seller data</b><p>Supabase connect pannina real data varum.</p></div>';
+    console.warn('Please configure your Supabase URL and anon key. No sample data will be shown.');
+    ['sellerRows','recentSellerRows','recentOrderRows','paymentRows','ticketRows'].forEach(id=>{ const el=$(id); if(el) el.innerHTML='<tr><td colspan="6">Connect Supabase to see live data.</td></tr>'; });
+    if($('liveFeed')) $('liveFeed').innerHTML='<div class="ticket"><b>Waiting for Supabase</b><p>Please set your Supabase URL and anon key.</p></div>';
+    if($('dashTopList')) $('dashTopList').innerHTML='<div class="ticket"><b>No seller data</b><p>Connect Supabase to see live data.</p></div>';
+    if($('leaderboard')) $('leaderboard').innerHTML='<div class="ticket"><b>No seller data</b><p>Connect Supabase to see live data.</p></div>';
     return;
   }
   await Promise.all([loadCounts(), loadActivity()]);
@@ -2529,7 +2571,7 @@ async function savePlan() {
   } else {
     ({ error } = await sb.from('plan_configs').insert(payload));
   }
-  btn.disabled = false; btn.textContent = '💾 Save Plan';
+  btn.disabled = false; btn.textContent = 'Save Plan';
 
   if (error) {
     errEl.textContent = '❌ ' + error.message;
@@ -2584,20 +2626,26 @@ async function assignPlanToSeller() {
   const planKey = document.getElementById('assignPlanSelect').value;
   const startDateVal = document.getElementById('assignStartDate').value;
   if (!userId || !planKey || !startDateVal) {
-    msgEl.textContent = '⚠️ Seller, Plan and Start Date எல்லாம் select பண்ணுங்க.';
+    msgEl.textContent = 'Please select a Seller, Plan, and Start Date before assigning.';
     msgEl.style.background = '#fee2e2'; msgEl.style.color = '#991b1b';
     msgEl.style.display = 'block'; return;
   }
   const plan = _allPlanConfigs.find(p => p.plan_key === planKey);
-  if (!plan) { msgEl.textContent = '❌ Plan not found.'; msgEl.style.display = 'block'; return; }
+  if (!plan) { msgEl.textContent = 'Error: Plan not found. Please refresh and try again.'; msgEl.style.display = 'block'; return; }
   const startDate = new Date(startDateVal);
   const expiryDate = new Date(startDate);
   expiryDate.setDate(expiryDate.getDate() + (plan.duration_days || 30));
 
-  // FIX10: deactivate previous subscriptions, then insert new — preserve history
-  await sb.from('subscriptions').update({is_active:false,status:'superseded'}).eq('user_id',userId).eq('is_active',true);
+  // Trim uuid value cleanly to avoid "operator does not exist: text = uuid" type mismatch
+  const uuidUserId = userId.trim();
+
+  // Deactivate previous active subscriptions (non-blocking best-effort)
+  try {
+    await sb.from('subscriptions').update({is_active:false,status:'superseded'}).eq('user_id',uuidUserId).eq('is_active',true);
+  } catch(e) { console.warn('Deactivate previous subscription skipped:', e.message); }
+
   const { error } = await sb.from('subscriptions').insert({
-    user_id: userId,
+    user_id: uuidUserId,
     plan: planKey,
     plan_type: plan.plan_name,
     amount: plan.price,
@@ -2612,14 +2660,14 @@ async function assignPlanToSeller() {
     msgEl.style.background = '#fee2e2'; msgEl.style.color = '#991b1b';
     msgEl.style.display = 'block'; return;
   }
-  msgEl.textContent = '✅ Plan assigned successfully! Seller dashboard-ல் update ஆகும்.';
+  msgEl.textContent = 'Plan assigned successfully. The seller dashboard will reflect the update shortly.';
   msgEl.style.background = '#dcfce7'; msgEl.style.color = '#15803d';
   msgEl.style.display = 'block';
   await loadSellerSubscriptions();
 }
 
 async function revokeSubscription(subId) {
-  if (!confirm('இந்த subscription revoke பண்ணணுமா?')) return;
+  if (!confirm('Are you sure you want to revoke this subscription?')) return;
   const { error } = await sb.from('subscriptions').update({ is_active: false, status: 'revoked' }).eq('id', subId);
   if (error) { alert('Error: ' + error.message); return; }
   await loadSellerSubscriptions();
@@ -2837,7 +2885,7 @@ async function saveBanners() {
   const statusEl = document.getElementById('bannerSaveStatus');
   statusEl.style.display = 'block';
   statusEl.style.background = '#e0f2fe'; statusEl.style.color = '#0369a1';
-  statusEl.textContent = '⏳ Saving...';
+  statusEl.textContent = 'Saving...';
 
   const toSave = _bannerSlots.filter(b => b.url && b.url.trim());
   const payload = JSON.stringify(toSave);
@@ -2852,7 +2900,7 @@ async function saveBanners() {
     statusEl.textContent = '❌ Error: ' + error.message;
   } else {
     statusEl.style.background = '#dcfce7'; statusEl.style.color = '#15803d';
-    statusEl.textContent = '✅ Banners saved! Seller dashboard-ல் உடனே reflect ஆகும்.';
+    statusEl.textContent = 'Banners saved successfully. Changes will reflect on the seller dashboard shortly.';
     setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
   }
 }

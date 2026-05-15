@@ -56,6 +56,335 @@
 .auth-field{margin-bottom:14px}.auth-field label{display:block;font-size:12px;font-weight:900;color:#334155;margin-bottom:7px}.auth-field input{width:100%;border:1px solid #dbe3ef;border-radius:16px;padding:13px 14px;font-size:14px;outline:none}.auth-field input:focus{border-color:#1d4ed8;box-shadow:0 0 0 4px rgba(29,78,216,.08)}
 .auth-btn{width:100%;border:0;border-radius:16px;background:#071427;color:#fff;font-weight:900;padding:14px;cursor:pointer;margin-top:6px}.auth-btn:disabled{opacity:.55;cursor:not-allowed}.auth-error{display:none;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:800;margin-bottom:12px}.auth-note{margin-top:14px;font-size:12px;color:#64748b;text-align:center}.logout-btn{border:0;background:#13243d;color:#fff;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:900;cursor:pointer;margin-left:auto}
 
+/* ============================
+   MODERN SETTINGS PAGE STYLES
+   ============================ */
+
+/* Settings page wrapper */
+#settingsPage {
+  animation: settingsFadeIn .35s ease;
+}
+@keyframes settingsFadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Settings section header */
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #071427 0%, #0f2240 60%, #1d4ed8 100%);
+  border-radius: 24px;
+  padding: 22px 26px;
+  box-shadow: 0 16px 40px rgba(7,20,39,.22), 0 0 0 1px rgba(255,255,255,.06);
+  position: relative;
+  overflow: hidden;
+}
+.settings-section-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(249,115,22,.18), transparent 70%);
+  pointer-events: none;
+}
+.settings-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: 30px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(29,78,216,.25), transparent 70%);
+  pointer-events: none;
+}
+.settings-section-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.settings-section-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+.settings-section-header .s-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(249,115,22,1);
+  color: #fff;
+  border: 0;
+  border-radius: 14px;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 6px 16px rgba(249,115,22,.35);
+  transition: transform .15s, box-shadow .15s;
+}
+.settings-section-header .s-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(249,115,22,.45);
+}
+
+/* Banner panel modern */
+.banner-panel {
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 12px 32px rgba(15,23,42,.07);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.banner-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafbfd;
+}
+.banner-panel-head h3 {
+  font-size: 15px;
+  font-weight: 900;
+  color: #071427;
+}
+.banner-panel-head p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+.banner-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #334155;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all .15s;
+}
+.banner-add-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15,23,42,.08);
+}
+.banner-slots-wrap {
+  padding: 20px 24px;
+  display: grid;
+  gap: 14px;
+}
+.banner-slot-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.banner-slot-item:focus-within {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(29,78,216,.08);
+  background: #fff;
+}
+.banner-slot-input {
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1e293b;
+  outline: none;
+  width: 100%;
+}
+.banner-slot-input::placeholder { color: #94a3b8; }
+.banner-slot-badge {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.banner-preview-wrap {
+  padding: 0 24px 24px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 18px;
+  margin-top: 0;
+}
+.banner-preview-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Plan management header modern */
+.plan-mgmt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.plan-mgmt-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #071427;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.default-plan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  padding: 10px 16px;
+  box-shadow: 0 4px 14px rgba(15,23,42,.05);
+}
+.default-plan-row label {
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+  white-space: nowrap;
+}
+.default-plan-row select {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+  color: #071427;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.default-plan-row select:focus { border-color: #1d4ed8; }
+
+/* Assign Plan panel */
+.assign-plan-panel {
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 12px 32px rgba(15,23,42,.07);
+  padding: 22px 24px;
+  margin-bottom: 0;
+}
+.assign-plan-panel h3 {
+  font-size: 16px;
+  font-weight: 900;
+  color: #071427;
+  margin-bottom: 4px;
+}
+.assign-plan-panel .sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 18px;
+}
+.assign-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+.assign-fields label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  display: block;
+  margin-bottom: 6px;
+}
+.assign-fields select,
+.assign-fields input[type=date] {
+  width: 100%;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  background: #fafbfd;
+}
+.assign-fields select:focus,
+.assign-fields input:focus {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(29,78,216,.08);
+  background: #fff;
+}
+.assign-btn {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(29,78,216,.28);
+  transition: transform .15s, box-shadow .15s;
+}
+.assign-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(29,78,216,.35);
+}
+.assign-subs-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #071427;
+  margin-bottom: 12px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Save status chips */
+.save-status-chip {
+  display: none;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 7px 14px;
+  border-radius: 10px;
+}
+
+/* Responsive */
+@media(max-width:900px){
+  .assign-fields{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .assign-fields{grid-template-columns:1fr}
+  .plan-mgmt-header{flex-direction:column;align-items:flex-start}
+}
+
   </style>
 </head>
 <body>
@@ -227,48 +556,62 @@
 <section id="settingsPage" class="page" style="display:none">
 
 <!-- BANNER MANAGEMENT SECTION -->
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;background:#fff;border:1px solid #eef2f7;border-radius:22px;padding:16px 20px;box-shadow:0 8px 24px rgba(15,23,42,.05)">
+<div class="settings-section-header" style="margin-bottom:20px">
   <div>
-    <div style="font-size:15px;font-weight:900;color:#071427">🖼️ Seller Dashboard Banner</div>
-    <div style="font-size:12px;color:#64748b;margin-top:3px">Seller login page-ல் left side-ல் slideshow ஆக தெரியும். Maximum 3 banners. (1920×1080 or 16:9 ratio best)</div>
+    <div class="settings-section-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+      Seller Dashboard Banner
+    </div>
+    <div class="settings-section-subtitle">Seller login page-ல் left side-ல் slideshow ஆக தெரியும் · Max 3 banners · 16:9 ratio best</div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <div id="bannerSaveStatus" style="display:none;font-size:12px;font-weight:800;padding:7px 14px;border-radius:10px"></div>
-    <button onclick="saveBanners()" style="display:flex;align-items:center;gap:8px;background:#071427;color:#fff;border:0;border-radius:14px;padding:11px 18px;font-size:13px;font-weight:900;cursor:pointer">
-      💾 Save Banners
+  <div style="display:flex;gap:10px;align-items:center;position:relative;z-index:1">
+    <div id="bannerSaveStatus" class="save-status-chip"></div>
+    <button onclick="saveBanners()" class="s-action-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save Banners
     </button>
   </div>
 </div>
 
-<div class="panel" style="margin-bottom:18px">
-  <div class="panel-head" style="margin-bottom:16px">
-    <div><h3>Banner Slides</h3><p class="small">Up to 3 banners. Image URL or Supabase Storage URL paste பண்ணுங்க.</p></div>
-    <button onclick="addBannerSlot()" id="addBannerBtn" style="border:1px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer">+ Add Banner</button>
+<div class="banner-panel">
+  <div class="banner-panel-head">
+    <div>
+      <h3>Banner Slides</h3>
+      <p>Up to 3 banners · Image URL or Supabase Storage URL paste பண்ணுங்க</p>
+    </div>
+    <button onclick="addBannerSlot()" id="addBannerBtn" class="banner-add-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Banner
+    </button>
   </div>
-
-  <div id="bannerSlotList" style="display:grid;gap:14px">
-    <!-- Slots injected by JS -->
-    <div style="text-align:center;color:#94a3b8;padding:24px;font-size:13px">Loading banners...</div>
+  <div style="padding:20px 24px;display:grid;gap:12px">
+    <div id="bannerSlotList">
+      <div style="text-align:center;color:#94a3b8;padding:28px;font-size:13px;background:#f8fafc;border-radius:14px">Loading banners...</div>
+    </div>
   </div>
-
   <!-- Preview -->
-  <div style="margin-top:20px;border-top:1px solid #eef2f7;padding-top:18px">
-    <div style="font-size:13px;font-weight:800;color:#334155;margin-bottom:10px">📱 Preview (how it looks on seller login page)</div>
-    <div style="position:relative;width:100%;max-width:480px;border-radius:16px;overflow:hidden;background:#071427;aspect-ratio:16/9;box-shadow:0 12px 32px rgba(15,23,42,.18)">
-      <div id="bannerPreviewImg" style="width:100%;height:100%;background:linear-gradient(135deg,#071427,#1d4ed8);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;transition:opacity .5s">
-        Banner preview here
-      </div>
-      <div id="bannerPreviewDots" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px"></div>
+  <div style="border-top:1px solid #f1f5f9;padding:18px 24px 24px">
+    <div style="font-size:12px;font-weight:800;color:#64748b;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Preview — Seller login page-ல் இப்படி தெரியும்
+    </div>
+    <div style="position:relative;width:100%;max-width:520px;border-radius:20px;overflow:hidden;background:#071427;aspect-ratio:16/9;box-shadow:0 16px 40px rgba(7,20,39,.22);border:1px solid rgba(0,0,0,.08)">
+      <div id="bannerPreviewImg" style="width:100%;height:100%;background:linear-gradient(135deg,#071427,#1d4ed8);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);font-size:13px;font-weight:700;transition:opacity .5s">Banner preview here</div>
+      <div id="bannerPreviewDots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px"></div>
     </div>
   </div>
 </div>
 
 <!-- Plan Management Header -->
-<div style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-  <div style="font-size:16px;font-weight:900;color:#071427">📋 Plan Management</div>
-  <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:12px 16px;box-shadow:0 4px 14px rgba(15,23,42,.05)">
-    <span style="font-size:12px;font-weight:900;color:#334155;white-space:nowrap">🎯 Default Signup Plan:</span>
-    <select id="defaultPlanSelect" onchange="saveDefaultPlan()" style="border:1.5px solid #e5e7eb;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;font-family:inherit;outline:none;color:#071427;cursor:pointer">
+<div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+  <div style="font-size:18px;font-weight:900;color:#071427;display:flex;align-items:center;gap:8px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 6h6M9 10h6M9 14h4"/></svg>
+    Plan Management
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:10px 16px;box-shadow:0 4px 14px rgba(15,23,42,.05)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+    <span style="font-size:12px;font-weight:900;color:#334155;white-space:nowrap">Default Signup Plan:</span>
+    <select id="defaultPlanSelect" onchange="saveDefaultPlan()" style="border:1.5px solid #e5e7eb;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:700;font-family:inherit;outline:none;color:#071427;cursor:pointer;transition:.2s">
       <option value="">— Select —</option>
     </select>
     <span id="defaultPlanSaved" style="display:none;font-size:11px;font-weight:800;color:#15803d;background:#dcfce7;padding:4px 10px;border-radius:999px">✓ Saved</span>
@@ -276,42 +619,42 @@
 </div>
 
 <!-- 5 Fixed Plan Cards -->
-<div id="planConfigsList" style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;align-items:stretch">
-  <div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px;font-size:13px">Loading plans...</div>
+<div id="planConfigsList" style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px;align-items:stretch">
+  <div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:48px;font-size:13px;background:#f8fafc;border-radius:20px">Loading plans...</div>
 </div>
 
 <!-- Assign Plan to Seller -->
-<div class="panel">
-  <div class="panel-head"><div><h3>Assign Plan to Seller</h3><p class="small">Manually activate a plan for a specific seller</p></div></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
+<div style="background:#fff;border-radius:24px;border:1px solid #eef2f7;box-shadow:0 12px 32px rgba(15,23,42,.07);padding:22px 24px">
+  <h3 style="font-size:16px;font-weight:900;color:#071427;margin-bottom:4px">Assign Plan to Seller</h3>
+  <p style="font-size:12px;color:#94a3b8;margin-bottom:18px">Manually activate a plan for a specific seller</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:0">
     <div>
-      <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Select Seller</label>
-      <select id="assignSellerSelect" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+      <label style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px">Select Seller</label>
+      <select id="assignSellerSelect" style="width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;background:#fafbfd;transition:.2s" onfocus="this.style.borderColor='#1d4ed8'" onblur="this.style.borderColor='#e5e7eb'">
         <option value="">— Select Seller —</option>
       </select>
     </div>
     <div>
-      <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Select Plan</label>
-      <select id="assignPlanSelect" onchange="updateExpiryPreview()" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+      <label style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px">Select Plan</label>
+      <select id="assignPlanSelect" onchange="updateExpiryPreview()" style="width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;background:#fafbfd;transition:.2s" onfocus="this.style.borderColor='#1d4ed8'" onblur="this.style.borderColor='#e5e7eb'">
         <option value="">— Select Active Plan —</option>
       </select>
     </div>
     <div>
-      <label style="font-size:12px;font-weight:800;color:#334155;display:block;margin-bottom:6px">Start Date</label>
-      <input type="date" id="assignStartDate" onchange="updateExpiryPreview()" style="width:100%;border:1px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none">
+      <label style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px">Start Date</label>
+      <input type="date" id="assignStartDate" onchange="updateExpiryPreview()" style="width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;background:#fafbfd;transition:.2s" onfocus="this.style.borderColor='#1d4ed8'" onblur="this.style.borderColor='#e5e7eb'">
       <div id="expiryPreview" style="font-size:11px;color:#64748b;font-weight:700;margin-top:5px"></div>
     </div>
-    <button onclick="assignPlanToSeller()" style="background:#1d4ed8;color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap">Assign Plan</button>
+    <button onclick="assignPlanToSeller()" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:0;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;box-shadow:0 6px 16px rgba(29,78,216,.28);transition:.15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Assign Plan</button>
   </div>
-  <div id="assignPlanMsg" style="display:none;margin-top:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700"></div>
-
+  <div id="assignPlanMsg" style="display:none;margin-top:14px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700"></div>
   <!-- Active Seller Subscriptions Table -->
-  <div style="margin-top:20px">
+  <div style="margin-top:20px;border-top:1px solid #f1f5f9;padding-top:18px">
     <div style="font-size:14px;font-weight:900;color:#071427;margin-bottom:12px">Current Seller Subscriptions</div>
     <div class="table-wrap">
       <table class="table">
         <thead><tr><th>Seller</th><th>Plan</th><th>Start Date</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr></thead>
-        <tbody id="sellerSubRows"><tr><td colspan="6" style="text-align:center;color:#94a3b8">Loading...</td></tr></tbody>
+        <tbody id="sellerSubRows"><tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:24px">Loading...</td></tr></tbody>
       </table>
     </div>
   </div>

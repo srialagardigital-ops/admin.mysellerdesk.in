@@ -552,7 +552,143 @@
 </section>
 <section id="districtPage" class="page" style="display:none"><section class="grid"><div class="panel"><div class="panel-head"><div><h3>District-wise Sellers</h3><p class="small">Seller distribution</p></div></div><canvas id="districtChart2"></canvas></div><div class="panel"><div class="panel-head"><div><h3>District Activity Heat Map</h3><p class="small">Darker blocks = more sellers</p></div></div><div class="heatmap-grid" id="heatMap"></div></div></section></section>
 <section id="subscriptionsPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Paid Sellers</div><div class="value" id="paidSellers">0</div><span class="trend up">Monthly + Yearly paid</span></div><div class="card"><div class="label">Monthly Paid</div><div class="value" id="monthlyPaid">0</div><span class="trend neutral">₹199 plan</span></div><div class="card"><div class="label">Yearly Paid</div><div class="value" id="yearlyPaid">0</div><span class="trend up">₹1,999 plan</span></div><div class="card"><div class="label">Revenue This Month</div><div class="value" id="revenueThisMonth">₹0</div><span class="trend up">Subscription income</span></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>Revenue Overview</h3><p class="small">Last 6 months</p></div></div><canvas id="revenueChart"></canvas></div><div class="panel"><div class="panel-head"><div><h3>Plan Distribution</h3><p class="small">Trial vs paid</p></div></div><canvas id="planChart2"></canvas></div></section><div class="panel"><div class="panel-head"><div><h3>Payment Details</h3><p class="small">Recent subscription payments</p></div></div><table class="table"><thead><tr><th>Seller</th><th>Plan</th><th>Amount</th><th>Status</th><th>Expiry</th></tr></thead><tbody id="paymentRows"></tbody></table></div></section>
-<section id="supportPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Open Tickets</div><div class="value" id="openTickets">0</div><span class="trend down">Need attention</span></div><div class="card"><div class="label">In Progress</div><div class="value" id="progressTickets">0</div><span class="trend neutral">Working</span></div><div class="card"><div class="label">Resolved Today</div><div class="value" id="resolvedTickets">0</div><span class="trend up">Good</span></div><div class="card"><div class="label">Avg Response Time</div><div class="value">-</div><span class="trend up">Need SLA data</span></div></section><section class="kanban"><div class="kanban-col"><div class="kanban-title">Open</div><div id="openTicketList"></div></div><div class="kanban-col"><div class="kanban-title">In Progress</div><div id="progressTicketList"></div></div><div class="kanban-col"><div class="kanban-title">Resolved</div><div id="resolvedTicketList"></div></div></section><section class="grid"><div class="panel"><div class="panel-head"><div><h3>All Tickets</h3><p class="small">Latest issues from sellers</p></div></div><table class="table"><thead><tr><th>ID</th><th>Issue</th><th>Seller</th><th>Priority</th><th>Status</th></tr></thead><tbody id="ticketRows"></tbody></table></div><div class="panel"><div class="panel-head"><div><h3>Quick Reply Templates</h3></div></div><div class="quick-replies"><div class="reply-chip">Payment received. Your plan will be activated shortly.</div><div class="reply-chip">Please refresh and login again after 2 minutes.</div><div class="reply-chip">We are checking your issue and will update soon.</div><div class="reply-chip">Your invoice has been generated and shared.</div></div></div></section></section>
+<section id="supportPage" class="page" style="display:none">
+
+<!-- SUPPORT PAGE HERO HEADER -->
+<div style="background:linear-gradient(135deg,#071427 0%,#0f2240 55%,#1e3a8a 100%);border-radius:24px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(7,20,39,.22)">
+  <div style="position:absolute;top:-50px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(249,115,22,.2),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-40px;left:40px;width:160px;height:160px;background:radial-gradient(circle,rgba(99,102,241,.2),transparent 70%);pointer-events:none"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:relative;z-index:1">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="width:38px;height:38px;border-radius:12px;background:rgba(249,115,22,.2);border:1px solid rgba(249,115,22,.3);display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:#fff">Support Tickets</div>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,.5)">Seller issues track பண்ணி resolve பண்ணுங்க</div>
+    </div>
+    <!-- Stat Pills -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:10px 16px;text-align:center;min-width:80px">
+        <div style="font-size:22px;font-weight:900;color:#f87171" id="openTickets">0</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:2px">Open</div>
+      </div>
+      <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:10px 16px;text-align:center;min-width:80px">
+        <div style="font-size:22px;font-weight:900;color:#fbbf24" id="progressTickets">0</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:2px">In Progress</div>
+      </div>
+      <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);border-radius:14px;padding:10px 16px;text-align:center;min-width:80px">
+        <div style="font-size:22px;font-weight:900;color:#34d399" id="resolvedTickets">0</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:2px">Resolved</div>
+      </div>
+      <div style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:10px 16px;text-align:center;min-width:80px">
+        <div style="font-size:22px;font-weight:900;color:#a78bfa">—</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:2px">Avg Time</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KANBAN BOARD -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+
+  <!-- Open Column -->
+  <div style="background:#fff;border:1px solid #fee2e2;border-radius:22px;overflow:hidden;box-shadow:0 8px 24px rgba(239,68,68,.07)">
+    <div style="background:linear-gradient(135deg,#fff1f2,#fff);padding:14px 18px;border-bottom:1px solid #fee2e2;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.2)"></div>
+        <span style="font-size:13px;font-weight:900;color:#991b1b">Open</span>
+      </div>
+      <span style="background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:900;padding:3px 10px;border-radius:999px" id="openBadgeCount">0</span>
+    </div>
+    <div style="padding:12px;display:grid;gap:10px;max-height:380px;overflow-y:auto" id="openTicketList">
+      <div style="text-align:center;color:#94a3b8;padding:24px;font-size:13px">Loading...</div>
+    </div>
+  </div>
+
+  <!-- In Progress Column -->
+  <div style="background:#fff;border:1px solid #fef3c7;border-radius:22px;overflow:hidden;box-shadow:0 8px 24px rgba(245,158,11,.07)">
+    <div style="background:linear-gradient(135deg,#fffbeb,#fff);padding:14px 18px;border-bottom:1px solid #fef3c7;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.2)"></div>
+        <span style="font-size:13px;font-weight:900;color:#92400e">In Progress</span>
+      </div>
+      <span style="background:#fef3c7;color:#b45309;font-size:11px;font-weight:900;padding:3px 10px;border-radius:999px" id="progressBadgeCount">0</span>
+    </div>
+    <div style="padding:12px;display:grid;gap:10px;max-height:380px;overflow-y:auto" id="progressTicketList">
+      <div style="text-align:center;color:#94a3b8;padding:24px;font-size:13px">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Resolved Column -->
+  <div style="background:#fff;border:1px solid #d1fae5;border-radius:22px;overflow:hidden;box-shadow:0 8px 24px rgba(16,185,129,.07)">
+    <div style="background:linear-gradient(135deg,#ecfdf5,#fff);padding:14px 18px;border-bottom:1px solid #d1fae5;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.2)"></div>
+        <span style="font-size:13px;font-weight:900;color:#065f46">Resolved</span>
+      </div>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:900;padding:3px 10px;border-radius:999px" id="resolvedBadgeCount">0</span>
+    </div>
+    <div style="padding:12px;display:grid;gap:10px;max-height:380px;overflow-y:auto" id="resolvedTicketList">
+      <div style="text-align:center;color:#94a3b8;padding:24px;font-size:13px">Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ALL TICKETS TABLE + QUICK REPLIES -->
+<div style="display:grid;grid-template-columns:1.4fr 0.6fr;gap:18px">
+
+  <!-- All Tickets Table -->
+  <div style="background:#fff;border:1px solid #eef2f7;border-radius:24px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,.07)">
+    <div style="padding:18px 22px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#071427">All Tickets</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Latest issues from sellers</div>
+      </div>
+      <div style="width:32px;height:32px;border-radius:10px;background:#f8fafc;border:1px solid #eef2f7;display:flex;align-items:center;justify-content:center">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Issue</th><th>Seller</th><th>Priority</th><th>Status</th></tr></thead>
+        <tbody id="ticketRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Quick Reply Templates -->
+  <div style="background:#fff;border:1px solid #eef2f7;border-radius:24px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,.07)">
+    <div style="padding:18px 22px 14px;border-bottom:1px solid #f1f5f9">
+      <div style="font-size:16px;font-weight:900;color:#071427">Quick Replies</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Copy & paste templates</div>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px">
+      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="Payment received. Your plan will be activated shortly." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Payment</div>
+        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">Payment received. Your plan will be activated shortly.</div>
+      </div>
+      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="Please refresh and login again after 2 minutes." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Login Issue</div>
+        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">Please refresh and login again after 2 minutes.</div>
+      </div>
+      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="We are checking your issue and will update soon." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Checking</div>
+        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">We are checking your issue and will update soon.</div>
+      </div>
+      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="Your invoice has been generated and shared." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
+        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Invoice</div>
+        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">Your invoice has been generated and shared.</div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:700;margin-top:4px">👆 Click to copy</div>
+    </div>
+  </div>
+
+</div>
+
+</section>
 <section id="settingsPage" class="page" style="display:none">
 
 <!-- BANNER MANAGEMENT SECTION -->
@@ -1277,16 +1413,42 @@ async function loadTickets(){
   const prog=arr.filter(t=>String(t.status||'').toLowerCase().includes('progress'));
   const res=arr.filter(t=>String(t.status||'').toLowerCase().includes('resolved'));
   setText('openTickets',open.length);setText('progressTickets',prog.length);setText('resolvedTickets',res.length);
+  // Update kanban column badge counts
+  if($('openBadgeCount')) $('openBadgeCount').textContent=open.length;
+  if($('progressBadgeCount')) $('progressBadgeCount').textContent=prog.length;
+  if($('resolvedBadgeCount')) $('resolvedBadgeCount').textContent=res.length;
   const getTitle=t=>t.subject||t.title||t.issue||t.id;
   const getMsg=t=>t.message||t.issue||'No description';
   // TKT-001 format: sort by created_at oldest first to assign numbers, then reverse for display
   const sorted=[...arr].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
   const tktNum=t=>'TKT-'+String(sorted.findIndex(x=>x.id===t.id)+1).padStart(3,'0');
-  const card=t=>`<div class="kanban-card"><span style="font-size:11px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 8px;border-radius:999px;">${tktNum(t)}</span><b style="display:block;margin-top:6px">${safe(getTitle(t))}</b><p style="color:#1d4ed8;font-weight:700;font-size:12px;margin-top:2px">🏪 ${safe(getSellerName(t))}</p><p>${safe(getMsg(t))}</p><span class="badge ${badge(t.priority)}">${safe(t.priority,'medium')}</span></div>`;
-  $('openTicketList').innerHTML=open.map(card).join('')||'<p class="small">No open tickets</p>';
-  $('progressTicketList').innerHTML=prog.map(card).join('')||'<p class="small">No in progress</p>';
-  $('resolvedTicketList').innerHTML=res.map(card).join('')||'<p class="small">No resolved</p>';
-  $('ticketRows').innerHTML=arr.map(t=>`<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${tktNum(t)}</span></td><td><b>${safe(getTitle(t))}</b><br><small>${safe(getMsg(t))}</small></td><td><span style="font-size:13px;font-weight:700;color:#1d4ed8">🏪 ${safe(getSellerName(t))}</span></td><td><span class="badge ${badge(t.priority)}">${safe(t.priority)}</span></td><td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td></tr>`).join('')||'<tr><td colspan="5">No tickets found</td></tr>';
+  // Priority color map
+  const priColor={high:'#fee2e2',highText:'#b91c1c',medium:'#fff7ed',mediumText:'#c2410c',low:'#f0fdf4',lowText:'#15803d'};
+  const getPri=t=>String(t.priority||'medium').toLowerCase();
+  const card=t=>{
+    const pri=getPri(t);
+    const bg=priColor[pri+'']||priColor.medium;
+    const tc=priColor[pri+'Text']||priColor.mediumText;
+    const timeStr=t.created_at?new Date(t.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):'-';
+    return `<div style="background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:13px 14px;box-shadow:0 2px 8px rgba(15,23,42,.05);transition:.2s" onmouseover="this.style.boxShadow='0 6px 18px rgba(15,23,42,.1)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(15,23,42,.05)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 9px;border-radius:999px">${tktNum(t)}</span>
+        <span style="font-size:10px;font-weight:800;color:${tc};background:${bg};padding:3px 9px;border-radius:999px;text-transform:capitalize">${safe(t.priority,'medium')}</span>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:#071427;margin-bottom:5px;line-height:1.4">${safe(getTitle(t))}</div>
+      <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:6px;display:flex;align-items:center;gap:4px">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        ${safe(getSellerName(t))}
+      </div>
+      <div style="font-size:11px;color:#64748b;line-height:1.45;margin-bottom:8px">${safe(getMsg(t)).slice(0,80)}${getMsg(t).length>80?'…':''}</div>
+      <div style="font-size:10px;color:#94a3b8;font-weight:700">${timeStr}</div>
+    </div>`;
+  };
+  const emptyCard=(msg)=>`<div style="text-align:center;padding:28px 16px;color:#94a3b8;font-size:13px;font-weight:600">${msg}</div>`;
+  $('openTicketList').innerHTML=open.map(card).join('')||emptyCard('No open tickets');
+  $('progressTicketList').innerHTML=prog.map(card).join('')||emptyCard('No tickets in progress');
+  $('resolvedTicketList').innerHTML=res.map(card).join('')||emptyCard('No resolved tickets');
+  $('ticketRows').innerHTML=arr.map(t=>`<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${tktNum(t)}</span></td><td><b>${safe(getTitle(t))}</b><br><small style="color:#94a3b8">${safe(getMsg(t)).slice(0,60)}${getMsg(t).length>60?'…':''}</small></td><td><span style="font-size:13px;font-weight:700;color:#1d4ed8">🏪 ${safe(getSellerName(t))}</span></td><td><span class="badge ${badge(t.priority)}">${safe(t.priority)}</span></td><td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px">No tickets found</td></tr>';
 }
 function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
 function drawPlans(v,rev){

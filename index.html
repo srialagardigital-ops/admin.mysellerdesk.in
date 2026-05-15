@@ -1375,7 +1375,8 @@ async function loadActivity(){
   if(window.lucide) setTimeout(()=>lucide.createIcons(), 50);
 }
 async function loadTickets(){
-  const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
+  // ticket_number = seller dashboard saves this field; also fetch all possible seller/user id fields
+  const{data,error}=await sb.from('support_tickets').select('id,ticket_number,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
   if(error){console.error('Tickets error:',error.message);
     ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small" style="color:#b91c1c">Error loading tickets: '+error.message+'</p>';});
     if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="5" style="color:#b91c1c">'+error.message+'</td></tr>';
@@ -1393,11 +1394,8 @@ async function loadTickets(){
   const uids=[...new Set(arr.map(t=>t.seller_id||t.user_id).filter(Boolean))];
   let sellerNameMap={};
   if(uids.length){
-    // 1. Try settings table (shop_name)
     const{data:sdata}=await sb.from('settings').select('user_id,shop_name').in('user_id',uids);
     (sdata||[]).forEach(s=>{ if(s.shop_name) sellerNameMap[s.user_id]=s.shop_name; });
-
-    // 2. For any uid still missing, try profiles table (full_name or email)
     const missing=uids.filter(u=>!sellerNameMap[u]);
     if(missing.length){
       const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
@@ -1406,40 +1404,41 @@ async function loadTickets(){
   }
   const getSellerName=t=>{
     const uid=t.seller_id||t.user_id;
-    return sellerNameMap[uid]||uid||'-';
+    if(!uid) return '-';
+    return sellerNameMap[uid]||(uid.length>12?uid.slice(0,8)+'...':uid);
+  };
+
+  // Ticket number: use ticket_number field from DB if available, else fallback to TKT-001 by created_at order
+  const sortedByDate=[...arr].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  const tktNum=t=>{
+    if(t.ticket_number) return String(t.ticket_number);
+    return 'TKT-'+String(sortedByDate.findIndex(x=>x.id===t.id)+1).padStart(3,'0');
   };
 
   const open=arr.filter(t=>String(t.status||'').toLowerCase().includes('open'));
   const prog=arr.filter(t=>String(t.status||'').toLowerCase().includes('progress'));
   const res=arr.filter(t=>String(t.status||'').toLowerCase().includes('resolved'));
   setText('openTickets',open.length);setText('progressTickets',prog.length);setText('resolvedTickets',res.length);
-  // Update kanban column badge counts
   if($('openBadgeCount')) $('openBadgeCount').textContent=open.length;
   if($('progressBadgeCount')) $('progressBadgeCount').textContent=prog.length;
   if($('resolvedBadgeCount')) $('resolvedBadgeCount').textContent=res.length;
   const getTitle=t=>t.subject||t.title||t.issue||t.id;
   const getMsg=t=>t.message||t.issue||'No description';
-  // TKT-001 format: sort by created_at oldest first to assign numbers, then reverse for display
-  const sorted=[...arr].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-  const tktNum=t=>'TKT-'+String(sorted.findIndex(x=>x.id===t.id)+1).padStart(3,'0');
-  // Priority color map
   const priColor={high:'#fee2e2',highText:'#b91c1c',medium:'#fff7ed',mediumText:'#c2410c',low:'#f0fdf4',lowText:'#15803d'};
   const getPri=t=>String(t.priority||'medium').toLowerCase();
   const card=t=>{
     const pri=getPri(t);
-    const bg=priColor[pri+'']||priColor.medium;
+    const bg=priColor[pri]||priColor.medium;
     const tc=priColor[pri+'Text']||priColor.mediumText;
     const timeStr=t.created_at?new Date(t.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):'-';
+    const sellerName=getSellerName(t);
     return `<div style="background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:13px 14px;box-shadow:0 2px 8px rgba(15,23,42,.05);transition:.2s" onmouseover="this.style.boxShadow='0 6px 18px rgba(15,23,42,.1)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(15,23,42,.05)'">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 9px;border-radius:999px">${tktNum(t)}</span>
         <span style="font-size:10px;font-weight:800;color:${tc};background:${bg};padding:3px 9px;border-radius:999px;text-transform:capitalize">${safe(t.priority,'medium')}</span>
       </div>
       <div style="font-size:13px;font-weight:800;color:#071427;margin-bottom:5px;line-height:1.4">${safe(getTitle(t))}</div>
-      <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:6px;display:flex;align-items:center;gap:4px">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        ${safe(getSellerName(t))}
-      </div>
+      <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:6px">${sellerName}</div>
       <div style="font-size:11px;color:#64748b;line-height:1.45;margin-bottom:8px">${safe(getMsg(t)).slice(0,80)}${getMsg(t).length>80?'…':''}</div>
       <div style="font-size:10px;color:#94a3b8;font-weight:700">${timeStr}</div>
     </div>`;
@@ -1448,7 +1447,16 @@ async function loadTickets(){
   $('openTicketList').innerHTML=open.map(card).join('')||emptyCard('No open tickets');
   $('progressTicketList').innerHTML=prog.map(card).join('')||emptyCard('No tickets in progress');
   $('resolvedTicketList').innerHTML=res.map(card).join('')||emptyCard('No resolved tickets');
-  $('ticketRows').innerHTML=arr.map(t=>`<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${tktNum(t)}</span></td><td><b>${safe(getTitle(t))}</b><br><small style="color:#94a3b8">${safe(getMsg(t)).slice(0,60)}${getMsg(t).length>60?'…':''}</small></td><td><span style="font-size:13px;font-weight:700;color:#1d4ed8">🏪 ${safe(getSellerName(t))}</span></td><td><span class="badge ${badge(t.priority)}">${safe(t.priority)}</span></td><td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px">No tickets found</td></tr>';
+  $('ticketRows').innerHTML=arr.map(t=>{
+    const sellerName=getSellerName(t);
+    return `<tr>
+      <td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${tktNum(t)}</span></td>
+      <td><b>${safe(getTitle(t))}</b><br><small style="color:#94a3b8">${safe(getMsg(t)).slice(0,60)}${getMsg(t).length>60?'…':''}</small></td>
+      <td><span style="font-size:13px;font-weight:700;color:#334155">${sellerName}</span></td>
+      <td><span class="badge ${badge(t.priority)}">${safe(t.priority,'medium')}</span></td>
+      <td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px">No tickets found</td></tr>';
 }
 function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
 function drawPlans(v,rev){
@@ -2436,59 +2444,80 @@ async function loadBanners() {
 function renderBannerSlots() {
   const list = document.getElementById('bannerSlotList');
   if (!list) return;
+  // Hide the old Add Banner button — always show 3 fixed boxes
   const addBtn = document.getElementById('addBannerBtn');
-  if (addBtn) addBtn.style.display = _bannerSlots.length >= 3 ? 'none' : 'inline-flex';
+  if (addBtn) addBtn.style.display = 'none';
 
-  if (!_bannerSlots.length) {
-    list.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:32px;border:2px dashed #e5e7eb;border-radius:16px;font-size:13px">
-      Banner இல்லை. "+ Add Banner" click பண்ணி add பண்ணுங்க.
-    </div>`;
-    updateBannerPreview();
-    return;
-  }
+  // Always render 3 fixed slide boxes
+  const slots = [0,1,2].map(i => _bannerSlots[i] || { url: '', link: '' });
 
-  list.innerHTML = _bannerSlots.map((b, i) => `
-    <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:16px;padding:14px">
-      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start">
-        <!-- Thumbnail -->
-        <div style="width:90px;height:54px;border-radius:10px;overflow:hidden;background:#e5e7eb;flex-shrink:0;position:relative">
-          ${b.url
-            ? `<img src="${b.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
-            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94a3b8">No image</div>`}
+  list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">` +
+    slots.map((b, i) => {
+      const hasImage = b.url && b.url.trim();
+      return `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <!-- Label -->
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:900;color:#334155">Slide ${i+1}</span>
+          <span id="bannerUploadStatus_${i}" style="font-size:11px;font-weight:700;color:#64748b"></span>
         </div>
-        <!-- Inputs -->
-        <div style="display:grid;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:11px;font-weight:900;background:#071427;color:#fff;padding:3px 9px;border-radius:999px;white-space:nowrap">Slide ${i+1}</span>
-            <input type="text" id="bannerUrlInput_${i}" placeholder="https://... image URL paste பண்ணுங்க"
-              value="${b.url||''}"
-              oninput="_bannerSlots[${i}].url=this.value;updateBannerPreview();"
-              style="flex:1;border:1px solid #dbe3ef;border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none">
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:11px;color:#64748b;font-weight:700;min-width:80px">Link (optional)</span>
-            <input type="text" placeholder="https://... click பண்ணும் போது போக வேண்டிய URL"
-              value="${b.link||''}"
-              oninput="_bannerSlots[${i}].link=this.value"
-              style="flex:1;border:1px solid #dbe3ef;border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none">
-          </div>
-          <!-- Upload button row -->
-          <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
-            <input type="file" id="bannerFileInput_${i}" accept="image/*" style="display:none"
-              onchange="uploadBannerImage(event, ${i})">
-            <button onclick="document.getElementById('bannerFileInput_${i}').click()"
-              style="display:inline-flex;align-items:center;gap:6px;border:1.5px solid #378add;background:#eff6ff;color:#1d4ed8;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">
-              📁 Upload Image
+
+        <!-- Image Box -->
+        <div id="bannerBox_${i}" style="position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#f1f5f9;border:2px dashed #cbd5e1;cursor:pointer;transition:.2s"
+          onmouseover="document.getElementById('bannerOverlay_${i}').style.opacity='1'"
+          onmouseout="document.getElementById('bannerOverlay_${i}').style.opacity='0'">
+
+          ${hasImage
+            ? `<img src="${b.url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">`
+            : `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#94a3b8">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span style="font-size:12px;font-weight:600">No image</span>
+              </div>`
+          }
+
+          <!-- Hover Overlay -->
+          <div id="bannerOverlay_${i}" style="position:absolute;inset:0;background:rgba(7,20,39,.65);display:flex;align-items:center;justify-content:center;gap:10px;opacity:${hasImage?'0':'0'};transition:.2s">
+            <!-- Upload / Edit -->
+            <button onclick="event.stopPropagation();document.getElementById('bannerFileInput_${i}').click()"
+              style="display:flex;align-items:center;gap:6px;background:#fff;color:#071427;border:0;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:900;cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              ${hasImage ? 'Change' : 'Upload'}
             </button>
-            <span id="bannerUploadStatus_${i}" style="font-size:11px;color:#64748b;"></span>
+            ${hasImage ? `
+            <!-- Delete -->
+            <button onclick="event.stopPropagation();deleteBannerSlot(${i})"
+              style="display:flex;align-items:center;gap:6px;background:#ef4444;color:#fff;border:0;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:900;cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              Delete
+            </button>` : ''}
           </div>
         </div>
-        <!-- Remove -->
-        <button onclick="removeBannerSlot(${i})" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;align-self:start">✕ Remove</button>
-      </div>
-    </div>
-  `).join('');
+
+        <!-- Hidden file input -->
+        <input type="file" id="bannerFileInput_${i}" accept="image/*" style="display:none" onchange="uploadBannerImage(event,${i})">
+
+        <!-- Upload button (shown when no image) -->
+        ${!hasImage ? `
+        <button onclick="document.getElementById('bannerFileInput_${i}').click()"
+          style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid #cbd5e1;background:#f8fafc;color:#475569;border-radius:10px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s"
+          onmouseover="this.style.borderColor='#1d4ed8';this.style.color='#1d4ed8';this.style.background='#eff6ff'"
+          onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#475569';this.style.background='#f8fafc'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Image
+        </button>` : ''}
+      </div>`;
+    }).join('') +
+  `</div>`;
+
   updateBannerPreview();
+}
+
+function deleteBannerSlot(i) {
+  if (!confirm('இந்த banner delete பண்ணணுமா?')) return;
+  // Ensure array is 3 long before clearing
+  while (_bannerSlots.length <= i) _bannerSlots.push({ url: '', link: '' });
+  _bannerSlots[i] = { url: '', link: '' };
+  renderBannerSlots();
 }
 
 // ── Banner Image Upload to Supabase Storage ──
@@ -2499,7 +2528,9 @@ async function uploadBannerImage(event, slotIdx) {
   const statusEl = document.getElementById('bannerUploadStatus_' + slotIdx);
   if (statusEl) { statusEl.style.color = '#0369a1'; statusEl.textContent = '⏳ Uploading...'; }
 
-  // Unique filename: banner_<timestamp>_<random>.<ext>
+  // Ensure _bannerSlots has 3 entries
+  while (_bannerSlots.length <= slotIdx) _bannerSlots.push({ url: '', link: '' });
+
   const ext = file.name.split('.').pop().toLowerCase();
   const fileName = 'banner_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) + '.' + ext;
 
@@ -2513,16 +2544,11 @@ async function uploadBannerImage(event, slotIdx) {
       return;
     }
 
-    // Get public URL
     const { data: urlData } = sb.storage.from('banners').getPublicUrl(fileName);
-    const publicUrl = urlData.publicUrl;
-
-    // Update slot URL
-    _bannerSlots[slotIdx].url = publicUrl;
+    _bannerSlots[slotIdx].url = urlData.publicUrl;
 
     if (statusEl) { statusEl.style.color = '#15803d'; statusEl.textContent = '✅ Uploaded!'; }
 
-    // Re-render to show thumbnail + fill URL input
     renderBannerSlots();
     updateBannerPreview();
 

@@ -1110,7 +1110,7 @@ function renderSellerTable(list){
           ? `<button class="tiny-btn" style="background:#dcfce7;color:#15803d;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','active',${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Activate</button>`
           : `<button class="tiny-btn" style="background:#fff7ed;color:#c2410c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','on_hold',${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Hold</button>`
         }
-        <button class="tiny-btn" style="background:#fee2e2;color:#b91c1c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="deleteSeller('${s.user_id}','${safe(displayLabel).replace(/'/g,&quot;&#39;&quot;)}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</button>
+        <button class="tiny-btn" style="background:#fee2e2;color:#b91c1c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="deleteSeller('${s.user_id}',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</button>
       </div></td>
     </tr>`;
   }).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
@@ -1230,8 +1230,11 @@ async function setSellerAccountStatus(userId, newStatus, idx) {
   await loadSellers();
 }
 
-async function deleteSeller(userId, sellerName) {
-  if (!confirm('DELETE seller "' + sellerName + '"?\n\nThis will permanently remove their account data. This action cannot be undone.')) return;
+async function deleteSeller(userId, btnEl) {
+  // Get seller name from the row's first cell
+  const row = (btnEl && btnEl.closest) ? btnEl.closest('tr') : null;
+  const sellerName = row ? (row.querySelector('.seller-row')?.textContent?.trim() || 'this seller') : 'this seller';
+  if (!confirm('Delete seller "' + sellerName + '"?\n\nThis will permanently remove their data. This cannot be undone.')) return;
   const secondConfirm = confirm('Final confirmation: permanently delete "' + sellerName + '"?');
   if (!secondConfirm) return;
 

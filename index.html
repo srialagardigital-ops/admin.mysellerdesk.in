@@ -1222,9 +1222,8 @@ async function setSellerAccountStatus(userId, newStatus, idx) {
   const { error: e1 } = await sb.from('settings').update({ account_status: newStatus }).eq('user_id', userId);
   if (e1) errors.push('settings: ' + e1.message);
 
-  // Also update profiles table (seller dashboard reads account_status from here)
-  const { error: e2 } = await sb.from('profiles').update({ account_status: newStatus }).eq('id', userId);
-  if (e2) console.warn('profiles update skipped (column may not exist):', e2.message);
+  // Also update profiles table — silent if column doesn't exist
+  try { await sb.from('profiles').update({ account_status: newStatus }).eq('id', userId); } catch(e){}
 
   if (errors.length) { alert('Error: ' + errors.join('\n')); return; }
   await loadSellers();
@@ -1300,8 +1299,10 @@ async function loadOrders(){
     (sdata||[]).forEach(s=>{ if(s.shop_name) shopMap[s.user_id]=s.shop_name; });
     const missing=uids.filter(u=>!shopMap[u]);
     if(missing.length){
-      const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
-      (pdata||[]).forEach(p=>{ shopMap[p.id]=p.full_name||p.email||(p.id?p.id.slice(0,8)+'...':'-'); });
+      try {
+        const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
+        (pdata||[]).forEach(p=>{ shopMap[p.id]=p.full_name||p.email||'Unknown Seller'; });
+      } catch(e){}
     }
   }
   $('recentOrderRows').innerHTML=arr.map(o=>{
@@ -1368,16 +1369,20 @@ async function loadActivity(){
         return {type:String(a.type||'').toLowerCase(), msg:safe(a.message), shop, time:a.created_at};
       });
     }
-  } catch(e){ console.warn('activity_logs fetch error:',e); }
+  } catch(e){ /* activity_logs table may not exist — silently skip */ }
 
   if(activities.length===0){
     // FIX4b: fetch ALL settings for complete shopNameMap (no limit(5) bug)
-    const [{data:allSettings},{data:orders},{data:subs},{data:logins}] = await Promise.all([
+    const [settingsRes,ordersRes,subsRes,loginsRes] = await Promise.allSettled([
       sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}),
       sb.from('orders').select('orderId,order_id,id,created_at,user_id,status').order('created_at',{ascending:false}).limit(5),
       sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2),
-      sb.from('profiles').select('id,full_name,email,last_sign_in_at').order('last_sign_in_at',{ascending:false}).limit(3)
+      sb.from('profiles').select('id,full_name,email').limit(3)
     ]);
+    const allSettings = settingsRes.status==='fulfilled' ? settingsRes.value.data : [];
+    const orders = ordersRes.status==='fulfilled' ? ordersRes.value.data : [];
+    const subs = subsRes.status==='fulfilled' ? subsRes.value.data : [];
+    const logins = loginsRes.status==='fulfilled' ? loginsRes.value.data : [];
     const sellers = allSettings||[];
 
     // Complete shopNameMap
@@ -1654,7 +1659,7 @@ async function updateTicketStatus(ticketId, newStatus){
   loadTickets();
 }
 async function loadTickets(){
-  const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,category,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
+  const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
   if(error){
     // If category column missing, retry without it
     const{data:data2,error:err2}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
@@ -1683,8 +1688,10 @@ async function _renderTickets(arr){
     (sdata||[]).forEach(s=>{ if(s.shop_name) sellerNameMap[s.user_id]=s.shop_name; });
     const missing=uids.filter(u=>!sellerNameMap[u]);
     if(missing.length){
-      const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
-      (pdata||[]).forEach(p=>{ sellerNameMap[p.id]=p.full_name||p.email||p.id; });
+      try {
+        const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
+        (pdata||[]).forEach(p=>{ sellerNameMap[p.id]=p.full_name||p.email||'Unknown Seller'; });
+      } catch(e){ /* profiles fetch failed silently */ }
     }
   }
   const getSellerName=t=>{ const uid=t.seller_id||t.user_id; if(!uid)return'-'; return sellerNameMap[uid]||'Unknown Seller'; };

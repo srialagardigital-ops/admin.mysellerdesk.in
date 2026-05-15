@@ -637,55 +637,79 @@
 
 </div>
 
-<!-- ALL TICKETS TABLE + QUICK REPLIES -->
-<div style="display:grid;grid-template-columns:1.4fr 0.6fr;gap:18px">
+<!-- ALL TICKETS TABLE (full width) -->
+<div style="background:#fff;border:1px solid #eef2f7;border-radius:24px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,.07)">
+  <div style="padding:18px 22px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:16px;font-weight:900;color:#071427">All Tickets</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Ticket-ஐ click பண்ணி reply & status மாத்தலாம்</div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Issue</th><th>Seller</th><th>Category</th><th>Priority</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="ticketRows"></tbody>
+    </table>
+  </div>
+</div>
 
-  <!-- All Tickets Table -->
-  <div style="background:#fff;border:1px solid #eef2f7;border-radius:24px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,.07)">
-    <div style="padding:18px 22px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+<!-- TICKET DETAIL MODAL -->
+<div id="ticketModal" style="display:none;position:fixed;inset:0;background:rgba(7,20,39,.55);z-index:9999;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)" onclick="if(event.target===this)closeTicketModal()">
+  <div style="background:#fff;border-radius:28px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;box-shadow:0 32px 80px rgba(15,23,42,.28);position:relative">
+
+    <!-- Modal Header -->
+    <div id="tktModalHeader" style="padding:20px 24px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:#fff;z-index:10;border-radius:28px 28px 0 0">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+          <span id="tktModalNum" style="font-size:11px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px"></span>
+          <span id="tktModalCatBadge" style="font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px"></span>
+          <span id="tktModalPriBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:capitalize"></span>
+          <span id="tktModalStatusBadge" style="font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px;text-transform:capitalize"></span>
+        </div>
+        <div id="tktModalTitle" style="font-size:17px;font-weight:900;color:#071427;line-height:1.3"></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="tktModalSeller" style="font-size:13px;font-weight:800;color:#1d4ed8"></span>
+          <span style="color:#e2e8f0">•</span>
+          <span id="tktModalDate" style="font-size:12px;color:#94a3b8;font-weight:600"></span>
+        </div>
+      </div>
+      <button onclick="closeTicketModal()" style="border:0;background:#f1f5f9;border-radius:999px;width:34px;height:34px;font-size:18px;cursor:pointer;color:#334155;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+
+    <div style="padding:20px 24px;display:grid;gap:18px">
+
+      <!-- Issue Description -->
+      <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:16px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Issue Description</div>
+        <div id="tktModalMsg" style="font-size:14px;color:#334155;line-height:1.7;white-space:pre-wrap"></div>
+      </div>
+
+      <!-- Smart Quick Replies -->
       <div>
-        <div style="font-size:16px;font-weight:900;color:#071427">All Tickets</div>
-        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Latest issues from sellers</div>
+        <div style="font-size:13px;font-weight:900;color:#071427;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Quick Replies <span style="font-size:11px;color:#94a3b8;font-weight:600">(click → copy → paste in WhatsApp)</span>
+        </div>
+        <div id="tktModalReplies" style="display:grid;gap:8px"></div>
       </div>
-      <div style="width:32px;height:32px;border-radius:10px;background:#f8fafc;border:1px solid #eef2f7;display:flex;align-items:center;justify-content:center">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+
+      <!-- Custom Reply Box -->
+      <div>
+        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">✏️ Custom Reply</div>
+        <textarea id="tktCustomReply" rows="3" placeholder="Custom reply type பண்ணலாம்..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;font-size:13px;font-family:inherit;outline:none;resize:vertical;transition:.2s;color:#334155" onfocus="this.style.borderColor='#6366f1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.08)'" onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"></textarea>
+        <button onclick="copyCustomReply()" style="margin-top:8px;border:0;border-radius:12px;background:#6366f1;color:#fff;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer">📋 Copy Custom Reply</button>
       </div>
-    </div>
-    <div style="overflow-x:auto">
-      <table class="table">
-        <thead><tr><th>ID</th><th>Issue</th><th>Seller</th><th>Priority</th><th>Status</th></tr></thead>
-        <tbody id="ticketRows"></tbody>
-      </table>
+
+      <!-- Status Workflow -->
+      <div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #eef2f7;border-radius:16px;padding:16px">
+        <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">⚡ Next Step — Status மாத்து</div>
+        <div id="tktModalWorkflow" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+        <div id="tktModalWorkflowNote" style="font-size:11px;color:#94a3b8;margin-top:8px;font-weight:600"></div>
+      </div>
+
     </div>
   </div>
-
-  <!-- Quick Reply Templates -->
-  <div style="background:#fff;border:1px solid #eef2f7;border-radius:24px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,.07)">
-    <div style="padding:18px 22px 14px;border-bottom:1px solid #f1f5f9">
-      <div style="font-size:16px;font-weight:900;color:#071427">Quick Replies</div>
-      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Copy & paste templates</div>
-    </div>
-    <div style="padding:14px;display:grid;gap:10px">
-      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="Payment received. Your plan will be activated shortly." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
-        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Payment</div>
-        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">Payment received. Your plan will be activated shortly.</div>
-      </div>
-      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="Please refresh and login again after 2 minutes." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
-        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Login Issue</div>
-        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">Please refresh and login again after 2 minutes.</div>
-      </div>
-      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="We are checking your issue and will update soon." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
-        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Checking</div>
-        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">We are checking your issue and will update soon.</div>
-      </div>
-      <div onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.msg);this.style.background='#dcfce7';this.style.borderColor='#86efac';setTimeout(()=>{this.style.background='';this.style.borderColor='';},1200)" data-msg="Your invoice has been generated and shared." style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;cursor:pointer;transition:.2s" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
-        <div style="font-size:10px;font-weight:900;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Invoice</div>
-        <div style="font-size:12px;color:#334155;font-weight:600;line-height:1.5">Your invoice has been generated and shared.</div>
-      </div>
-      <div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:700;margin-top:4px">👆 Click to copy</div>
-    </div>
-  </div>
-
 </div>
 
 </section>
@@ -1374,23 +1398,203 @@ async function loadActivity(){
   }).join('');
   if(window.lucide) setTimeout(()=>lucide.createIcons(), 50);
 }
-async function loadTickets(){
-  // ticket_number = seller dashboard saves this field; also fetch all possible seller/user id fields
-  const{data,error}=await sb.from('support_tickets').select('id,ticket_number,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
-  if(error){console.error('Tickets error:',error.message);
-    ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small" style="color:#b91c1c">Error loading tickets: '+error.message+'</p>';});
-    if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="5" style="color:#b91c1c">'+error.message+'</td></tr>';
-    return;
+// ─── CATEGORY-BASED QUICK REPLIES ───────────────────────────────
+const QUICK_REPLIES = {
+  'billing': [
+    { label:'💳 Payment Confirm', msg:'உங்கள் payment successfully received ஆச்சு. உங்கள் plan சீக்கிரம் activate ஆகும். கொஞ்சம் wait பண்ணுங்க! 🙏' },
+    { label:'🧾 Invoice Ready', msg:'உங்கள் invoice ready ஆச்சு. WhatsApp-ல் இப்போவே share பண்றோம். Check பண்ணுங்க! ✅' },
+    { label:'⏳ Payment Pending', msg:'உங்கள் payment process ஆகுது. 2-4 மணி நேரத்தில் confirm ஆகும். Patience 🙏' },
+    { label:'❌ Payment Failed', msg:'உங்கள் payment failed ஆச்சு. மீண்டும் try பண்ணுங்க அல்லது different payment method use பண்ணுங்க.' },
+  ],
+  'orders': [
+    { label:'📦 Order Confirmed', msg:'உங்கள் order successfully placed ஆச்சு! Order ID check பண்ணுங்க. நன்றி 🎉' },
+    { label:'🚚 Shipping Update', msg:'உங்கள் order dispatch ஆச்சு. Tracking details soon share பண்றோம்.' },
+    { label:'📍 Out for Delivery', msg:'உங்கள் order today deliver ஆகும். Phone-ல் available ஆ இருங்க! 🚚' },
+    { label:'✅ Delivered', msg:'Order successfully delivered! Satisfied இல்லன்னா 24 மணி நேரத்தில் contact பண்ணுங்க.' },
+  ],
+  'login': [
+    { label:'🔄 Refresh & Retry', msg:'Browser refresh பண்ணி 2 minutes wait பண்ணி login try பண்ணுங்க. Problem solve ஆகும்!' },
+    { label:'🔑 Password Reset', msg:'Password reset link உங்கள் email-க்கு அனுப்பினோம். Check பண்ணுங்க (Spam folder கூட check பண்ணுங்க).' },
+    { label:'📱 App Update', msg:'App-ஐ latest version-க்கு update பண்ணுங்க. Play Store / App Store-ல் check பண்ணுங்க.' },
+    { label:'🖥️ Clear Cache', msg:'Browser cache clear பண்ணி try பண்ணுங்க. Settings → Privacy → Clear Cache.' },
+  ],
+  'bug': [
+    { label:'🔍 Investigating', msg:'உங்கள் issue-ஐ investigate பண்றோம். 24 மணி நேரத்தில் update தருவோம். 🙏' },
+    { label:'🛠️ Fix in Progress', msg:'இந்த bug-ஐ identify பண்ணோம். Fix deploy பண்றோம் — சீக்கிரம் resolve ஆகும்!' },
+    { label:'✅ Bug Fixed', msg:'Issue fix ஆச்சு! App refresh பண்ணி try பண்ணுங்க. Problem இருந்தா மீண்டும் contact பண்ணுங்க.' },
+    { label:'📸 Need Screenshot', msg:'Issue-ஐ better understand பண்ண screenshot அனுப்புங்க. WhatsApp-ல் send பண்ணுங்க.' },
+  ],
+  'feature': [
+    { label:'📝 Request Noted', msg:'உங்கள் feature request note பண்ணினோம். Future update-ல் consider பண்றோம். நன்றி! 🙏' },
+    { label:'🚀 Coming Soon', msg:'இந்த feature develop ஆகுது! Next update-ல் release பண்றோம். Stay tuned 🎉' },
+    { label:'💡 Workaround', msg:'இப்போ இந்த feature இல்ல. Alternative way-ல் பண்ண possible — contact பண்ணுங்க explain பண்றோம்.' },
+  ],
+  'other': [
+    { label:'👋 Acknowledged', msg:'உங்கள் message பாத்தோம். Team check பண்றோம் — சீக்கிரம் reply தருவோம்! 🙏' },
+    { label:'🔍 Need More Info', msg:'Issue clearly புரிய additional details வேணும். Please describe பண்ணுங்க.' },
+    { label:'✅ Resolved', msg:'உங்கள் issue resolve ஆச்சு! வேற ஏதாவது help வேணும்னா contact பண்ணுங்க 😊' },
+    { label:'📞 Call Back', msg:'உங்களை soon call பண்றோம். Phone available ஆ இருங்க. 📱' },
+  ],
+};
+
+const CAT_META = {
+  'billing':  { label:'💳 Billing & Payments',   bg:'#fef3c7', color:'#92400e' },
+  'orders':   { label:'📦 Orders & Tracking',    bg:'#dbeafe', color:'#1e40af' },
+  'login':    { label:'👤 Account & Login',       bg:'#ede9fe', color:'#5b21b6' },
+  'bug':      { label:'🐛 Bug / Technical',       bg:'#fee2e2', color:'#991b1b' },
+  'feature':  { label:'💡 Feature Request',       bg:'#d1fae5', color:'#065f46' },
+  'other':    { label:'📌 Other',                 bg:'#f1f5f9', color:'#334155' },
+};
+
+function detectCategory(t){
+  const raw=String(t.category||t.subject||t.title||t.issue||'').toLowerCase();
+  if(/billing|payment|invoice|plan|subscription|pay/.test(raw)) return 'billing';
+  if(/order|track|ship|deliver|dispatch|courier/.test(raw)) return 'orders';
+  if(/login|password|account|sign|access|otp/.test(raw)) return 'login';
+  if(/bug|error|crash|issue|problem|not working|fail/.test(raw)) return 'bug';
+  if(/feature|request|suggest|add|new/.test(raw)) return 'feature';
+  return 'other';
+}
+
+let _currentTicket = null;
+
+function openTicketModal(t, sellerName, tktNumStr){
+  _currentTicket = t;
+  const cat = detectCategory(t);
+  const catMeta = CAT_META[cat];
+  const curStatus = String(t.status||'').toLowerCase();
+  const pri = String(t.priority||'medium').toLowerCase();
+  const priColors = {high:'#fee2e2',highText:'#b91c1c',medium:'#fff7ed',mediumText:'#c2410c',low:'#dcfce7',lowText:'#15803d'};
+  const statColors = {open:'#fee2e2//#b91c1c', progress:'#fff7ed//#c2410c', resolved:'#dcfce7//#15803d'};
+
+  $('tktModalNum').textContent = tktNumStr;
+  $('tktModalTitle').textContent = t.subject||t.title||t.issue||'Support Ticket';
+  $('tktModalSeller').textContent = sellerName;
+  $('tktModalDate').textContent = t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+  $('tktModalMsg').textContent = t.message||t.issue||'No description provided.';
+
+  // Category badge
+  $('tktModalCatBadge').textContent = catMeta.label;
+  $('tktModalCatBadge').style.background = catMeta.bg;
+  $('tktModalCatBadge').style.color = catMeta.color;
+
+  // Priority badge
+  const pb = $('tktModalPriBadge');
+  pb.textContent = pri;
+  pb.style.background = priColors[pri]||priColors.medium;
+  pb.style.color = priColors[pri+'Text']||priColors.mediumText;
+
+  // Status badge
+  const sb2 = $('tktModalStatusBadge');
+  const isOpen=curStatus.includes('open'), isProg=curStatus.includes('progress'), isRes=curStatus.includes('resolved');
+  sb2.textContent = isRes?'✅ Resolved': isProg?'🔄 In Progress':'🔴 Open';
+  sb2.style.background = isRes?'#dcfce7': isProg?'#fff7ed':'#fee2e2';
+  sb2.style.color = isRes?'#15803d': isProg?'#c2410c':'#b91c1c';
+
+  // Smart quick replies for this category
+  const replies = QUICK_REPLIES[cat] || QUICK_REPLIES.other;
+  $('tktModalReplies').innerHTML = replies.map(r=>`
+    <div onclick="copyReply(this,'${r.msg.replace(/'/g,"&#39;")}')" style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:14px;padding:11px 14px;cursor:pointer;transition:.2s;display:flex;align-items:flex-start;gap:10px"
+      onmouseover="this.style.background='#eef2ff';this.style.borderColor='#c7d2fe'"
+      onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e5e7eb'">
+      <div style="flex:1">
+        <div style="font-size:10px;font-weight:900;color:${catMeta.color};margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">${r.label}</div>
+        <div style="font-size:12px;color:#334155;line-height:1.6">${r.msg}</div>
+      </div>
+      <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0;margin-top:2px">📋 Copy</span>
+    </div>
+  `).join('');
+
+  // Clear custom reply box
+  const cbox = $('tktCustomReply');
+  if(cbox) cbox.value = '';
+
+  // Workflow buttons
+  const wf = $('tktModalWorkflow');
+  const note = $('tktModalWorkflowNote');
+  wf.innerHTML = '';
+  if(isRes){
+    wf.innerHTML=`<span style="font-size:13px;font-weight:800;color:#15803d;background:#dcfce7;padding:8px 16px;border-radius:999px">✅ Ticket Resolved</span>
+    <button onclick="modalUpdateStatus('open')" style="border:0;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:13px;font-weight:900;padding:9px 18px;cursor:pointer">↩ Reopen</button>`;
+    note.textContent = 'இந்த ticket resolved ஆச்சு. Reopen பண்ணணும்னா button click பண்ணுங்க.';
+  } else if(isProg){
+    wf.innerHTML=`<button onclick="modalUpdateStatus('resolved')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,.3)">✅ Mark as Resolved</button>
+    <button onclick="modalUpdateStatus('open')" style="border:0;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer">↩ Back to Open</button>`;
+    note.textContent = '💡 Reply copy பண்ணி WhatsApp-ல் seller-கிட்ட அனுப்பிட்டு Resolved click பண்ணுங்க.';
+  } else {
+    wf.innerHTML=`<button onclick="modalUpdateStatus('in_progress')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(249,115,22,.3)">▶ Move to In Progress</button>
+    <button onclick="modalUpdateStatus('resolved')" style="border:0;border-radius:12px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:13px;font-weight:900;padding:10px 22px;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,.3)">✅ Direct Resolve</button>`;
+    note.textContent = '💡 Step 1: Reply copy → WhatsApp அனுப்பு. Step 2: "In Progress" click பண்ணு. Step 3: Resolved-ஆனா "Resolve" click பண்ணு.';
   }
-  const arr=data||[];
+
+  const modal = $('ticketModal');
+  modal.style.display = 'flex';
+  setTimeout(()=>{ modal.scrollTop=0; },50);
+}
+
+function closeTicketModal(){
+  $('ticketModal').style.display='none';
+  _currentTicket=null;
+}
+
+function copyReply(el, msg){
+  const decoded = msg.replace(/&#39;/g,"'");
+  navigator.clipboard && navigator.clipboard.writeText(decoded);
+  const orig = el.querySelector('span:last-child');
+  if(orig){ orig.textContent='✅ Copied!'; orig.style.background='#dcfce7'; orig.style.color='#15803d'; }
+  el.style.background='#dcfce7'; el.style.borderColor='#86efac';
+  setTimeout(()=>{
+    if(orig){ orig.textContent='📋 Copy'; orig.style.background='#eef2ff'; orig.style.color='#6366f1'; }
+    el.style.background='#f8fafc'; el.style.borderColor='#e5e7eb';
+  }, 1800);
+}
+
+function copyCustomReply(){
+  const val = ($('tktCustomReply')||{}).value||'';
+  if(!val.trim()){ alert('Reply type பண்ணுங்க!'); return; }
+  navigator.clipboard && navigator.clipboard.writeText(val);
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent='✅ Copied!'; btn.style.background='#16a34a';
+  setTimeout(()=>{ btn.textContent=orig; btn.style.background='#6366f1'; }, 1800);
+}
+
+async function modalUpdateStatus(newStatus){
+  if(!_currentTicket) return;
+  const {error}=await sb.from('support_tickets').update({status:newStatus}).eq('id',_currentTicket.id);
+  if(error){ alert('Status update failed: '+error.message); return; }
+  closeTicketModal();
+  loadTickets();
+}
+
+async function updateTicketStatus(ticketId, newStatus){
+  const{error}=await sb.from('support_tickets').update({status:newStatus}).eq('id',ticketId);
+  if(error){ alert('Status update failed: '+error.message); return; }
+  loadTickets();
+}
+async function loadTickets(){
+  const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,category,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
+  if(error){
+    // If category column missing, retry without it
+    const{data:data2,error:err2}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
+    if(err2){console.error('Tickets error:',err2.message);
+      ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small" style="color:#b91c1c">Error loading tickets: '+err2.message+'</p>';});
+      if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="7" style="color:#b91c1c">'+err2.message+'</td></tr>';
+      return;
+    }
+    return _renderTickets(data2||[]);
+  }
+  _renderTickets(data||[]);
+}
+
+async function _renderTickets(arr){
   if(!arr.length){
     ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small">No tickets found</p>';});
-    if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="5">No tickets found</td></tr>';
+    if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="7">No tickets found</td></tr>';
     setText('openTickets',0);setText('progressTickets',0);setText('resolvedTickets',0);
     return;
   }
 
-  // Fetch seller names — try settings table first, then profiles table as fallback
   const uids=[...new Set(arr.map(t=>t.seller_id||t.user_id).filter(Boolean))];
   let sellerNameMap={};
   if(uids.length){
@@ -1402,61 +1606,89 @@ async function loadTickets(){
       (pdata||[]).forEach(p=>{ sellerNameMap[p.id]=p.full_name||p.email||p.id; });
     }
   }
-  const getSellerName=t=>{
-    const uid=t.seller_id||t.user_id;
-    if(!uid) return '-';
-    return sellerNameMap[uid]||(uid.length>12?uid.slice(0,8)+'...':uid);
-  };
+  const getSellerName=t=>{ const uid=t.seller_id||t.user_id; if(!uid)return'-'; return sellerNameMap[uid]||(uid.length>12?uid.slice(0,8)+'...':uid); };
 
-  // Ticket number: use ticket_number field from DB if available, else fallback to TKT-001 by created_at order
   const sortedByDate=[...arr].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-  const tktNum=t=>{
-    if(t.ticket_number) return String(t.ticket_number);
-    return 'TKT-'+String(sortedByDate.findIndex(x=>x.id===t.id)+1).padStart(3,'0');
-  };
+  const tktNum=t=>{ if(t.ticket_number)return String(t.ticket_number); return 'TKT-'+String(sortedByDate.findIndex(x=>x.id===t.id)+1).padStart(3,'0'); };
 
   const open=arr.filter(t=>String(t.status||'').toLowerCase().includes('open'));
   const prog=arr.filter(t=>String(t.status||'').toLowerCase().includes('progress'));
   const res=arr.filter(t=>String(t.status||'').toLowerCase().includes('resolved'));
   setText('openTickets',open.length);setText('progressTickets',prog.length);setText('resolvedTickets',res.length);
-  if($('openBadgeCount')) $('openBadgeCount').textContent=open.length;
-  if($('progressBadgeCount')) $('progressBadgeCount').textContent=prog.length;
-  if($('resolvedBadgeCount')) $('resolvedBadgeCount').textContent=res.length;
+  if($('openBadgeCount'))$('openBadgeCount').textContent=open.length;
+  if($('progressBadgeCount'))$('progressBadgeCount').textContent=prog.length;
+  if($('resolvedBadgeCount'))$('resolvedBadgeCount').textContent=res.length;
+
   const getTitle=t=>t.subject||t.title||t.issue||t.id;
   const getMsg=t=>t.message||t.issue||'No description';
   const priColor={high:'#fee2e2',highText:'#b91c1c',medium:'#fff7ed',mediumText:'#c2410c',low:'#f0fdf4',lowText:'#15803d'};
   const getPri=t=>String(t.priority||'medium').toLowerCase();
+
   const card=t=>{
     const pri=getPri(t);
     const bg=priColor[pri]||priColor.medium;
     const tc=priColor[pri+'Text']||priColor.mediumText;
     const timeStr=t.created_at?new Date(t.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):'-';
     const sellerName=getSellerName(t);
-    return `<div style="background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:13px 14px;box-shadow:0 2px 8px rgba(15,23,42,.05);transition:.2s" onmouseover="this.style.boxShadow='0 6px 18px rgba(15,23,42,.1)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(15,23,42,.05)'">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 9px;border-radius:999px">${tktNum(t)}</span>
-        <span style="font-size:10px;font-weight:800;color:${tc};background:${bg};padding:3px 9px;border-radius:999px;text-transform:capitalize">${safe(t.priority,'medium')}</span>
+    const curStatus=String(t.status||'').toLowerCase();
+    const isOpen=curStatus.includes('open');
+    const isProgress=curStatus.includes('progress');
+    const isResolved=curStatus.includes('resolved');
+    const cat=detectCategory(t);
+    const catMeta=CAT_META[cat];
+    const tktN=tktNum(t);
+    const tData=JSON.stringify(t).replace(/"/g,'&quot;');
+    const statusBtns=`<div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">
+      <button onclick="event.stopPropagation();openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" style="border:0;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">💬 Reply & Manage</button>
+      ${!isProgress&&!isResolved?`<button onclick="event.stopPropagation();updateTicketStatus('${t.id}','in_progress')" style="border:0;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">▶ Progress</button>`:''}
+      ${!isResolved?`<button onclick="event.stopPropagation();updateTicketStatus('${t.id}','resolved')" style="border:0;border-radius:999px;background:#dcfce7;color:#15803d;font-size:10px;font-weight:900;padding:4px 10px;cursor:pointer">✓ Resolve</button>`:''}
+      ${isResolved?`<span style="background:#dcfce7;color:#15803d;font-size:10px;font-weight:900;padding:4px 10px;border-radius:999px">✓ Resolved</span>`:''}
+    </div>`;
+    return `<div style="background:#fff;border:1px solid #eef2f7;border-radius:16px;padding:13px 14px;box-shadow:0 2px 8px rgba(15,23,42,.05);transition:.2s;cursor:pointer" onclick="openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" onmouseover="this.style.boxShadow='0 6px 18px rgba(15,23,42,.1)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(15,23,42,.05)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:10px;font-weight:900;color:#6366f1;background:#eef2ff;padding:3px 9px;border-radius:999px">${tktN}</span>
+        <span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:999px;background:${catMeta.bg};color:${catMeta.color}">${catMeta.label}</span>
       </div>
-      <div style="font-size:13px;font-weight:800;color:#071427;margin-bottom:5px;line-height:1.4">${safe(getTitle(t))}</div>
-      <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:6px">${sellerName}</div>
-      <div style="font-size:11px;color:#64748b;line-height:1.45;margin-bottom:8px">${safe(getMsg(t)).slice(0,80)}${getMsg(t).length>80?'…':''}</div>
+      <div style="font-size:13px;font-weight:800;color:#071427;margin-bottom:5px;line-height:1.3">${safe(getTitle(t))}</div>
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span style="font-size:12px;font-weight:800;color:#1d4ed8">${sellerName}</span>
+        <span style="font-size:10px;font-weight:800;color:${tc};background:${bg};padding:2px 8px;border-radius:999px;text-transform:capitalize;margin-left:4px">${safe(t.priority,'medium')}</span>
+      </div>
+      <div style="font-size:11px;color:#64748b;line-height:1.45;margin-bottom:4px">${safe(getMsg(t)).slice(0,70)}${getMsg(t).length>70?'…':''}</div>
       <div style="font-size:10px;color:#94a3b8;font-weight:700">${timeStr}</div>
+      ${statusBtns}
     </div>`;
   };
   const emptyCard=(msg)=>`<div style="text-align:center;padding:28px 16px;color:#94a3b8;font-size:13px;font-weight:600">${msg}</div>`;
   $('openTicketList').innerHTML=open.map(card).join('')||emptyCard('No open tickets');
   $('progressTicketList').innerHTML=prog.map(card).join('')||emptyCard('No tickets in progress');
   $('resolvedTicketList').innerHTML=res.map(card).join('')||emptyCard('No resolved tickets');
+
   $('ticketRows').innerHTML=arr.map(t=>{
     const sellerName=getSellerName(t);
-    return `<tr>
-      <td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${tktNum(t)}</span></td>
-      <td><b>${safe(getTitle(t))}</b><br><small style="color:#94a3b8">${safe(getMsg(t)).slice(0,60)}${getMsg(t).length>60?'…':''}</small></td>
-      <td><span style="font-size:13px;font-weight:700;color:#334155">${sellerName}</span></td>
+    const curStatus=String(t.status||'').toLowerCase();
+    const isResolved=curStatus.includes('resolved');
+    const isProgress=curStatus.includes('progress');
+    const cat=detectCategory(t);
+    const catMeta=CAT_META[cat];
+    const tktN=tktNum(t);
+    const tData=JSON.stringify(t).replace(/"/g,'&quot;');
+    return `<tr style="cursor:pointer" onclick="openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')">
+      <td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${tktN}</span></td>
+      <td><b>${safe(getTitle(t))}</b><br><small style="color:#94a3b8">${safe(getMsg(t)).slice(0,55)}…</small></td>
+      <td><div style="display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span style="font-size:13px;font-weight:700;color:#1d4ed8">${sellerName}</span></div></td>
+      <td><span style="font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px;background:${catMeta.bg};color:${catMeta.color}">${catMeta.label}</span></td>
       <td><span class="badge ${badge(t.priority)}">${safe(t.priority,'medium')}</span></td>
       <td><span class="status-chip ${orderCls(t.status)}">${safe(t.status)}</span></td>
+      <td onclick="event.stopPropagation()">
+        <div style="display:flex;gap:5px">
+          <button onclick="openTicketModal(${tData},'${sellerName.replace(/'/g,"&#39;")}','${tktN}')" style="border:0;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:900;padding:5px 11px;cursor:pointer">💬 Reply</button>
+          ${!isResolved?`<button onclick="updateTicketStatus('${t.id}','resolved')" style="border:0;border-radius:999px;background:#dcfce7;color:#15803d;font-size:11px;font-weight:900;padding:5px 11px;cursor:pointer">✓</button>`:''}
+        </div>
+      </td>
     </tr>`;
-  }).join('')||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px">No tickets found</td></tr>';
+  }).join('')||'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:24px">No tickets found</td></tr>';
 }
 function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
 function drawPlans(v,rev){

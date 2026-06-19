@@ -1941,7 +1941,13 @@ function drawPlans(v,rev){
 }
 function renderTop(sellers){
   // --- Sort by thisMonth orders (from settings.badge_month_count if available, else fall back to total orders) ---
-  const sorted=[...sellers].sort((a,b)=>(b.thisMonthOrders||b.orders||0)-(a.thisMonthOrders||a.orders||0));
+  const sorted=[...sellers].sort((a,b)=>{
+    const aOrders = (a.thisMonthOrders||a.orders||0);
+    const bOrders = (b.thisMonthOrders||b.orders||0);
+    if(bOrders !== aOrders) return bOrders - aOrders;
+    // Secondary: more recent joined = lower rank (older sellers get priority)
+    return new Date(a.created_at||0) - new Date(b.created_at||0);
+  });
   const top=sorted.slice(0,10);
 
   // Helper: render stat card photo+name chip

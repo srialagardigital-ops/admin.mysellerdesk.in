@@ -1001,20 +1001,18 @@ async function count(table,fn){let q=sb.from(table).select('id',{count:'exact',h
 async function loadCounts(){
   // FIX2: fresh IST dates every call + handle RPC error gracefully
   const todayISO=getTodayStartISO();
-  const {data:cnt,error:cntErr}=await sb.rpc('get_seller_counts');
-  if(cntErr){
-    console.error('RPC ERROR get_seller_counts:', cntErr.message);
-    // Fallback: count directly from settings table
-    const {count:tc}=await sb.from('settings').select('user_id',{count:'exact',head:true});
-    const {count:vc}=await sb.from('settings').select('user_id',{count:'exact',head:true}).not('user_id','is',null);
-    setText('totalSellers',tc||0); setText('activeSellers',vc||0); setText('pendingVerification',0);
-  } else {
-    const verified=(cnt&&cnt.verified_sellers)||0;
-    const unverified=(cnt&&cnt.unverified_sellers)||0;
-    setText('totalSellers',verified+unverified);
-    setText('activeSellers',verified);
-    setText('pendingVerification',unverified);
-  }
+  // Direct query — no RPC needed (admin_users table removed)
+  const [{count:totalC},{count:confirmedC}] = await Promise.all([
+    sb.from('settings').select('user_id',{count:'exact',head:true}),
+    sb.from('settings').select('user_id',{count:'exact',head:true}).not('user_id','is',null)
+  ]);
+  // Get confirmed count from auth.users via get_seller_details
+  const {data:sellerList} = await sb.rpc('get_seller_details');
+  const confirmedSellers = (sellerList||[]).filter(s=>s.email_confirmed_at);
+  const pendingSellers   = (sellerList||[]).filter(s=>!s.email_confirmed_at);
+  setText('totalSellers', (sellerList||[]).length);
+  setText('activeSellers', confirmedSellers.length);
+  setText('pendingVerification', pendingSellers.length);
   const totalOrders=await count('orders');
   const orders=await count('orders',q=>q.gte('created_at',todayISO));
   setText('totalOrders',totalOrders);
@@ -1491,7 +1489,7 @@ async function loadActivity(){
   // FIX4: activity_logs msg properly mapped; fallback fetches ALL sellers for shopNameMap
   let activities = [];
   try {
-    const {data,error}=await sb.from('activity_logs').select('type,message,seller_id,user_id,created_at').order('created_at',{ascending:false}).limit(8);
+    const {data,error}=await sb.from('activity_logs').select('*').order('created_at',{ascending:false}).limit(8);
     if(!error && data && data.length>0){
       // FIX4a: build shopNameMap for activity_logs entries too
       const logUids=[...new Set((data||[]).map(a=>a.seller_id||a.user_id).filter(Boolean))];
@@ -1514,7 +1512,7 @@ async function loadActivity(){
       sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}),
       sb.from('orders').select('orderId,order_id,id,created_at,user_id,status').order('created_at',{ascending:false}).limit(5),
       sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2),
-      sb.from('profiles').select('id,full_name,email,last_sign_in_at').limit(3)
+      sb.from('profiles').select('id,full_name,email').limit(3)
     ]);
     const allSettings = settingsRes.status==='fulfilled' ? settingsRes.value.data : [];
     const orders = ordersRes.status==='fulfilled' ? ordersRes.value.data : [];

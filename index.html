@@ -1157,7 +1157,12 @@ function renderSellerTable(list){
     const phone=String(s.phone||'').replace(/[^0-9]/g,'');
     const district=s.city||s.district||'-';
     const profilePic=s.logo||s.profile_photo||s.avatar_url||s.photo_url||img(avatarSeed);
-    const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', your MySellerDesk account has been created successfully. Please verify your email and log in. Reply if you need any assistance.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
+    // FIX: WhatsApp template now includes shop name + district, and changes
+    // based on whether the seller's email is confirmed or still pending.
+    const waMsg = status==='Confirmed'
+      ? `Hi ${shopName} (${district}), thank you for confirming your email! 🎉 Your MySellerDesk journey starts now — you can log in, add your products and start managing orders. Reply here anytime if you need help getting started.`
+      : `Hi ${shopName} (${district}), your MySellerDesk account has been created successfully. Please check your inbox and confirm your email to activate your account — you won't be able to log in until it's confirmed. Reply here if you need any assistance.`;
+    const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent(waMsg)}`:'https://wa.me/?text='+encodeURIComponent(waMsg);
     const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
     return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
       <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${_realIdx})" data-seller-idx="${_realIdx}">
@@ -1317,23 +1322,23 @@ async function deleteSeller(userId, btnEl) {
   // Get seller name from the row's first cell
   const row = (btnEl && btnEl.closest) ? btnEl.closest('tr') : null;
   const sellerName = row ? (row.querySelector('.seller-row')?.textContent?.trim() || 'this seller') : 'this seller';
-  if (!confirm('Delete seller "' + sellerName + '"?\n\nThis will permanently remove their data. This cannot be undone.')) return;
+  if (!confirm('Delete seller "' + sellerName + '"?\n\nThis will permanently remove their data, including all their orders. This cannot be undone.')) return;
   const secondConfirm = confirm('Final confirmation: permanently delete "' + sellerName + '"?');
   if (!secondConfirm) return;
 
-  // Delete from settings, subscriptions, and profiles (in safe order)
-  const errors = [];
-  const { error: e1 } = await sb.from('settings').delete().eq('user_id', userId);
-  if (e1) errors.push('settings: ' + e1.message);
-  const { error: e2 } = await sb.from('subscriptions').delete().eq('user_id', userId);
-  if (e2) errors.push('subscriptions: ' + e2.message);
-  const { error: e3 } = await sb.from('support_tickets').delete().eq('seller_id', userId);
-  if (e3) errors.push('tickets: ' + e3.message);
+  // FIX: single DB-side RPC deletes orders, settings, subscriptions, tickets,
+  // profile AND the auth account together — so the seller disappears from
+  // both the seller list and the Orders page immediately.
+  // NOTE: requires the delete_seller_account() SQL function to be created
+  // once in Supabase (SQL Editor) — see setup instructions provided separately.
+  const { error } = await sb.rpc('delete_seller_account', { p_seller_id: userId });
 
-  if (errors.length) {
-    alert('Partial errors during deletion:\n' + errors.join('\n') + '\n\nNote: Auth account may need to be deleted separately from Supabase dashboard.');
+  if (error) {
+    alert('Could not delete seller: ' + error.message + '\n\nIf this says the function does not exist, run the one-time SQL setup in Supabase first.');
+    return;
   }
   await loadSellers();
+  if (typeof loadOrders === 'function') await loadOrders(); // refresh order page so their orders disappear too
 }
 
 function bindSellerTabs(){
@@ -1397,13 +1402,20 @@ async function loadOrders(){
   const {from, to} = getOrderDateRange();
   let countQ = sb.from('orders').select('id',{count:'exact',head:true});
   let tableQ = sb.from('orders').select('id,orderId,order_id,created_at,date,status,amount,user_id').order('created_at',{ascending:false});
-  if(from){ countQ = countQ.gte('created_at', from); tableQ = tableQ.gte('created_at', from); }
-  if(to)  { countQ = countQ.lt('created_at', to);   tableQ = tableQ.lt('created_at', to); }
+  // FIX: these three were missing the date filter entirely, so Processing/
+  // Delivered/Cancelled cards always showed ALL-TIME totals no matter which
+  // date range (Today/7 Days/Month/Year/Custom) was selected — now fixed to
+  // match whatever range is active, same as the Today Orders card.
+  let procQ = sb.from('orders').select('id',{count:'exact',head:true}).or('status.ilike.%process%,status.ilike.%packing%');
+  let delQ  = sb.from('orders').select('id',{count:'exact',head:true}).or('status.ilike.%deliver%,status.ilike.%complete%');
+  let canQ  = sb.from('orders').select('id',{count:'exact',head:true}).ilike('status','%cancel%');
+  if(from){ countQ = countQ.gte('created_at', from); tableQ = tableQ.gte('created_at', from); procQ = procQ.gte('created_at', from); delQ = delQ.gte('created_at', from); canQ = canQ.gte('created_at', from); }
+  if(to)  { countQ = countQ.lt('created_at', to);   tableQ = tableQ.lt('created_at', to);   procQ = procQ.lt('created_at', to);   delQ = delQ.lt('created_at', to);   canQ = canQ.lt('created_at', to); }
 
   const [procRes,delRes,canRes,countRes,tableRes] = await Promise.all([
-    sb.from('orders').select('id',{count:'exact',head:true}).or('status.ilike.%process%,status.ilike.%packing%'),
-    sb.from('orders').select('id',{count:'exact',head:true}).or('status.ilike.%deliver%,status.ilike.%complete%'),
-    sb.from('orders').select('id',{count:'exact',head:true}).ilike('status','%cancel%'),
+    procQ,
+    delQ,
+    canQ,
     countQ,
     tableQ.limit(500)
   ]);
@@ -1428,17 +1440,19 @@ async function loadOrders(){
   };
   const arr=(data||[]).sort((a,b)=>getOrderTime(b)-getOrderTime(a));
   const uids=[...new Set(arr.map(o=>o.user_id).filter(Boolean))];
-  let shopMap={};
+  let shopMap={}, emailMap={};
   if(uids.length){
     const{data:sdata}=await sb.from('settings').select('user_id,shop_name').in('user_id',uids);
     (sdata||[]).forEach(s=>{ if(s.shop_name) shopMap[s.user_id]=s.shop_name; });
-    const missing=uids.filter(u=>!shopMap[u]);
-    if(missing.length){
-      try {
-        const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',missing);
-        (pdata||[]).forEach(p=>{ shopMap[p.id]=p.full_name||p.email||'Unknown Seller'; });
-      } catch(e){}
-    }
+    // FIX: fetch email for EVERY seller (not just ones missing a shop name)
+    // so the Order page can show the seller's email under their shop name.
+    try {
+      const{data:pdata}=await sb.from('profiles').select('id,full_name,email').in('id',uids);
+      (pdata||[]).forEach(p=>{
+        if(p.email) emailMap[p.id]=p.email;
+        if(!shopMap[p.id]) shopMap[p.id]=p.full_name||p.email||'Unknown Seller';
+      });
+    } catch(e){}
   }
   $('recentOrderRows').innerHTML=arr.map(o=>{
     let displayDate = '-';
@@ -1448,13 +1462,14 @@ async function loadOrders(){
       else { const ts=parseInt((o.id||'').split('_')[1]); displayDate = o.date + (ts>1000000000000?' '+new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):''); }
     } else if(o.created_at) displayDate = fmtDT(new Date(o.created_at));
     else if(o.id){const ts=parseInt((o.id||'').split('_')[1]);if(ts>1000000000000)displayDate=fmtDT(new Date(ts));}
-    const sellerName = shopMap[o.user_id] || (o.user_id ? o.user_id.slice(0,8)+'...' : '-');
+    const sellerName = shopMap[o.user_id] || (o.user_id ? 'Deleted Seller (' + o.user_id.slice(0,8) + ')' : '-');
+    const sellerEmail = emailMap[o.user_id] || '';
     // Use exact order_id from DB — same as seller dashboard shows (e.g. #1001)
     const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
     // orderId = camelCase (seller dashboard saves it this way e.g. "1001" or "PREFIX-1001")
     const rawId = o.orderId || o.order_id || '';
     const displayOrdId = rawId && !isUUID(rawId) && !rawId.startsWith('o_') ? '#' + rawId : (rawId ? 'Enquiry' : '-');
-    return `<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${displayOrdId}</span></td><td>${sellerName}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
+    return `<tr><td><span style="font-size:12px;font-weight:900;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:999px;white-space:nowrap">${displayOrdId}</span></td><td><div style="font-weight:700">${sellerName}</div>${sellerEmail?`<div style="font-size:11px;color:#64748b;margin-top:2px">${sellerEmail}</div>`:''}</td><td>${rupee(o.amount)}</td><td><span class="status-chip ${orderCls(o.status)}">${safe(o.status,'Processing')}</span></td><td>${displayDate}</td></tr>`;
   }).join('')||'<tr><td colspan="5">No orders found</td></tr>';
   return arr
 }

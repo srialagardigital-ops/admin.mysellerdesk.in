@@ -386,7 +386,14 @@
   .plan-mgmt-header{flex-direction:column;align-items:flex-start}
 }
 
-  </style>
+  
+.order-date-btn{border:1.5px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;}
+.order-date-btn:hover{background:#eef2ff;border-color:#6366f1;color:#4338ca;}
+.order-date-btn.active{background:#071427;color:#fff;border-color:#071427;}
+#sellerPagination button{border:1.5px solid #e5e7eb;background:#f8fafc;color:#334155;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;}
+#sellerPagination button:hover{background:#eef2ff;border-color:#6366f1;color:#4338ca;}
+#sellerPagination button.active{background:#071427;color:#fff;border-color:#071427;}
+</style>
 </head>
 <body>
 
@@ -428,11 +435,40 @@
     <button class="seller-tab" data-seller-filter="confirmed">Confirmed</button>
     <button class="seller-tab" data-seller-filter="pending">Pending Verification</button>
   </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+    <span id="sellerCountLabel" style="font-size:13px;color:#64748b;font-weight:700;">Loading...</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <label style="font-size:12px;color:#64748b;font-weight:700;">Show</label>
+      <select id="sellerPerPage" onchange="changeSellerPerPage()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 8px;font-size:13px;font-family:inherit;outline:none;">
+        <option value="10">10</option>
+        <option value="25" selected>25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="999999">All</option>
+      </select>
+      <label style="font-size:12px;color:#64748b;font-weight:700;">per page</label>
+    </div>
+  </div>
   <div class="table-wrap"><table class="table"><thead><tr><th>Seller</th><th>Email / Mobile</th><th>District</th><th>Signup Date</th><th>Email Status</th><th>Action</th></tr></thead><tbody id="sellerRows"></tbody></table></div>
+  <div id="sellerPagination" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap;"></div>
   <p class="muted-note" style="margin-top:12px">Note: Pending Verification users will show from sellers/signup_leads table when email_confirmed, confirmed_at or email_confirmed_at fields are available.</p>
 </div>
 </section>
-<section id="ordersPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Today Orders</div><div class="value" id="ordersToday2">0</div><span class="trend up">Order ID created</span></div><div class="card"><div class="label">Processing</div><div class="value" id="processingOrders">0</div><span class="trend neutral">Live orders</span></div><div class="card"><div class="label">Delivered</div><div class="value" id="deliveredOrders">0</div><span class="trend up">Completed</span></div><div class="card"><div class="label">Cancelled</div><div class="value" id="cancelledOrders">0</div><span class="trend down">Need attention</span></div></section><div class="panel"><div class="panel-head"><div><h3>Recent Orders</h3><p class="small">All sellers order activity</p></div></div><table class="table"><thead><tr><th>Order ID</th><th>Seller</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentOrderRows"></tbody></table></div></section>
+<section id="ordersPage" class="page" style="display:none"><section class="cards"><div class="card"><div class="label">Today Orders</div><div class="value" id="ordersToday2">0</div><span class="trend up">Order ID created</span></div><div class="card"><div class="label">Processing</div><div class="value" id="processingOrders">0</div><span class="trend neutral">Live orders</span></div><div class="card"><div class="label">Delivered</div><div class="value" id="deliveredOrders">0</div><span class="trend up">Completed</span></div><div class="card"><div class="label">Cancelled</div><div class="value" id="cancelledOrders">0</div><span class="trend down">Need attention</span></div></section><div class="panel"><div class="panel-head"><div><h3>All Orders</h3><p class="small">All sellers order activity</p></div><span id="orderCountLabel" style="font-size:12px;color:#64748b;font-weight:700;"></span></div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+  <button class="order-date-btn active" data-range="today" onclick="setOrderDateFilter('today',this)">Today</button>
+  <button class="order-date-btn" data-range="7" onclick="setOrderDateFilter('7',this)">Last 7 Days</button>
+  <button class="order-date-btn" data-range="30" onclick="setOrderDateFilter('30',this)">Last Month</button>
+  <button class="order-date-btn" data-range="365" onclick="setOrderDateFilter('365',this)">Last Year</button>
+  <button class="order-date-btn" data-range="all" onclick="setOrderDateFilter('all',this)">All</button>
+  <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+    <input type="date" id="orderDateFrom" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 8px;font-size:12px;font-family:inherit;outline:none;" onchange="setOrderDateFilter('custom',null)">
+    <span style="font-size:12px;color:#64748b;">to</span>
+    <input type="date" id="orderDateTo" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 8px;font-size:12px;font-family:inherit;outline:none;" onchange="setOrderDateFilter('custom',null)">
+    <button class="order-date-btn" onclick="setOrderDateFilter('custom',null)">Apply</button>
+  </div>
+</div>
+<table class="table"><thead><tr><th>Order ID</th><th>Seller</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentOrderRows"></tbody></table></div></section>
 <section id="topPage" class="page" style="display:none">
 
 <!-- BADGE RECALCULATE BAR -->
@@ -989,7 +1025,6 @@ async function loadCounts(){
   const orders=await count('orders',q=>q.gte('created_at',todayISO));
   setText('totalOrders',totalOrders);
   setText('ordersToday',orders);
-  setText('ordersToday2',orders);
 }
 async function loadSellers(){
   const {data:authData,error:authErr}=await sb.rpc('get_seller_details');
@@ -1076,8 +1111,52 @@ async function loadSellers(){
   renderTop(verified.length?verified:allSellers); drawDistrict(allSellers); return allSellers; // FIX7: bindSellerTabs removed here — called once in init()
 }
 function sellerStatus(s){return s._status==='confirmed'?'Confirmed':'Pending';}
+// ── SELLER PAGINATION STATE ──
+let _sellerPage = 0;
+let _sellerPerPage = 25;
+let _sellerList = [];
+
+function changeSellerPerPage(){
+  const v = parseInt(document.getElementById('sellerPerPage').value) || 25;
+  _sellerPerPage = v;
+  _sellerPage = 0;
+  renderSellerTable(_sellerList);
+}
+
 function renderSellerTable(list){
-  const rows=(list||[]).map((s,idx)=>{
+  _sellerList = list || [];
+  const total = _sellerList.length;
+  const perPage = _sellerPerPage;
+  const totalPages = Math.ceil(total / perPage);
+  if(_sellerPage >= totalPages) _sellerPage = Math.max(0, totalPages - 1);
+  const start = _sellerPage * perPage;
+  const pageList = _sellerList.slice(start, start + perPage);
+
+  // Update count label
+  const lbl = document.getElementById('sellerCountLabel');
+  if(lbl) lbl.textContent = 'Showing ' + (start+1) + '–' + Math.min(start+perPage, total) + ' of ' + total + ' sellers';
+
+  // Render pagination
+  const pgEl = document.getElementById('sellerPagination');
+  if(pgEl){
+    let pgHtml = '';
+    if(totalPages > 1){
+      pgHtml += `<button onclick="goSellerPage(${_sellerPage-1})" ${_sellerPage===0?'disabled':''}>← Prev</button>`;
+      for(let i=0;i<totalPages;i++){
+        if(totalPages<=7||i===0||i===totalPages-1||Math.abs(i-_sellerPage)<=1){
+          pgHtml+=`<button class="${i===_sellerPage?'active':''}" onclick="goSellerPage(${i})">${i+1}</button>`;
+        } else if(Math.abs(i-_sellerPage)===2){
+          pgHtml+='<span style="padding:0 4px;color:#94a3b8;">…</span>';
+        }
+      }
+      pgHtml += `<button onclick="goSellerPage(${_sellerPage+1})" ${_sellerPage===totalPages-1?'disabled':''}>Next →</button>`;
+    }
+    pgEl.innerHTML = pgHtml;
+  }
+
+  const paginatedList = pageList;
+  const rows=(paginatedList||[]).map((s,idx)=>{
+    const _realIdx = start + idx;
     const shopName=s.shop_name&&s.shop_name.trim()&&s.shop_name!==s.email?s.shop_name:(s.business_name||s.store_name||'');
     const displayLabel=shopName||s.email||'Unnamed';
     const avatarSeed=shopName||s.email||'Seller';
@@ -1089,7 +1168,7 @@ function renderSellerTable(list){
     const wa=phone?`https://wa.me/91${phone.slice(-10)}?text=${encodeURIComponent('Hi '+shopName+', your MySellerDesk account has been created successfully. Please verify your email and log in. Reply if you need any assistance.')}`:'https://wa.me/?text='+encodeURIComponent('Hi '+shopName+', please verify your MySellerDesk account.');
     const sellerJson=encodeURIComponent(JSON.stringify({shopName,email,phone,district,status,created_at:s.created_at,address:s.address||'-',user_id:s.user_id||''}));
     return`<tr data-seller-status="${status==='Confirmed'?'confirmed':'pending'}">
-      <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${idx})" data-seller-idx="${idx}">
+      <td><div class="seller-row" style="cursor:pointer" onclick="openSellerPopup(${_realIdx})" data-seller-idx="${_realIdx}">
         <img class="seller-img" src="${profilePic}" onerror="this.src='${img(avatarSeed)}'">${safe(displayLabel)}
       </div></td>
       <td>
@@ -1111,17 +1190,24 @@ function renderSellerTable(list){
       <td><div class="action-row">
         <a class="tiny-btn" href="mailto:${email}?subject=Verify your MySellerDesk account&body=Hi ${shopName},%0D%0A%0D%0APlease verify your MySellerDesk account by clicking the confirmation link sent to your email.%0D%0A%0D%0AThank you!" target="_blank">Resend Email</a>
         <a class="tiny-btn whatsapp" href="${wa}" target="_blank">WhatsApp</a>
-        <button class="tiny-btn" style="background:#eef2ff;color:#3730a3;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="openEditModal(${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg> Edit</button>
+        <button class="tiny-btn" style="background:#eef2ff;color:#3730a3;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="openEditModal(${_realIdx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg> Edit</button>
         ${s.account_status==='on_hold'
-          ? `<button class="tiny-btn" style="background:#dcfce7;color:#15803d;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','active',${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Activate</button>`
-          : `<button class="tiny-btn" style="background:#fff7ed;color:#c2410c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','on_hold',${idx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Hold</button>`
+          ? `<button class="tiny-btn" style="background:#dcfce7;color:#15803d;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','active',${_realIdx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Activate</button>`
+          : `<button class="tiny-btn" style="background:#fff7ed;color:#c2410c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="setSellerAccountStatus('${s.user_id}','on_hold',${_realIdx})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Hold</button>`
         }
         <button class="tiny-btn" style="background:#fee2e2;color:#b91c1c;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px" onclick="deleteSeller('${s.user_id}',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete</button>
       </div></td>
     </tr>`;
   }).join('')||'<tr><td colspan="6">No sellers found</td></tr>';
   if($('sellerRows'))$('sellerRows').innerHTML=rows;
-  window.__renderedSellers=list||[];
+  window.__renderedSellers=_sellerList||[];
+}
+
+function goSellerPage(p){
+  const total = (_sellerList||[]).length;
+  const totalPages = Math.ceil(total / _sellerPerPage);
+  _sellerPage = Math.max(0, Math.min(p, totalPages-1));
+  renderSellerTable(_sellerList);
 }
 function openSellerPopup(idx){
   const s=(window.__renderedSellers||[])[idx];
@@ -1269,6 +1355,7 @@ function bindSellerTabs(){
       const all=Array.isArray(window.__allSellers)?window.__allSellers:[];
       if(all.length){
         const filtered=filter==='confirmed'?all.filter(s=>sellerStatus(s)==='Confirmed'):filter==='pending'?all.filter(s=>sellerStatus(s)!=='Confirmed'):all;
+        _sellerPage = 0;
         renderSellerTable(filtered);
       }else{
         document.querySelectorAll('#sellerRows tr[data-seller-status]').forEach(row=>{
@@ -1279,17 +1366,67 @@ function bindSellerTabs(){
     });
   });
 }
+// ── ORDER FILTER STATE ──
+let _orderDateRange = 'today';
+let _orderDateFrom = null;
+let _orderDateTo = null;
+
+function setOrderDateFilter(range, btnEl){
+  _orderDateRange = range;
+  document.querySelectorAll('.order-date-btn').forEach(b=>b.classList.remove('active'));
+  if(btnEl) btnEl.classList.add('active');
+  if(range === 'custom'){
+    _orderDateFrom = document.getElementById('orderDateFrom')?.value || null;
+    _orderDateTo   = document.getElementById('orderDateTo')?.value || null;
+  }
+  loadOrders();
+}
+
+function getOrderDateRange(){
+  const now = new Date();
+  let from = null, to = null;
+  if(_orderDateRange === 'today'){
+    from = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    to   = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1).toISOString();
+  } else if(_orderDateRange === 'all'){
+    from = null; to = null;
+  } else if(_orderDateRange === 'custom'){
+    from = _orderDateFrom ? new Date(_orderDateFrom).toISOString() : null;
+    to   = _orderDateTo   ? new Date(new Date(_orderDateTo).getTime() + 86400000).toISOString() : null;
+  } else {
+    const days = parseInt(_orderDateRange);
+    from = new Date(now.getTime() - days * 86400000).toISOString();
+    to   = null;
+  }
+  return {from, to};
+}
+
 async function loadOrders(){
-  // FIX3: status counts from ALL orders (separate count queries), table shows recent 20
-  const [procRes,delRes,canRes,tableRes] = await Promise.all([
+  const {from, to} = getOrderDateRange();
+  let countQ = sb.from('orders').select('id',{count:'exact',head:true});
+  let tableQ = sb.from('orders').select('id,orderId,order_id,created_at,date,status,amount,user_id').order('created_at',{ascending:false});
+  if(from){ countQ = countQ.gte('created_at', from); tableQ = tableQ.gte('created_at', from); }
+  if(to)  { countQ = countQ.lt('created_at', to);   tableQ = tableQ.lt('created_at', to); }
+
+  const [procRes,delRes,canRes,countRes,tableRes] = await Promise.all([
     sb.from('orders').select('id',{count:'exact',head:true}).or('status.ilike.%process%,status.ilike.%packing%'),
     sb.from('orders').select('id',{count:'exact',head:true}).or('status.ilike.%deliver%,status.ilike.%complete%'),
     sb.from('orders').select('id',{count:'exact',head:true}).ilike('status','%cancel%'),
-    sb.from('orders').select('id,orderId,order_id,created_at,date,status,amount,user_id').order('created_at',{ascending:false}).limit(20)
+    countQ,
+    tableQ.limit(500)
   ]);
   setText('processingOrders', procRes.count||0);
   setText('deliveredOrders', delRes.count||0);
   setText('cancelledOrders', canRes.count||0);
+  const lbl = document.getElementById('orderCountLabel');
+  if(lbl) lbl.textContent = (countRes.count||0) + ' orders';
+  // Update Today Orders card label dynamically
+  const todayCard = document.querySelector('#ordersPage .card .label');
+  if(todayCard){
+    const labelMap = {'today':'Today Orders','7':'Last 7 Days','30':'Last Month','365':'Last Year','all':'All Orders','custom':'Custom Range'};
+    todayCard.textContent = labelMap[_orderDateRange] || 'Orders';
+  }
+  setText('ordersToday2', countRes.count||0);
   const {data,error}=tableRes;
   if(error){if($('recentOrderRows'))$('recentOrderRows').innerHTML=`<tr><td colspan="5">${error.message}</td></tr>`;return[]}
   const getOrderTime = o => {

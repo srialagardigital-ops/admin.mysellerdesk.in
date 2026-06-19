@@ -535,7 +535,7 @@
       <span style="background:#f3e8ff;color:#7c3aed;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">#4–10 Prime</span>
     </div>
   </div>
-  <div id="leaderboard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin"></div>
+  <div id="leaderboard" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;padding-bottom:4px"></div>
 </div>
 
 <!-- ALL SELLERS PERFORMANCE TABLE WITH SEARCH & FILTER -->
@@ -555,12 +555,7 @@
       style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;outline:none;background:#fff;font-family:inherit;color:#334155">
       <option value="">All Districts</option>
     </select>
-    <select id="perfFilterStatus" onchange="filterPerfTable()"
-      style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;outline:none;background:#fff;font-family:inherit;color:#334155">
-      <option value="">All Status</option>
-      <option value="confirmed">Confirmed</option>
-      <option value="pending">Pending</option>
-    </select>
+
     <select id="perfSort" onchange="filterPerfTable()"
       style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;outline:none;background:#fff;font-family:inherit;color:#334155">
       <option value="orders">Sort: Orders ↓</option>
@@ -577,7 +572,6 @@
         <th>Seller</th>
         <th>District</th>
         <th>Orders</th>
-        <th>Status</th>
         <th>Joined</th>
         <th>Badge</th>
       </tr></thead>
@@ -1526,7 +1520,7 @@ async function loadActivity(){
     const orders = ordersRes.status==='fulfilled' ? ordersRes.value.data : [];
     const subs = subsRes.status==='fulfilled' ? subsRes.value.data : [];
     const logins = loginsRes.status==='fulfilled' ? loginsRes.value.data : [];
-    const sellers = allSettings||[];
+    const sellers = (allSettings||[]).filter(s=>s._status==='confirmed');
 
     // Complete shopNameMap
     const shopNameMap = {};
@@ -2168,7 +2162,7 @@ function renderPerfTable(list){
   const tbody=$('perfTableBody');
   if(!tbody) return;
   if(!list||!list.length){
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#64748b;padding:24px">No sellers found</td></tr>';
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#64748b;padding:24px">No sellers found</td></tr>';
     if($('perfCount')) $('perfCount').textContent='0 sellers';
     return;
   }
@@ -2199,7 +2193,6 @@ function renderPerfTable(list){
       </div></td>
       <td style="font-size:13px;color:#334155">${safe(s.city,'-')}</td>
       <td><span style="font-size:15px;font-weight:900;color:#071427">${s.orders||'-'}</span></td>
-      <td><span class="badge ${status==='confirmed'?'verify-confirmed':'verify-pending'}">${status==='confirmed'?'Confirmed':'Pending'}</span></td>
       <td style="font-size:12px;color:#64748b">${joined}</td>
       <td><span style="background:${b.bg};color:${b.color};font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px">${b.label}</span></td>
     </tr>`;
@@ -2210,7 +2203,7 @@ function renderPerfTable(list){
 function filterPerfTable(){
   const search=($('perfSearch')||{value:''}).value.toLowerCase();
   const district=($('perfFilterDistrict')||{value:''}).value;
-  const status=($('perfFilterStatus')||{value:''}).value;
+  const status='';
   const sortBy=($('perfSort')||{value:'orders'}).value;
   let list=[...(window.__perfSellers||[])];
   if(search) list=list.filter(s=>{
@@ -2220,7 +2213,6 @@ function filterPerfTable(){
     return n.includes(search)||e.includes(search)||c.includes(search);
   });
   if(district) list=list.filter(s=>(s.city||s.district)===district);
-  if(status) list=list.filter(s=>s._status===status);
   if(sortBy==='name') list.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   else if(sortBy==='date') list.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
   else list.sort((a,b)=>(b.orders||0)-(a.orders||0));
@@ -2255,6 +2247,16 @@ function nav(){
           loadSellerDropdown();
           loadSellerSubscriptions();
           loadBanners();
+        }
+        if(a.dataset.page==='ordersPage'){
+          // Reset filter UI to match current state, then reload
+          document.querySelectorAll('.order-date-btn').forEach(b=>b.classList.remove('active'));
+          const activeBtn = document.querySelector(`.order-date-btn[data-range="${_orderDateRange}"]`);
+          if(activeBtn) activeBtn.classList.add('active');
+          loadOrders();
+        }
+        if(a.dataset.page==='sellersPage'){
+          loadSellers();
         }
       });
     }

@@ -27,8 +27,9 @@
 .sidebar:not(:hover) .menu a{justify-content:center!important;padding:13px 0!important;}
 .sidebar:hover .menu a{justify-content:flex-start!important;padding:13px 14px!important;}
 .sidebar .menu svg,.sidebar .menu i{width:20px!important;height:20px!important;min-width:20px!important;display:block!important;}
-.sidebar:hover ~ .main{margin-left:80px!important;width:calc(100% - 80px)!important;}
-.main{transition:none!important;}
+/* FIX5: Sidebar hover — main content shifts correctly, no overlap */
+.sidebar:hover ~ .main{margin-left:260px!important;width:calc(100% - 260px)!important;transition:margin-left .3s,width .3s!important;}
+.main{transition:margin-left .3s,width .3s;}
 .performer-card{position:relative;overflow:hidden;min-height:78px;}
 .performer-card.rank-diamond{background:linear-gradient(135deg,#eef2ff,#fff 55%,#e0f2fe);border:1px solid #60a5fa;box-shadow:0 12px 28px rgba(59,130,246,.13);}
 .performer-card.rank-gold{background:linear-gradient(135deg,#fffbeb,#fff 55%,#fef3c7);border:1px solid #f59e0b;box-shadow:0 12px 28px rgba(245,158,11,.15);}
@@ -407,11 +408,11 @@
 <aside class="sidebar"><div class="brand"><div class="logo">MS</div><div><h1>MySellerDesk</h1><p>Admin Panel</p></div></div><nav class="menu"><a class="active" href="#" data-page="dashboardPage"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a><a href="#" data-page="sellersPage"><i data-lucide="users"></i><span>Sellers</span></a><a href="#" data-page="ordersPage"><i data-lucide="receipt"></i><span>Orders</span></a><a href="#" data-page="topPage"><i data-lucide="trophy"></i><span>Top Performers</span></a><a href="#" data-page="districtPage"><i data-lucide="map-pin"></i><span>District Reports</span></a><a href="#" data-page="subscriptionsPage"><i data-lucide="credit-card"></i><span>Subscriptions</span></a><a href="#" data-page="supportPage"><i data-lucide="ticket"></i><span>Support Tickets</span></a><a href="#" data-page="settingsPage"><i data-lucide="settings"></i><span>Settings</span></a></nav></aside>
 <main class="main">
 <section class="topbar"><div><div class="page-kicker"><i data-lucide="shield-check"></i> MySellerDesk Admin Control Center</div><div class="date-chip"><i data-lucide="calendar-days"></i> Admin Dashboard</div></div><div class="admin-profile"><div class="admin-avatar">A</div><div><div class="admin-name">Alagar Admin</div><div class="admin-role">Master Admin</div></div><button class="logout-btn" type="button" onclick="adminLogout()">Logout</button></div></section>
-<div id="dashboardPage" class="page" style="display:flex;flex-direction:column;height:calc(100vh - 90px);gap:14px;overflow:hidden;">
+<div id="dashboardPage" class="page" style="display:flex;flex-direction:column;gap:14px;padding-bottom:20px;">
 <section class="cards" style="margin-bottom:0;flex-shrink:0"><div class="card"><div class="label">Total Sellers</div><div class="value" id="totalSellers">0</div><span class="trend up">All signups</span></div><div class="card"><div class="label">Active Sellers</div><div class="value" id="activeSellers">0</div><span class="trend up">Email confirmed + login</span></div><div class="card split-card"><div class="split-metric"><div class="label">Total Orders</div><div class="value" id="totalOrders">0</div><span class="trend neutral">All time handled</span></div><div class="split-metric"><div class="label">Today Orders</div><div class="value" id="ordersToday">0</div><span class="trend up">Created today</span></div></div><div class="card"><div class="label">Pending Verification</div><div class="value" id="pendingVerification">0</div><span class="trend down">Need follow-up</span></div></section>
-<section class="grid" style="margin-bottom:0;flex:1;min-height:0;">
-  <div class="panel" style="display:flex;flex-direction:column;overflow:hidden;"><div class="panel-head" style="flex-shrink:0"><div><h3>District-wise Sellers</h3><p class="small">Supabase sellers data</p></div></div><div style="flex:1;min-height:0;position:relative;"><canvas id="districtChart" style="position:absolute;inset:0;width:100%!important;height:100%!important;"></canvas></div></div>
-  <div class="panel" style="display:flex;flex-direction:column;overflow:hidden;"><div class="panel-head" style="flex-shrink:0"><div><h3>Live Activity</h3><p class="small">Payments, signups, logins update</p></div><span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;">Live Now</span></div><div class="live-feed" id="liveFeed" style="flex:1;overflow-y:auto;max-height:none;"><div class="ticket"><b>Loading...</b><p>Fetching from Supabase</p></div></div></div>
+<section class="grid" style="margin-bottom:0;">
+  <div class="panel" style="display:flex;flex-direction:column;"><div class="panel-head" style="flex-shrink:0"><div><h3>District-wise Sellers</h3><p class="small">Supabase sellers data</p></div></div><div style="position:relative;height:280px;"><canvas id="districtChart" style="width:100%!important;height:100%!important;"></canvas></div></div>
+  <div class="panel" style="display:flex;flex-direction:column;"><div class="panel-head" style="flex-shrink:0"><div><h3>Live Activity</h3><p class="small">Payments, signups, logins update</p></div><span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;">Live Now</span></div><div class="live-feed" id="liveFeed" style="overflow-y:auto;max-height:320px;"><div class="ticket"><b>Loading...</b><p>Fetching from Supabase</p></div></div></div>
 </section>
 </div>
 <section id="sellersPage" class="page" style="display:none">
@@ -699,7 +700,7 @@
         <div style="font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Custom Reply</div>
         <textarea id="tktCustomReply" rows="3" placeholder="Type your custom reply here..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;font-size:13px;font-family:inherit;outline:none;resize:vertical;transition:.2s;color:#334155" onfocus="this.style.borderColor='#6366f1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.08)'" onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-          <button onclick="copyCustomReply()" style="border:0;border-radius:12px;background:#6366f1;color:#fff;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Reply</button>
+          <button onclick="copyCustomReply(event)" style="border:0;border-radius:12px;background:#6366f1;color:#fff;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Reply</button>
           <button onclick="saveCustomReply()" style="border:0;border-radius:12px;background:#0f172a;color:#fff;font-size:13px;font-weight:900;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Reply to Ticket</button>
         </div>
         <div id="replyToTicketStatus" style="display:none;margin-top:8px;font-size:12px;font-weight:700;padding:7px 12px;border-radius:10px"></div>
@@ -922,26 +923,31 @@ async function startAuthGate(){
   showLogin();
 }
 async function adminLogout(){ await sb.auth.signOut(); location.reload(); }
+// FIX1: Single DOMContentLoaded — login form bind + startAuthGate combined
 document.addEventListener('DOMContentLoaded',()=>{
+  // Bind login form
   const form=document.getElementById('adminLoginForm');
-  if(!form) return;
-  form.addEventListener('submit',async(e)=>{
-    e.preventDefault(); clearAuthError();
-    const btn=document.getElementById('loginBtn');
-    const email=String(document.getElementById('adminEmail').value||'').trim().toLowerCase();
-    const password=document.getElementById('adminPassword').value||'';
-    if(!ALLOWED_ADMIN_EMAILS.includes(email)){
-      authError('Access denied. You are not an authorised admin.');
-      return;
-    }
-    if(btn){btn.disabled=true;btn.textContent='Checking...';}
-    const { data, error } = await sb.auth.signInWithPassword({email,password});
-    if(btn){btn.disabled=false;btn.textContent='Login';}
-    if(error){ authError(error.message||'Incorrect email or password. Please try again.'); return; }
-    const loggedEmail=String(data?.user?.email||'').toLowerCase();
-    if(!ALLOWED_ADMIN_EMAILS.includes(loggedEmail)){ await sb.auth.signOut(); authError('Access denied.'); return; }
-    showDashboard();
-  });
+  if(form){
+    form.addEventListener('submit',async(e)=>{
+      e.preventDefault(); clearAuthError();
+      const btn=document.getElementById('loginBtn');
+      const email=String(document.getElementById('adminEmail').value||'').trim().toLowerCase();
+      const password=document.getElementById('adminPassword').value||'';
+      if(!ALLOWED_ADMIN_EMAILS.includes(email)){
+        authError('Access denied. You are not an authorised admin.');
+        return;
+      }
+      if(btn){btn.disabled=true;btn.textContent='Checking...';}
+      const { data, error } = await sb.auth.signInWithPassword({email,password});
+      if(btn){btn.disabled=false;btn.textContent='Login';}
+      if(error){ authError(error.message||'Incorrect email or password. Please try again.'); return; }
+      const loggedEmail=String(data?.user?.email||'').toLowerCase();
+      if(!ALLOWED_ADMIN_EMAILS.includes(loggedEmail)){ await sb.auth.signOut(); authError('Access denied.'); return; }
+      showDashboard();
+    });
+  }
+  // Start auth gate
+  startAuthGate();
 });
 
 const $=id=>document.getElementById(id);
@@ -1377,7 +1383,7 @@ async function loadActivity(){
       sb.from('settings').select('shop_name,district,user_id,created_at').order('created_at',{ascending:false}),
       sb.from('orders').select('orderId,order_id,id,created_at,user_id,status').order('created_at',{ascending:false}).limit(5),
       sb.from('subscriptions').select('user_id,plan_type,amount,created_at,status').order('created_at',{ascending:false}).limit(2),
-      sb.from('profiles').select('id,full_name,email').limit(3)
+      sb.from('profiles').select('id,full_name,email,last_sign_in_at').limit(3)
     ]);
     const allSettings = settingsRes.status==='fulfilled' ? settingsRes.value.data : [];
     const orders = ordersRes.status==='fulfilled' ? ordersRes.value.data : [];
@@ -1400,7 +1406,7 @@ async function loadActivity(){
       return 'New Order';
     };
 
-    (sellers||[]).forEach(s=>activities.push({type:'signup',shop:safe(s.shop_name,'Seller'),place:safe(s.district,''),time:s.created_at}));
+    (sellers||[]).slice(0,5).forEach(s=>activities.push({type:'signup',shop:safe(s.shop_name,'Seller'),place:safe(s.district,''),time:s.created_at}));
     ordersAll.forEach((o,idx)=>{
       const ordId = ordLabel(o);
       const shop = getShopName(o.user_id);
@@ -1419,13 +1425,14 @@ async function loadActivity(){
       activities.push({type:'login',title:name,time:p.last_sign_in_at});
     });
     activities.sort((a,b)=>new Date(b.time)-new Date(a.time));
-    activities=activities.slice(0,6);
+    activities=activities.slice(0,8);
   }
 
   if(!activities.length){
-    $('liveFeed').innerHTML='<div class="ticket"><b>No live activity yet</b><p>Live activity from sellers and orders will appear here</p></div>';
+    if($('liveFeed')) $('liveFeed').innerHTML='<div class="ticket"><b>No recent activity</b><p>Seller signups, orders, and payments will appear here automatically</p></div>';
     return;
   }
+  if(!$('liveFeed')) return;
   $('liveFeed').innerHTML=activities.map(a=>{
     let cls='live-order',icon='bell',label='Activity';
     if(a.type.includes('payment')){cls='live-payment';icon='credit-card';label='Payment Received'}
@@ -1608,7 +1615,7 @@ function copyReply(el, msg){
   }, 1800);
 }
 
-function copyCustomReply(){
+function copyCustomReply(event){
   const val = ($('tktCustomReply')||{}).value||'';
   if(!val.trim()){ alert('Please type a reply before copying.'); return; }
   navigator.clipboard && navigator.clipboard.writeText(val);
@@ -1659,16 +1666,13 @@ async function updateTicketStatus(ticketId, newStatus){
   loadTickets();
 }
 async function loadTickets(){
+  // FIX2: removed dead identical retry — single query, proper error handling
   const{data,error}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
   if(error){
-    // If category column missing, retry without it
-    const{data:data2,error:err2}=await sb.from('support_tickets').select('id,title,subject,message,issue,priority,status,created_at,seller_id,user_id').order('created_at',{ascending:false}).limit(50);
-    if(err2){console.error('Tickets error:',err2.message);
-      ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small" style="color:#b91c1c">Error loading tickets: '+err2.message+'</p>';});
-      if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="7" style="color:#b91c1c">'+err2.message+'</td></tr>';
-      return;
-    }
-    return _renderTickets(data2||[]);
+    console.error('Tickets error:',error.message);
+    ['openTicketList','progressTicketList','resolvedTicketList'].forEach(id=>{if($(id))$(id).innerHTML='<p class="small" style="color:#b91c1c">Error loading tickets: '+error.message+'</p>';});
+    if($('ticketRows'))$('ticketRows').innerHTML='<tr><td colspan="7" style="color:#b91c1c">'+error.message+'</td></tr>';
+    return;
   }
   _renderTickets(data||[]);
 }
@@ -1778,7 +1782,28 @@ async function _renderTickets(arr){
     </tr>`;
   }).join('')||'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:24px">No tickets found</td></tr>';
 }
-function drawDistrict(sellers){let m={}; sellers.forEach(s=>{let d=s.city||'Unknown';m[d]=(m[d]||0)+1}); let labels=Object.keys(m),vals=labels.map(l=>m[l]); chart('districtChart',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); chart('districtChart2',{type:'bar',data:{labels,datasets:[{data:vals,borderRadius:10}]},options:common}); $('heatMap').innerHTML=labels.map((l,i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${m[l]} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>'}
+function drawDistrict(sellers){
+  let m={};
+  sellers.forEach(s=>{ let d=s.city||s.district||'Unknown'; m[d]=(m[d]||0)+1; });
+  let entries=Object.entries(m).sort((a,b)=>b[1]-a[1]);
+  let labels=entries.map(e=>e[0]), vals=entries.map(e=>e[1]);
+  const colors=['#1d4ed8','#f97316','#10b981','#7c3aed','#ef4444','#06b6d4','#eab308','#6366f1','#84cc16','#ec4899'];
+  const bgColors=labels.map((_,i)=>colors[i%colors.length]);
+  const cfg={
+    type:'bar',
+    data:{labels,datasets:[{data:vals,borderRadius:8,backgroundColor:bgColors}]},
+    options:{
+      ...common,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} sellers`}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#eef2f7'},ticks:{stepSize:1}},x:{grid:{display:false}}}
+    }
+  };
+  chart('districtChart',cfg);
+  chart('districtChart2',cfg);
+  // Trigger resize so chart fills the container properly
+  if(charts['districtChart']) setTimeout(()=>{ charts['districtChart'].resize(); },100);
+  $('heatMap').innerHTML=entries.map(([l,c],i)=>`<div class="heat-cell heat-${Math.min(5,Math.max(1,5-i))}"><b>${l}</b><span>${c} Sellers</span></div>`).join('')||'<div class="ticket"><b>No district data</b></div>';
+}
 function drawPlans(v,rev){
   // FIX6: use passed rev value directly, no DOM scraping
   chart('planChart',{type:'doughnut',data:{labels:['Trial','Monthly','Yearly'],datasets:[{data:v,borderWidth:4}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
@@ -2011,17 +2036,22 @@ function renderPerfTable(list){
     return;
   }
   if($('perfCount')) $('perfCount').textContent=list.length+' sellers';
-  // Rank is based on original sorted position in __perfSellers
+  // FIX6: globalRank = rank in original full sorted list (for badge), localRank = position in filtered view
   const allSorted=(window.__perfSellers||list);
-  tbody.innerHTML=list.map(s=>{
+  const isFiltered = list.length < allSorted.length;
+  tbody.innerHTML=list.map((s, localIdx)=>{
     const globalRank=allSorted.findIndex(x=>(x.user_id||x.email)===( s.user_id||s.email))+1;
     const b=perfBadgeForRank(globalRank);
     const photoSrc=s.logo||s.profile_photo||s.avatar_url||img(s.name||s.shop_name||'Seller');
     const name=safe(s.name||s.shop_name,'Seller');
     const status=s._status==='confirmed'?'confirmed':'pending';
     const joined=s.created_at?new Date(s.created_at).toLocaleDateString('en-IN'):'-';
+    // Show global rank; if filtered, also show filtered position
+    const rankDisplay = isFiltered
+      ? `<span style="font-size:13px;font-weight:900;color:#071427">#${globalRank}</span><span style="font-size:10px;color:#94a3b8;display:block">(filtered #${localIdx+1})</span>`
+      : `<span style="font-size:13px;font-weight:900;color:#071427">#${globalRank}</span>`;
     return `<tr>
-      <td><span style="font-size:13px;font-weight:900;color:#071427">#${globalRank}</span></td>
+      <td>${rankDisplay}</td>
       <td><div style="display:flex;align-items:center;gap:10px">
         <img src="${photoSrc}" onerror="this.src='${img(name)}'"
           style="width:38px;height:38px;border-radius:10px;object-fit:cover;border:1.5px solid #e2e8f0;flex-shrink:0">
@@ -2070,23 +2100,27 @@ function nav(){
     loadSellerSubscriptions();
     loadBanners();
   }
+  // FIX4: Use a named handler stored on the element to prevent listener stacking on re-calls
   document.querySelectorAll('.menu a').forEach(a=>{
     a.classList.toggle('active',a.dataset.page===saved);
-    a.addEventListener('click',e=>{
-      e.preventDefault();
-      document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));
-      a.classList.add('active');
-      document.querySelectorAll('.page').forEach(p=>p.style.display='none');
-      const page=$(a.dataset.page);if(page)page.style.display='block';
-      sessionStorage.setItem('activePage',a.dataset.page);
-      if(window.lucide)lucide.createIcons();
-      if(a.dataset.page==='settingsPage'){
-        loadPlanConfigs();
-        loadSellerDropdown();
-        loadSellerSubscriptions();
-        loadBanners();
-      }
-    });
+    if(!a._navBound){
+      a._navBound=true;
+      a.addEventListener('click',e=>{
+        e.preventDefault();
+        document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));
+        a.classList.add('active');
+        document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+        const page=$(a.dataset.page);if(page)page.style.display='block';
+        sessionStorage.setItem('activePage',a.dataset.page);
+        if(window.lucide)lucide.createIcons();
+        if(a.dataset.page==='settingsPage'){
+          loadPlanConfigs();
+          loadSellerDropdown();
+          loadSellerSubscriptions();
+          loadBanners();
+        }
+      });
+    }
   });
 }
 async function init(){
@@ -2173,12 +2207,13 @@ async function recalculateBadges(){
     }));
     sellers.sort((a,b) => b.thisMonthCount - a.thisMonthCount);
 
-    // Step 6: Assign badge by rank
+    // FIX7: assignBadge matches perfBadgeForRank — rank > 10 gets 'seller', not 'prime'
     function assignBadge(rank){
       if(rank===1) return 'diamond';
       if(rank===2) return 'gold';
       if(rank===3) return 'silver';
-      return 'prime';
+      if(rank<=10) return 'prime';
+      return 'seller';
     }
 
     // Step 7: Build upsert rows for all sellers
@@ -2952,7 +2987,7 @@ async function saveBanners() {
 }
 // ===================== END BANNER MANAGEMENT =====================
 
-document.addEventListener('DOMContentLoaded', startAuthGate);
+// (startAuthGate is called inside the single DOMContentLoaded above)
 </script>
 
 </body>

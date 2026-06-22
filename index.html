@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MySellerDesk — Admin Panel</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -7782,7 +7785,7 @@ function settings_saveGeneral(){
 window.settings_select = settings_select;
 
 /* ===== SUPABASE CONFIG ===== */
-const SUPA_URL = 'https://zkafglojonsxpzlsfxcdh.supabase.co';
+const SUPA_URL = 'https://zkafglojonspzlsfxcdh.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
 
 async function supa(path, opts={}){
@@ -9009,7 +9012,7 @@ function toggleProfileMenu(e, el){
 (function(){
   /* Self-contained Supabase config — avoids dependency on outer SUPA_URL/SUPA_KEY
      which may not be defined yet when this IIFE runs */
-  const _SUPA_URL = 'https://zkafglojonsxpzlsfxcdh.supabase.co';
+  const _SUPA_URL = 'https://zkafglojonspzlsfxcdh.supabase.co';
   const _SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
 
   /* --- Inject login overlay styles --- */
@@ -9111,6 +9114,8 @@ function toggleProfileMenu(e, el){
 
   /* --- Supabase Auth Sign-In --- */
   window.msdDoLogin = async function(){
+    var SUPABASE_URL = "https://zkafglojonspzlsfxcdh.supabase.co";
+    var SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ";
     const email = document.getElementById('msd-email').value.trim();
     const password = document.getElementById('msd-password').value;
     const btn = document.getElementById('msd-login-btn');
@@ -9130,10 +9135,10 @@ function toggleProfileMenu(e, el){
     btn.textContent = 'Signing in…';
 
     try {
-      const res = await fetch(_SUPA_URL + '/auth/v1/token?grant_type=password', {
+      const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
         method:'POST',
         headers:{
-          'apikey': _SUPA_KEY,
+          'apikey': SUPABASE_ANON,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password })

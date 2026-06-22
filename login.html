@@ -40,16 +40,14 @@ body{
   top:-80px;right:-60px;
 }
 .blob-2{
-  width:200px;height:200px;
+  width:120px;height:120px;
   background:radial-gradient(circle, #ec4899 0%, rgba(219,39,119,0.1) 70%);
   top:60px;right:100px;
-  width:120px;height:120px;
 }
 .blob-3{
-  width:220px;height:220px;
+  width:90px;height:90px;
   background:radial-gradient(circle, rgba(79,70,229,0.5) 0%, rgba(55,48,163,0.1) 70%);
   top:280px;right:30px;
-  width:90px;height:90px;
 }
 .blob-4{
   width:380px;height:380px;
@@ -201,6 +199,7 @@ body{
   color:#fff;border:none;border-radius:12px;
   font-size:15px;font-weight:700;font-family:inherit;
   cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
   transition:opacity .2s, transform .1s, box-shadow .2s;
   box-shadow:0 4px 14px rgba(109,40,217,.35);
   letter-spacing:.3px;
@@ -402,40 +401,66 @@ body{
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
+  /* ─────────────────────────────────────────
+     SECURE SESSION STRATEGY
+     • localStorage → never used for auth data
+     • Supabase client → storage: sessionStorage
+       → browser close = session gone automatically
+     • sessionStorage → wiped on tab/window close
+  ───────────────────────────────────────── */
   const SUPABASE_URL  = 'https://zkafglojonspzlsfxcdh.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  /* ── Check if already logged in ── */
-  const { data: { session } } = await supabase.auth.getSession();
-  if(session){
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-    if(profile?.role === 'admin') window.location.href = 'index.html';
+  /* Force Supabase to use sessionStorage — never localStorage */
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: {
+      storage: window.sessionStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  /* ── On page load: check existing session (wrapped, no top-level await issue) ── */
+  async function checkExistingSession() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      if (profile?.role === 'admin') {
+        window.location.href = 'index.html';
+      } else {
+        /* session exists but not admin — clear it */
+        await supabase.auth.signOut();
+        sessionStorage.clear();
+      }
+    } catch (_) { /* network error — stay on login page */ }
   }
+  checkExistingSession();
 
   /* ── Helpers ── */
-  function showError(msg){
-    const el = document.getElementById('errorMsg');
+  function showError(msg) {
     document.getElementById('errorText').textContent = msg;
-    el.classList.add('show');
+    document.getElementById('errorMsg').classList.add('show');
   }
-  function hideError(){ document.getElementById('errorMsg').classList.remove('show'); }
-
-  function setLoading(on){
+  function hideError() {
+    document.getElementById('errorMsg').classList.remove('show');
+  }
+  function setLoading(on) {
     const btn = document.getElementById('signInBtn');
     btn.classList.toggle('loading', on);
     btn.disabled = on;
   }
 
   /* ── Toggle password visibility ── */
-  window.togglePassword = function(){
+  window.togglePassword = function () {
     const inp  = document.getElementById('passwordInput');
     const icon = document.getElementById('eyeIcon');
-    if(inp.type === 'password'){
+    if (inp.type === 'password') {
       inp.type = 'text';
       icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
     } else {
@@ -445,17 +470,17 @@ body{
   };
 
   /* ── Main Sign In ── */
-  window.handleSignIn = async function(){
+  window.handleSignIn = async function () {
     const email    = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
     hideError();
 
-    if(!email){
+    if (!email) {
       showError('Please enter your email address.');
       document.getElementById('emailInput').focus();
       return;
     }
-    if(!password){
+    if (!password) {
       showError('Please enter your password.');
       document.getElementById('passwordInput').focus();
       return;
@@ -464,37 +489,31 @@ body{
     setLoading(true);
 
     try {
-      /* Step 1 — Supabase Auth sign in */
+      /* Step 1 — Supabase Auth */
       const { data: authData, error: authError } =
         await supabase.auth.signInWithPassword({ email, password });
+      if (authError) throw new Error('Invalid email or password. Please try again.');
 
-      if(authError) throw new Error('Invalid email or password. Please try again.');
-
-      /* Step 2 — Check profiles table for role = admin */
+      /* Step 2 — profiles table role check */
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', authData.user.id)
         .single();
 
-      if(profileError || !profile)
+      if (profileError || !profile)
         throw new Error('Profile not found. Contact support.');
 
-      if(profile.role !== 'admin'){
+      if (profile.role !== 'admin') {
         await supabase.auth.signOut();
+        sessionStorage.clear();
         throw new Error('Access denied. Admin privileges required.');
       }
 
-      /* Step 3 — Remember me: persist session or not */
-      if(!document.getElementById('rememberMe').checked){
-        // Session will clear on browser close (default supabase behaviour with local storage)
-        // For session-only storage we just leave as-is; supabase handles expiry
-      }
-
-      /* ✅ Success — go to dashboard */
+      /* ✅ Success — redirect to dashboard */
       window.location.href = 'index.html';
 
-    } catch(err){
+    } catch (err) {
       showError(err.message || 'Something went wrong. Please try again.');
       document.getElementById('passwordInput').value = '';
       document.getElementById('passwordInput').focus();
@@ -504,19 +523,19 @@ body{
   };
 
   /* ── Google OAuth ── */
-  window.handleGoogle = async function(){
+  window.handleGoogle = async function () {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin + '/index.html' }
     });
-    if(error) showError('Google sign-in failed. Please try again.');
+    if (error) showError('Google sign-in failed. Please try again.');
   };
 
   /* ── Forgot Password ── */
-  window.handleForgot = async function(e){
+  window.handleForgot = async function (e) {
     e.preventDefault();
     const email = document.getElementById('emailInput').value.trim();
-    if(!email){
+    if (!email) {
       showError('Enter your email above first, then click Forgot Password.');
       document.getElementById('emailInput').focus();
       return;
@@ -524,7 +543,7 @@ body{
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin + '/login.html'
     });
-    if(error){
+    if (error) {
       showError('Could not send reset email. Check the address and try again.');
     } else {
       hideError();
@@ -534,7 +553,7 @@ body{
 
   /* ── Enter key ── */
   document.addEventListener('keydown', e => {
-    if(e.key === 'Enter') window.handleSignIn();
+    if (e.key === 'Enter') window.handleSignIn();
   });
 </script>
 </body>

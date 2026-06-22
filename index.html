@@ -9007,6 +9007,10 @@ function toggleProfileMenu(e, el){
 
 // ===== INLINE LOGIN OVERLAY (merged from login.html) =====
 (function(){
+  /* Self-contained Supabase config — avoids dependency on outer SUPA_URL/SUPA_KEY
+     which may not be defined yet when this IIFE runs */
+  const _SUPA_URL = 'https://zkafglojonsxpzlsfxcdh.supabase.co';
+  const _SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
 
   /* --- Inject login overlay styles --- */
   const loginStyle = document.createElement('style');
@@ -9126,10 +9130,10 @@ function toggleProfileMenu(e, el){
     btn.textContent = 'Signing in…';
 
     try {
-      const res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+      const res = await fetch(_SUPA_URL + '/auth/v1/token?grant_type=password', {
         method:'POST',
         headers:{
-          'apikey': SUPA_KEY,
+          'apikey': _SUPA_KEY,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password })

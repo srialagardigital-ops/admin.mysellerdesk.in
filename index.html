@@ -7734,7 +7734,7 @@ async function loadSellersFromSupabase(){
   try {
     const profiles = await supa('profiles?select=id,email,shop_name,plan,role,whatsapp_number,created_at&order=created_at.desc');
     if(!profiles || !profiles.length){ console.log('No profiles found, using demo data'); return; }
-
+console.log(profiles);
     const details = await supa('seller_details?select=user_id,shop_name,whatsapp_number,district,address');
     const detailMap = {};
     if(details) details.forEach(d => detailMap[d.user_id] = d);

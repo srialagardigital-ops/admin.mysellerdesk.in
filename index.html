@@ -5879,10 +5879,31 @@ function goToPage(evt, pageId){
   if(navEl) navEl.classList.add('active');
   if(pageId !== 'settings'){
     document.querySelectorAll('.nav-item-settings').forEach(n => n.classList.remove('active'));
+    try { sessionStorage.removeItem('msd_settings_key'); } catch(e){}
   }
+  try { sessionStorage.setItem('msd_page', pageId); } catch(e){}
   window.scrollTo(0,0);
 }
-document.getElementById('page-dashboard').classList.add('active');
+
+// Restore last visited page on load
+(function(){
+  let savedPage = 'dashboard';
+  try { savedPage = sessionStorage.getItem('msd_page') || 'dashboard'; } catch(e){}
+  document.getElementById('page-dashboard').classList.add('active');
+  if(savedPage !== 'dashboard'){
+    goToPage(null, savedPage);
+    if(savedPage === 'settings'){
+      let savedSettingsKey = 'general';
+      try { savedSettingsKey = sessionStorage.getItem('msd_settings_key') || 'general'; } catch(e){}
+      setTimeout(function(){
+        const settingsNavEl = document.querySelector('.nav-item-settings[data-settings="' + savedSettingsKey + '"]');
+        if(settingsNavEl && typeof settings_select === 'function'){
+          settings_select(settingsNavEl, savedSettingsKey);
+        }
+      }, 0);
+    }
+  }
+})();
 
 
 /* ===== Dashboard JS ===== */
@@ -7380,6 +7401,7 @@ const settingsContent = {
 function settings_select(el, key){
   document.querySelectorAll('.nav-item-settings').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
+  try { sessionStorage.setItem('msd_settings_key', key); } catch(e){}
   const panel = document.getElementById('settings-panel-body');
   const saveBtn = document.getElementById('settings-save-btn');
 
@@ -7758,6 +7780,142 @@ function settings_saveGeneral(){
   setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; }, 1800);
 }
 window.settings_select = settings_select;
+
+/* ===== SUPABASE CONFIG ===== */
+const SUPA_URL = 'https://zkafglojonsxpzlsfxcdh.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
+
+async function supa(path, opts={}){
+  const res = await fetch(SUPA_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers || {})
+    },
+    method: opts.method || 'GET',
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if(!res.ok){ console.error('Supabase error:', res.status, await res.text()); return null; }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function loadSellersFromSupabase(){
+  try {
+    const profiles = await supa('profiles?select=id,email,shop_name,plan,role,whatsapp_number,created_at&order=created_at.desc');
+    if(!profiles || !profiles.length){ console.log('No profiles found, using demo data'); return; }
+
+    const details = await supa('seller_details?select=user_id,shop_name,whatsapp_number,district,address');
+    const detailMap = {};
+    if(details) details.forEach(d => detailMap[d.user_id] = d);
+
+    const subs = await supa('subscriptions?select=user_id,status,plan_id,expires_at&order=created_at.desc');
+    const subMap = {};
+    if(subs) subs.forEach(s => { if(!subMap[s.user_id]) subMap[s.user_id] = s; });
+
+    const avClasses = ['av-1','av-2','av-3','av-4','av-5','av-6'];
+    const newSellers = profiles.map((p, i) => {
+      const det = detailMap[p.id] || {};
+      const sub = subMap[p.id] || {};
+      const shopName = det.shop_name || p.shop_name || (p.email ? p.email.split('@')[0] : 'Unknown');
+      const initials = shopName.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2) || 'NA';
+      const joinDate = p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+      const rawPlan = p.plan || sub.plan_id || 'starter';
+      const plan = rawPlan.charAt(0).toUpperCase() + rawPlan.slice(1).toLowerCase();
+      const status = (sub.status === 'active' || !sub.status) ? 'Active' : 'Suspended';
+      return {
+        av: initials,
+        cls: avClasses[i % avClasses.length],
+        name: shopName,
+        id: 'SELL' + String(1000 + i + 1),
+        email: p.email || '-',
+        phone: det.whatsapp_number || p.whatsapp_number || '-',
+        plan: plan,
+        status: status,
+        emailStatus: 'Verified',
+        district: det.district || '-',
+        join: joinDate,
+        revenue: '₹0',
+        _supaId: p.id
+      };
+    });
+
+    sellers.length = 0;
+    newSellers.forEach(s => sellers.push(s));
+
+    // Update dashboard Total Sellers stat
+    document.querySelectorAll('.stat-label').forEach(el => {
+      if(el.textContent.trim() === 'Total Sellers'){
+        const valEl = el.nextElementSibling;
+        if(valEl) valEl.textContent = sellers.length.toLocaleString('en-IN');
+      }
+    });
+
+    // Update sellers page stat cards if they exist
+    const totalEl = document.getElementById('sellers-stat-total');
+    if(totalEl) totalEl.textContent = sellers.length;
+    const activeEl = document.getElementById('sellers-stat-active');
+    if(activeEl) activeEl.textContent = sellers.filter(s=>s.status==='Active').length;
+    const suspEl = document.getElementById('sellers-stat-suspended');
+    if(suspEl) suspEl.textContent = sellers.filter(s=>s.status==='Suspended').length;
+
+    // Re-render table if page is visible
+    if(document.getElementById('page-sellers') && document.getElementById('page-sellers').classList.contains('active')){
+      if(typeof sellers_renderTable === 'function') sellers_renderTable();
+    }
+
+    console.log('✅ Sellers loaded from Supabase:', sellers.length);
+  } catch(e) {
+    console.warn('⚠️ Supabase sellers load failed, using demo data:', e);
+  }
+}
+
+async function loadSubsStats(){
+  try {
+    const subs = await supa('subscriptions?select=status');
+    if(!subs) return;
+    const active = subs.filter(s=>s.status==='active').length;
+    document.querySelectorAll('.stat-label').forEach(el => {
+      if(el.textContent.trim() === 'Active Subscriptions'){
+        const valEl = el.nextElementSibling;
+        if(valEl) valEl.textContent = active.toLocaleString('en-IN');
+      }
+    });
+    console.log('✅ Subscriptions loaded:', active, 'active');
+  } catch(e) { console.warn('⚠️ Subs stats failed:', e); }
+}
+
+async function loadOrdersStats(){
+  try {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const orders = await supa('orders?select=id&created_at=gte.' + encodeURIComponent(firstDay));
+    if(!orders) return;
+    document.querySelectorAll('.stat-label').forEach(el => {
+      if(el.textContent.trim() === 'Orders This Month'){
+        const valEl = el.nextElementSibling;
+        if(valEl) valEl.textContent = orders.length.toLocaleString('en-IN');
+      }
+    });
+    console.log('✅ Orders this month:', orders.length);
+  } catch(e) { console.warn('⚠️ Orders stats failed:', e); }
+}
+
+async function supabase_initLoad(){
+  await Promise.all([
+    loadSellersFromSupabase(),
+    loadSubsStats(),
+    loadOrdersStats()
+  ]);
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', supabase_initLoad);
+} else {
+  supabase_initLoad();
+}
 
 /* ===== WHATSAPP TEMPLATES STYLES ===== */
 (function(){
@@ -8848,11 +9006,27 @@ function toggleProfileMenu(e, el){
 function adminLogout(){
   document.querySelectorAll('.profile-dropdown.open').forEach(d => d.classList.remove('open'));
   if(confirm('Are you sure you want to logout?')){
-    alert('You have been logged out successfully.');
-    // Integrate with your backend/auth here, e.g.:
-    // window.location.href = 'login.html';
+    try {
+      localStorage.removeItem('msd_admin_logged_in');
+      localStorage.removeItem('msd_admin_email');
+      sessionStorage.removeItem('msd_admin_logged_in');
+      sessionStorage.removeItem('msd_admin_email');
+      sessionStorage.removeItem('msd_page');
+      sessionStorage.removeItem('msd_settings_key');
+    } catch(e){}
+    window.location.href = 'login.html';
   }
 }
+
+// Auth guard — redirect to login if not logged in
+(function(){
+  try {
+    const loggedIn = localStorage.getItem('msd_admin_logged_in') || sessionStorage.getItem('msd_admin_logged_in');
+    if(loggedIn !== 'true'){
+      window.location.href = 'login.html';
+    }
+  } catch(e){}
+})();
 
 document.addEventListener('click', function(e){
   if(!e.target.closest('.profile-wrap')){

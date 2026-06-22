@@ -7739,7 +7739,7 @@ async function loadSellersFromSupabase(){
     const detailMap = {};
     if(details) details.forEach(d => detailMap[d.user_id] = d);
 
-    const subs = await supa('subscriptions?select=user_id,status,plan_id,expires_at&order=created_at.desc');
+    const subs = await supa('subscriptions?select=user_id,status,plan,expires_at&order=created_at.desc');
     const subMap = {};
     if(subs) subs.forEach(s => { if(!subMap[s.user_id]) subMap[s.user_id] = s; });
 
@@ -7750,7 +7750,7 @@ async function loadSellersFromSupabase(){
       const shopName = det.shop_name || p.shop_name || (p.email ? p.email.split('@')[0] : 'Unknown');
       const initials = shopName.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2) || 'NA';
       const joinDate = p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '-';
-      const rawPlan = p.plan || sub.plan_id || 'starter';
+      const rawPlan = p.plan || sub.plan || 'starter';
       const plan = rawPlan.charAt(0).toUpperCase() + rawPlan.slice(1).toLowerCase();
       const status = (sub.status === 'active' || !sub.status) ? 'Active' : 'Suspended';
       return {
@@ -7880,13 +7880,13 @@ async function loadOrdersFromSupabase(){
 
 async function loadTicketsFromSupabase(){
   try {
-    const rows = await supa('support_tickets?select=id,ticket_number,subject,category,priority,status,created_at,user_id&order=created_at.desc&limit=100');
+    const rows = await supa('support_tickets?select=id,subject,category,priority,status,created_at,user_id&order=created_at.desc&limit=100');
     if(!rows || !rows.length){ console.log('No tickets found in Supabase'); return; }
     const avCls = ['av-1','av-2','av-3','av-4','av-5','av-6'];
     const priMap = {high:'High',medium:'Medium',low:'Low',urgent:'High'};
     const statMap = {open:'Open',in_progress:'In Progress',closed:'Closed',resolved:'Closed'};
     const newTickets = rows.map((t,i) => ({
-      id: t.ticket_number || ('#TKT-' + t.id.toString().slice(-4)),
+      id: '#TKT-' + String(t.id).slice(-4),
       subject: t.subject || 'No Subject',
       sub: (t.subject||'').slice(0,30) + '...',
       cust:{av:(t.user_id||'?')[0].toUpperCase(), cls:avCls[i%avCls.length], name:'Seller #'+(i+1), email:'—'},

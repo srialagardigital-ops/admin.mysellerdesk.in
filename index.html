@@ -7841,27 +7841,44 @@ async function loadOrdersStats(){
 
 async function loadOrdersFromSupabase(){
   try {
-    const rows = await supa('orders?select=id,order_number,created_at,customer_name,customer_email,customer_phone,seller_id,amount,payment_method,status&order=created_at.desc&limit=100');
+    const rows = await supa('orders?select=*&order=created_at.desc&limit=100');
     if(!rows || !rows.length){ console.log('No orders found in Supabase'); return; }
     const avCls = ['av-1','av-2','av-3','av-4','av-5','av-6'];
-    const newOrders = rows.map((o,i) => ({
-      id: o.order_number || ('#ORD-' + o.id.toString().slice(-5)),
-      date: o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—',
-      time: o.created_at ? new Date(o.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—',
-      cust: o.customer_name || 'Unknown',
-      email: o.customer_email || '—',
-      phone: o.customer_phone || '—',
-      av: (o.customer_name||'?')[0].toUpperCase(),
-      cls: avCls[i % avCls.length],
-      seller: o.seller_id || '—',
-      items: '—',
-      amount: o.amount ? '₹' + Number(o.amount).toLocaleString('en-IN') : '₹0',
-      pay: o.payment_method || '—',
-      status: o.status ? (o.status.charAt(0).toUpperCase() + o.status.slice(1)) : 'Pending',
-      address:'—', delivery:'—', tracking:'—', paymethod: o.payment_method || '—', paystatus: o.status || '—',
-      lines:[], subtotal: o.amount ? '₹'+Number(o.amount).toLocaleString('en-IN') : '₹0',
-      shipping:'₹0', discount:'₹0', total: o.amount ? '₹'+Number(o.amount).toLocaleString('en-IN') : '₹0'
-    }));
+    const newOrders = rows.map((o,i) => {
+      const custName = o.customer_name || o.name || 'Unknown';
+      const orderId = o.orderid || o.order_id || o.id || ('ORD-' + String(i+1).padStart(4,'0'));
+      const amt = o.amount ? Number(o.amount) : 0;
+      const amtStr = '₹' + amt.toLocaleString('en-IN');
+      const statusRaw = o.status || 'pending';
+      const status = statusRaw.charAt(0).toUpperCase() + statusRaw.slice(1);
+      const dateStr = o.created_at
+        ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+        : (o.date || '—');
+      const timeStr = o.created_at
+        ? new Date(o.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+        : '—';
+      return {
+        id: '#' + String(orderId),
+        date: dateStr,
+        time: timeStr,
+        cust: custName,
+        email: o.email || '—',
+        phone: o.customer_phone || o.phone || '—',
+        av: custName[0].toUpperCase(),
+        cls: avCls[i % avCls.length],
+        seller: o.seller_id || '—',
+        items: '—',
+        amount: amtStr,
+        pay: o.payment || o.payment_method || '—',
+        status: status,
+        address: o.address || '—',
+        delivery: o.stage || '—',
+        tracking: o.courier || '—',
+        paymethod: o.payment || o.payment_method || '—',
+        paystatus: o.payment || status,
+        lines: [], subtotal: amtStr, shipping: '₹0', discount: '₹0', total: amtStr
+      };
+    });
     orders.length = 0;
     newOrders.forEach(o => orders.push(o));
     // Update dashboard stat
@@ -7880,17 +7897,17 @@ async function loadOrdersFromSupabase(){
 
 async function loadTicketsFromSupabase(){
   try {
-    const rows = await supa('support_tickets?select=id,subject,category,priority,status,created_at,user_id&order=created_at.desc&limit=100');
+    const rows = await supa('support_tickets?select=*&order=created_at.desc&limit=100');
     if(!rows || !rows.length){ console.log('No tickets found in Supabase'); return; }
     const avCls = ['av-1','av-2','av-3','av-4','av-5','av-6'];
     const priMap = {high:'High',medium:'Medium',low:'Low',urgent:'High'};
     const statMap = {open:'Open',in_progress:'In Progress',closed:'Closed',resolved:'Closed'};
     const newTickets = rows.map((t,i) => ({
       id: '#TKT-' + String(t.id).slice(-4),
-      subject: t.subject || 'No Subject',
+      subject: t.subject || t.title || t.message || 'No Subject',
       sub: (t.subject||'').slice(0,30) + '...',
-      cust:{av:(t.user_id||'?')[0].toUpperCase(), cls:avCls[i%avCls.length], name:'Seller #'+(i+1), email:'—'},
-      cat: t.category || 'General',
+      cust:{av:(t.user_id||'S')[0].toUpperCase(), cls:avCls[i%avCls.length], name:t.seller_name||t.name||('Seller #'+(i+1)), email:t.email||'—'},
+      cat: t.category || t.type || t.ticket_type || t.tag || 'General',
       pri: priMap[t.priority] || 'Medium',
       agent:{av:'AD', name:'Admin'},
       status: statMap[t.status] || 'Open',

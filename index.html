@@ -9003,30 +9003,208 @@ function toggleProfileMenu(e, el){
   dropdown.classList.toggle('open');
 }
 
+// adminLogout is defined below (merged with login overlay)
+
+// ===== INLINE LOGIN OVERLAY (merged from login.html) =====
+(function(){
+
+  /* --- Inject login overlay styles --- */
+  const loginStyle = document.createElement('style');
+  loginStyle.textContent = `
+    #msd-login-overlay {
+      position:fixed;inset:0;z-index:9999;
+      background:linear-gradient(135deg,#0b1437 0%,#121b44 60%,#1a2452 100%);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+    }
+    #msd-login-overlay.hidden { display:none; }
+    .msd-login-card {
+      background:#fff;border-radius:20px;
+      padding:40px 38px 36px;
+      width:100%;max-width:420px;
+      box-shadow:0 24px 64px rgba(0,0,0,.32);
+    }
+    .msd-login-brand {
+      display:flex;align-items:center;gap:12px;margin-bottom:28px;
+    }
+    .msd-login-brand-icon {
+      width:44px;height:44px;border-radius:12px;
+      background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .msd-login-brand-icon svg { width:22px;height:22px; }
+    .msd-login-brand-text strong { display:block;font-size:17px;font-weight:800;color:#0b1437;letter-spacing:.2px; }
+    .msd-login-brand-text span { display:block;font-size:12px;color:#6b7180;margin-top:1px; }
+    .msd-login-title { font-size:22px;font-weight:800;color:#0b1437;margin-bottom:6px; }
+    .msd-login-sub { font-size:13.5px;color:#6b7180;margin-bottom:28px; }
+    .msd-login-field { margin-bottom:16px; }
+    .msd-login-label {
+      display:block;font-size:12.5px;font-weight:700;color:#15192e;margin-bottom:6px;
+    }
+    .msd-login-input {
+      width:100%;padding:11px 14px;border:1.5px solid #e9ecf3;border-radius:10px;
+      font-size:14px;font-family:inherit;color:#15192e;outline:none;
+      transition:border-color .15s;
+    }
+    .msd-login-input:focus { border-color:#2f6df6; }
+    .msd-login-input.error { border-color:#dc2626; }
+    .msd-login-btn {
+      width:100%;padding:13px;border:none;border-radius:11px;
+      background:#2f6df6;color:#fff;
+      font-size:14.5px;font-weight:700;font-family:inherit;
+      cursor:pointer;margin-top:6px;
+      box-shadow:0 4px 14px rgba(47,109,246,.35);
+      transition:background .15s, transform .1s;
+    }
+    .msd-login-btn:hover { background:#2459d9; }
+    .msd-login-btn:active { transform:scale(.98); }
+    .msd-login-btn:disabled { background:#9ab3f8;cursor:not-allowed;transform:none; }
+    .msd-login-err {
+      background:#fdecec;border:1px solid #fca5a5;border-radius:9px;
+      color:#dc2626;font-size:13px;font-weight:600;
+      padding:10px 13px;margin-bottom:16px;display:none;
+    }
+    .msd-login-err.show { display:block; }
+    .msd-login-footer {
+      margin-top:22px;text-align:center;font-size:12px;color:#9298a8;
+    }
+  `;
+  document.head.appendChild(loginStyle);
+
+  /* --- Inject login overlay HTML --- */
+  const overlay = document.createElement('div');
+  overlay.id = 'msd-login-overlay';
+  overlay.innerHTML = `
+    <div class="msd-login-card">
+      <div class="msd-login-brand">
+        <div class="msd-login-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="msd-login-brand-text">
+          <strong>MySellerDesk</strong>
+          <span>Admin Panel</span>
+        </div>
+      </div>
+      <div class="msd-login-title">Welcome back 👋</div>
+      <div class="msd-login-sub">Sign in with your admin credentials to continue.</div>
+      <div id="msd-login-err" class="msd-login-err">Invalid email or password. Please try again.</div>
+      <div class="msd-login-field">
+        <label class="msd-login-label" for="msd-email">Email</label>
+        <input class="msd-login-input" id="msd-email" type="email" placeholder="admin@mysellerdesk.com" autocomplete="email"/>
+      </div>
+      <div class="msd-login-field">
+        <label class="msd-login-label" for="msd-password">Password</label>
+        <input class="msd-login-input" id="msd-password" type="password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="msd-login-btn" id="msd-login-btn" onclick="msdDoLogin()">Sign In</button>
+      <div class="msd-login-footer">MySellerDesk &copy; 2026 &mdash; Admin access only</div>
+    </div>
+  `;
+  document.body.prepend(overlay);
+
+  /* --- Supabase Auth Sign-In --- */
+  window.msdDoLogin = async function(){
+    const email = document.getElementById('msd-email').value.trim();
+    const password = document.getElementById('msd-password').value;
+    const btn = document.getElementById('msd-login-btn');
+    const errEl = document.getElementById('msd-login-err');
+
+    errEl.classList.remove('show');
+    document.getElementById('msd-email').classList.remove('error');
+    document.getElementById('msd-password').classList.remove('error');
+
+    if(!email || !password){
+      errEl.textContent = 'Please enter both email and password.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+        method:'POST',
+        headers:{
+          'apikey': SUPA_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if(!res.ok || !data.access_token){
+        throw new Error(data.error_description || data.msg || 'Login failed');
+      }
+
+      // Store session
+      sessionStorage.setItem('msd_admin_logged_in', 'true');
+      sessionStorage.setItem('msd_admin_email', email);
+      sessionStorage.setItem('msd_access_token', data.access_token);
+
+      // Update profile display
+      const nameEl = document.querySelector('.profile-text strong');
+      const emailEl = document.querySelector('.profile-text span');
+      if(nameEl) nameEl.textContent = email.split('@')[0];
+      if(emailEl) emailEl.textContent = email;
+
+      // Hide overlay, show app
+      document.getElementById('msd-login-overlay').classList.add('hidden');
+
+    } catch(err){
+      errEl.textContent = err.message || 'Login failed. Please try again.';
+      errEl.classList.add('show');
+      document.getElementById('msd-email').classList.add('error');
+      document.getElementById('msd-password').classList.add('error');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  };
+
+  /* --- Enter key support --- */
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !document.getElementById('msd-login-overlay').classList.contains('hidden')){
+      window.msdDoLogin();
+    }
+  });
+
+  /* --- Auth guard: check existing session, else show overlay --- */
+  const alreadyLoggedIn = sessionStorage.getItem('msd_admin_logged_in') === 'true';
+  if(!alreadyLoggedIn){
+    // Overlay is already visible (rendered above). App content stays hidden behind it.
+  } else {
+    // Already authenticated — hide overlay immediately
+    overlay.classList.add('hidden');
+  }
+
+})();
+
+// Patch adminLogout to use overlay instead of redirect
 function adminLogout(){
   document.querySelectorAll('.profile-dropdown.open').forEach(d => d.classList.remove('open'));
   if(confirm('Are you sure you want to logout?')){
     try {
-      localStorage.removeItem('msd_admin_logged_in');
-      localStorage.removeItem('msd_admin_email');
       sessionStorage.removeItem('msd_admin_logged_in');
       sessionStorage.removeItem('msd_admin_email');
+      sessionStorage.removeItem('msd_access_token');
       sessionStorage.removeItem('msd_page');
       sessionStorage.removeItem('msd_settings_key');
     } catch(e){}
-    window.location.href = 'login.html';
+    // Show login overlay instead of redirecting
+    const overlay = document.getElementById('msd-login-overlay');
+    if(overlay){
+      document.getElementById('msd-email').value = '';
+      document.getElementById('msd-password').value = '';
+      document.getElementById('msd-login-err').classList.remove('show');
+      document.getElementById('msd-login-btn').disabled = false;
+      document.getElementById('msd-login-btn').textContent = 'Sign In';
+      overlay.classList.remove('hidden');
+    }
   }
 }
-
-// Auth guard — redirect to login if not logged in
-(function(){
-  try {
-    const loggedIn = localStorage.getItem('msd_admin_logged_in') || sessionStorage.getItem('msd_admin_logged_in');
-    if(loggedIn !== 'true'){
-      window.location.href = 'login.html';
-    }
-  } catch(e){}
-})();
 
 document.addEventListener('click', function(e){
   if(!e.target.closest('.profile-wrap')){

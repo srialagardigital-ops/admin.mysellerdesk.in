@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySellerDesk — Admin Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+  display:flex;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===== LEFT PANEL ===== */
+.left-panel{
+  width:48%;
+  background: linear-gradient(145deg, #0a0e2e 0%, #0e1545 40%, #1a0a3d 100%);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:36px 48px;
+  min-height:100vh;
+}
+
+/* Decorative blobs */
+.blob{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(2px);
+}
+.blob-1{
+  width:280px;height:280px;
+  background:radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(109,40,217,0.2) 70%);
+  top:-80px;right:-60px;
+}
+.blob-2{
+  width:200px;height:200px;
+  background:radial-gradient(circle, #ec4899 0%, rgba(219,39,119,0.1) 70%);
+  top:60px;right:100px;
+  width:120px;height:120px;
+}
+.blob-3{
+  width:220px;height:220px;
+  background:radial-gradient(circle, rgba(79,70,229,0.5) 0%, rgba(55,48,163,0.1) 70%);
+  top:280px;right:30px;
+  width:90px;height:90px;
+}
+.blob-4{
+  width:380px;height:380px;
+  background:radial-gradient(circle, rgba(139,92,246,0.4) 0%, rgba(88,28,220,0.05) 70%);
+  bottom:-100px;right:-100px;
+}
+.blob-5{
+  width:260px;height:260px;
+  background:radial-gradient(circle, rgba(217,70,239,0.35) 0%, rgba(147,51,234,0.05) 70%);
+  bottom:60px;left:-80px;
+}
+/* dot grid */
+.dot-grid{
+  position:absolute;
+  top:160px;left:48px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+  opacity:0.18;
+}
+.dot-grid span{
+  width:4px;height:4px;border-radius:50%;background:#7c6ff7;display:block;
+}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:10px;position:relative;z-index:2;}
+.logo-icon{
+  width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-icon svg{width:22px;height:22px;color:#fff;}
+.logo-text{color:#fff;}
+.logo-text strong{font-size:15px;font-weight:800;letter-spacing:.3px;}
+.logo-badge{
+  display:inline-block;background:#4f46e5;color:#fff;
+  font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  padding:2px 8px;border-radius:4px;margin-top:2px;
+}
+
+/* Welcome copy */
+.welcome-copy{position:relative;z-index:2;margin-top:auto;margin-bottom:32px;}
+.welcome-copy h2{
+  font-size:48px;font-weight:800;color:#fff;line-height:1.1;
+  margin-bottom:6px;
+}
+.welcome-copy h2 .name{color:#f472b6;}
+.welcome-divider{
+  width:40px;height:3px;border-radius:2px;
+  background:linear-gradient(to right,#a78bfa,#f472b6);
+  margin:18px 0;
+}
+.welcome-copy h3{font-size:22px;font-weight:700;color:#fff;margin-bottom:12px;}
+.welcome-copy p{font-size:14px;color:#94a3b8;line-height:1.6;max-width:340px;}
+
+/* Footer */
+.left-footer{color:#475569;font-size:12px;position:relative;z-index:2;}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel{
+  flex:1;
+  background:#f8f9fc;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:60px 40px;
+  position:relative;
+}
+
+/* circle decoration top right */
+.right-deco{
+  position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(139,92,246,0.08);
+}
+
+/* Card */
+.login-card{
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 4px 32px rgba(20,30,80,.08), 0 1px 4px rgba(20,30,80,.04);
+  padding:44px 48px;
+  width:100%;max-width:460px;
+  position:relative;z-index:1;
+}
+
+/* Lock icon */
+.lock-icon-wrap{
+  width:72px;height:72px;border-radius:50%;
+  background:#ede9fe;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;
+}
+.lock-icon-wrap svg{width:34px;height:34px;color:#7c3aed;}
+
+.card-title{text-align:center;font-size:24px;font-weight:800;color:#111827;margin-bottom:6px;}
+.card-sub{text-align:center;font-size:13.5px;color:#6b7280;margin-bottom:32px;}
+
+/* Form */
+.field-label{font-size:13px;font-weight:600;color:#374151;margin-bottom:7px;display:block;}
+
+.input-wrap{
+  position:relative;margin-bottom:20px;
+}
+.input-wrap svg.field-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:17px;height:17px;color:#9ca3af;pointer-events:none;
+}
+.input-wrap input{
+  width:100%;
+  border:1.5px solid #e5e7eb;
+  border-radius:11px;
+  padding:13px 44px;
+  font-size:14px;font-family:inherit;
+  color:#111827;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s;
+  background:#fff;
+}
+.input-wrap input::placeholder{color:#9ca3af;}
+.input-wrap input:focus{
+  border-color:#7c3aed;
+  box-shadow:0 0 0 3px rgba(124,58,237,.1);
+}
+.input-wrap .eye-btn{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:#9ca3af;padding:2px;
+  display:flex;align-items:center;
+}
+.input-wrap .eye-btn svg{width:17px;height:17px;}
+.input-wrap .eye-btn:hover{color:#6b7280;}
+
+/* Row: remember + forgot */
+.form-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;}
+.remember{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.remember input[type="checkbox"]{
+  width:16px;height:16px;accent-color:#7c3aed;cursor:pointer;
+}
+.remember span{font-size:13px;color:#374151;font-weight:500;}
+.forgot-link{font-size:13px;color:#7c3aed;font-weight:600;text-decoration:none;}
+.forgot-link:hover{text-decoration:underline;}
+
+/* Sign In button */
+.btn-signin{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,#7c3aed,#6d28d9);
+  color:#fff;border:none;border-radius:12px;
+  font-size:15px;font-weight:700;font-family:inherit;
+  cursor:pointer;
+  transition:opacity .2s, transform .1s, box-shadow .2s;
+  box-shadow:0 4px 14px rgba(109,40,217,.35);
+  letter-spacing:.3px;
+}
+.btn-signin:hover{opacity:.92;box-shadow:0 6px 20px rgba(109,40,217,.45);}
+.btn-signin:active{transform:scale(.98);}
+
+/* Divider */
+.or-row{display:flex;align-items:center;gap:12px;margin:22px 0;}
+.or-line{flex:1;height:1px;background:#e5e7eb;}
+.or-text{font-size:13px;color:#9ca3af;font-weight:500;}
+
+/* Google button */
+.btn-google{
+  width:100%;padding:13px;
+  background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;
+  font-size:14px;font-weight:600;font-family:inherit;
+  color:#374151;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:border-color .2s, background .2s, box-shadow .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.btn-google:hover{border-color:#d1d5db;background:#f9fafb;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+
+/* Google G icon */
+.g-icon{width:20px;height:20px;flex-shrink:0;}
+
+/* Bottom secure note */
+.secure-note{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  margin-top:32px;font-size:12px;color:#9ca3af;
+}
+.secure-note svg{width:14px;height:14px;}
+
+/* Error message */
+.error-msg{
+  display:none;background:#fef2f2;border:1px solid #fca5a5;
+  color:#dc2626;font-size:12.5px;font-weight:500;
+  border-radius:9px;padding:10px 14px;margin-bottom:16px;
+  align-items:center;gap:8px;
+}
+.error-msg.show{display:flex;}
+.error-msg svg{width:15px;height:15px;flex-shrink:0;}
+
+/* Loading spinner */
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinner{
+  display:none;width:18px;height:18px;
+  border:2.5px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+.btn-signin.loading .spinner{display:block;}
+.btn-signin.loading .btn-text{display:none;}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <!-- Blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+  <div class="blob blob-5"></div>
+
+  <!-- Dot grid -->
+  <div class="dot-grid">
+    <!-- 5 rows × 6 cols = 30 dots -->
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Logo -->
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <strong>MySellerDesk</strong>
+      <div><span class="logo-badge">Admin Panel</span></div>
+    </div>
+  </div>
+
+  <!-- Welcome copy -->
+  <div class="welcome-copy">
+    <h2>Welcome Back,<br><span class="name">Alagar</span></h2>
+    <div class="welcome-divider"></div>
+    <h3>Master Admin</h3>
+    <p>Sign in to access and manage your platform with complete control and insights.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="left-footer">© 2025 MySellerDesk. All rights reserved.</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="right-deco"></div>
+
+  <div class="login-card">
+    <!-- Lock icon -->
+    <div class="lock-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+
+    <h1 class="card-title">Admin Login</h1>
+    <p class="card-sub">Enter your credentials to continue</p>
+
+    <!-- Error message -->
+    <div class="error-msg" id="errorMsg">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="errorText">Invalid email or password. Please try again.</span>
+    </div>
+
+    <!-- Email -->
+    <label class="field-label" for="emailInput">Email Address</label>
+    <div class="input-wrap">
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      <input type="email" id="emailInput" placeholder="Enter your email" autocomplete="email">
+    </div>
+
+    <!-- Password -->
+    <label class="field-label" for="passwordInput">Password</label>
+    <div class="input-wrap">
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password">
+      <button class="eye-btn" onclick="togglePassword()" id="eyeBtn" type="button" aria-label="Toggle password">
+        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Remember + Forgot -->
+    <div class="form-row">
+      <label class="remember">
+        <input type="checkbox" id="rememberMe">
+        <span>Remember me</span>
+      </label>
+      <a href="#" class="forgot-link" onclick="handleForgot(event)">Forgot Password?</a>
+    </div>
+
+    <!-- Sign In -->
+    <button class="btn-signin" id="signInBtn" onclick="handleSignIn()">
+      <span class="btn-text">Sign In</span>
+      <div class="spinner"></div>
+    </button>
+
+    <!-- Divider -->
+    <div class="or-row">
+      <div class="or-line"></div>
+      <span class="or-text">or</span>
+      <div class="or-line"></div>
+    </div>
+
+    <!-- Google -->
+    <button class="btn-google" onclick="handleGoogle()">
+      <svg class="g-icon" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.1 0 5.8 1.1 8 2.9l6-6C34.6 3.2 29.6 1 24 1 14.8 1 7 6.7 3.7 14.7l7 5.4C12.3 13.9 17.7 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-17.4z"/>
+        <path fill="#FBBC05" d="M10.7 28.6A14.9 14.9 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7-5.4A23.9 23.9 0 0 0 0 24c0 3.9.9 7.6 2.6 10.9l8.1-6.3z"/>
+        <path fill="#34A853" d="M24 47c5.4 0 10-1.8 13.3-4.9l-7.4-5.7c-1.8 1.2-4.1 1.9-5.9 1.9-6.3 0-11.7-4.3-13.6-10.1l-8.1 6.3C7 41.3 14.8 47 24 47z"/>
+      </svg>
+      Sign in with Google
+    </button>
+  </div>
+
+  <!-- Secure note -->
+  <div class="secure-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    Secure admin access to manage your platform.
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const SUPABASE_URL  = 'https://zkafglojonspzlsfxcdh.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  /* ── Check if already logged in ── */
+  const { data: { session } } = await supabase.auth.getSession();
+  if(session){
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+    if(profile?.role === 'admin') window.location.href = 'index.html';
+  }
+
+  /* ── Helpers ── */
+  function showError(msg){
+    const el = document.getElementById('errorMsg');
+    document.getElementById('errorText').textContent = msg;
+    el.classList.add('show');
+  }
+  function hideError(){ document.getElementById('errorMsg').classList.remove('show'); }
+
+  function setLoading(on){
+    const btn = document.getElementById('signInBtn');
+    btn.classList.toggle('loading', on);
+    btn.disabled = on;
+  }
+
+  /* ── Toggle password visibility ── */
+  window.togglePassword = function(){
+    const inp  = document.getElementById('passwordInput');
+    const icon = document.getElementById('eyeIcon');
+    if(inp.type === 'password'){
+      inp.type = 'text';
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    } else {
+      inp.type = 'password';
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    }
+  };
+
+  /* ── Main Sign In ── */
+  window.handleSignIn = async function(){
+    const email    = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    hideError();
+
+    if(!email){
+      showError('Please enter your email address.');
+      document.getElementById('emailInput').focus();
+      return;
+    }
+    if(!password){
+      showError('Please enter your password.');
+      document.getElementById('passwordInput').focus();
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      /* Step 1 — Supabase Auth sign in */
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({ email, password });
+
+      if(authError) throw new Error('Invalid email or password. Please try again.');
+
+      /* Step 2 — Check profiles table for role = admin */
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single();
+
+      if(profileError || !profile)
+        throw new Error('Profile not found. Contact support.');
+
+      if(profile.role !== 'admin'){
+        await supabase.auth.signOut();
+        throw new Error('Access denied. Admin privileges required.');
+      }
+
+      /* Step 3 — Remember me: persist session or not */
+      if(!document.getElementById('rememberMe').checked){
+        // Session will clear on browser close (default supabase behaviour with local storage)
+        // For session-only storage we just leave as-is; supabase handles expiry
+      }
+
+      /* ✅ Success — go to dashboard */
+      window.location.href = 'index.html';
+
+    } catch(err){
+      showError(err.message || 'Something went wrong. Please try again.');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ── Google OAuth ── */
+  window.handleGoogle = async function(){
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + '/index.html' }
+    });
+    if(error) showError('Google sign-in failed. Please try again.');
+  };
+
+  /* ── Forgot Password ── */
+  window.handleForgot = async function(e){
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value.trim();
+    if(!email){
+      showError('Enter your email above first, then click Forgot Password.');
+      document.getElementById('emailInput').focus();
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/login.html'
+    });
+    if(error){
+      showError('Could not send reset email. Check the address and try again.');
+    } else {
+      hideError();
+      alert(`✅ Password reset link sent to ${email}. Check your inbox.`);
+    }
+  };
+
+  /* ── Enter key ── */
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Enter') window.handleSignIn();
+  });
+</script>
+</body>
+</html>

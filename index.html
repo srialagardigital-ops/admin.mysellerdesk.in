@@ -61,10 +61,14 @@ button{font-family:inherit;}
     position:sticky;
     top:0;
     height:100vh;
+    min-height:100vh;
     overflow:hidden;
+    overflow-y:auto;
+    scrollbar-width:none;
     transition:width .18s ease;
     z-index:20;
   }
+  .sidebar::-webkit-scrollbar{display:none;}
 
   .sidebar:hover{
     width:230px;
@@ -3223,6 +3227,10 @@ button{font-family:inherit;}
       <a class="nav-item" href="#" data-page="support" onclick="goToPage(event, 'support')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
         <span>Support Tickets</span>
+      </a>
+      <a class="nav-item" href="#" data-page="leads" onclick="goToPage(event, 'leads')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M20 8l2 2 4-4" transform="translate(-4,-1) scale(.7)"/></svg>
+        <span>Leads</span>
       </a>
     </nav>
 
@@ -9744,5 +9752,1309 @@ performers_renderDetailPanel();
 
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════
+     LEADS PAGE — CSS
+═══════════════════════════════════════════════ -->
+<style>
+/* ---- Leads Page Layout ---- */
+#page-leads .content { padding: 4px 28px 32px; }
+
+#page-leads .page-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 20px;
+}
+#page-leads .page-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -.3px; }
+#page-leads .page-head p  { font-size: 13.5px; color: var(--text-dim); margin-top: 3px; }
+#page-leads .page-head-actions { display: flex; gap: 10px; align-items: center; }
+
+#page-leads .btn-primary {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--blue); color: #fff; border: none;
+  padding: 11px 18px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 10px rgba(47,109,246,.25);
+  transition: background .15s, transform .1s;
+}
+#page-leads .btn-primary:hover { background: #2459d9; }
+#page-leads .btn-primary svg { width: 15px; height: 15px; }
+
+#page-leads .btn-outline {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; color: var(--text); border: 1px solid var(--border);
+  padding: 11px 18px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+  box-shadow: var(--shadow); transition: background .15s;
+}
+#page-leads .btn-outline:hover { background: #f7f8fc; }
+#page-leads .btn-outline svg { width: 15px; height: 15px; color: var(--text-dim); }
+
+/* ---- Summary Cards ---- */
+#page-leads .leads-summary {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px;
+}
+#page-leads .lsum-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px 14px;
+  box-shadow: var(--shadow); cursor: pointer; transition: box-shadow .15s;
+  position: relative; overflow: hidden;
+}
+#page-leads .lsum-card:hover { box-shadow: 0 4px 16px rgba(16,24,40,.1); }
+#page-leads .lsum-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+#page-leads .lsum-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+#page-leads .lsum-icon svg { width: 20px; height: 20px; }
+#page-leads .lsum-label { font-size: 12.5px; color: var(--text-dim); font-weight: 500; }
+#page-leads .lsum-val { font-size: 28px; font-weight: 800; letter-spacing: -.5px; line-height: 1; }
+#page-leads .lsum-link {
+  margin-top: 10px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 4px;
+}
+#page-leads .lsum-link svg { width: 13px; height: 13px; }
+#page-leads .lsum-card.blue .lsum-link  { color: var(--blue); }
+#page-leads .lsum-card.red .lsum-link   { color: var(--red); }
+#page-leads .lsum-card.green .lsum-link { color: var(--green); }
+#page-leads .lsum-card.purple .lsum-link{ color: var(--purple); }
+#page-leads .ic-blue   { background: var(--blue-light);   color: var(--blue); }
+#page-leads .ic-red    { background: var(--red-light);    color: var(--red); }
+#page-leads .ic-green  { background: var(--green-light);  color: var(--green); }
+#page-leads .ic-purple { background: var(--purple-light); color: var(--purple); }
+#page-leads .lsum-card-accent {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+}
+#page-leads .lsum-card.blue  .lsum-card-accent { background: var(--blue); }
+#page-leads .lsum-card.red   .lsum-card-accent { background: var(--red); }
+#page-leads .lsum-card.green .lsum-card-accent { background: var(--green); }
+#page-leads .lsum-card.purple.lsum-card-accent { background: var(--purple); }
+
+/* ---- Filters Bar ---- */
+#page-leads .filters-bar {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+}
+#page-leads .search-box {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; box-shadow: var(--shadow); max-width: 360px;
+}
+#page-leads .search-box svg { width: 16px; height: 16px; color: var(--text-faint); flex-shrink: 0; }
+#page-leads .search-box input {
+  border: none; outline: none; font-family: inherit; font-size: 13.5px;
+  width: 100%; background: transparent; color: var(--text);
+}
+#page-leads .search-box input::placeholder { color: var(--text-faint); }
+#page-leads .filter-select {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--text);
+  cursor: pointer; box-shadow: var(--shadow); white-space: nowrap; position: relative;
+}
+#page-leads .filter-select svg { width: 14px; height: 14px; color: var(--text-dim); }
+#page-leads .filter-select .filter-label { font-size: 10.5px; color: var(--text-faint); font-weight: 600; margin-right: 2px; }
+#page-leads .filters-spacer { flex: 1; }
+#page-leads .reset-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-dim);
+  cursor: pointer; box-shadow: var(--shadow);
+}
+#page-leads .reset-btn svg { width: 14px; height: 14px; }
+#page-leads .filter-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--blue); color: #fff; border: none; border-radius: 10px;
+  padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+#page-leads .filter-btn svg { width: 14px; height: 14px; }
+
+/* ---- Table ---- */
+#page-leads .table-panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+}
+#page-leads .table-scroll { overflow-x: auto; }
+#page-leads table { width: 100%; border-collapse: collapse; min-width: 980px; }
+#page-leads thead th {
+  text-align: left; font-size: 11.5px; font-weight: 700; color: var(--text-faint);
+  letter-spacing: .2px; white-space: nowrap;
+  padding: 13px 16px; border-bottom: 1px solid var(--border); background: #fbfcfe;
+}
+#page-leads thead th.sortable { cursor: pointer; user-select: none; }
+#page-leads thead th.sortable:hover { color: var(--text); }
+#page-leads tbody td {
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  font-size: 13px; vertical-align: middle;
+}
+#page-leads tbody tr:last-child td { border-bottom: none; }
+#page-leads tbody tr:hover { background: #fafbfd; }
+
+/* Name cell */
+#page-leads .name-cell { display: flex; align-items: center; gap: 10px; }
+#page-leads .lead-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+#page-leads .lead-name { font-size: 13.3px; font-weight: 600; }
+
+/* Status badge */
+#page-leads .status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 700; padding: 4px 11px; border-radius: 20px;
+  white-space: nowrap;
+}
+#page-leads .status-new         { background: #f0f2f8; color: #444b6a; }
+#page-leads .status-followup    { background: var(--orange-light); color: #c9750f; }
+#page-leads .status-demo        { background: var(--blue-light);   color: var(--blue); }
+#page-leads .status-onboarded   { background: var(--green-light);  color: var(--green); }
+#page-leads .status-closed      { background: var(--red-light);    color: var(--red); }
+
+/* Follow-up date */
+#page-leads .fup-date { display: flex; align-items: center; gap: 6px; }
+#page-leads .fup-date svg { width: 14px; height: 14px; color: var(--text-faint); flex-shrink: 0; }
+#page-leads .fup-main { font-size: 13px; font-weight: 500; }
+#page-leads .fup-relative { font-size: 11.5px; font-weight: 600; margin-top: 1px; }
+#page-leads .fup-today    { color: var(--green); }
+#page-leads .fup-tomorrow { color: var(--blue); }
+#page-leads .fup-overdue  { color: var(--red); }
+#page-leads .fup-upcoming { color: var(--text-dim); }
+
+/* Last contact */
+#page-leads .lc-cell { display: flex; align-items: center; gap: 7px; }
+#page-leads .lc-cell svg { width: 14px; height: 14px; color: var(--text-faint); }
+#page-leads .lc-main { font-size: 13px; font-weight: 500; }
+#page-leads .lc-time { font-size: 11.5px; color: var(--text-faint); }
+
+/* Source badge */
+#page-leads .source-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 20px;
+}
+#page-leads .src-instagram { background: #fde8f5; color: #c2297a; }
+#page-leads .src-whatsapp  { background: #e8f9ef; color: #16a34a; }
+#page-leads .src-facebook  { background: #e7f0ff; color: #1877f2; }
+#page-leads .src-website   { background: var(--purple-light); color: var(--purple); }
+#page-leads .src-referral  { background: var(--orange-light); color: #c9750f; }
+#page-leads .src-walk-in   { background: #f0f2f8; color: #444b6a; }
+#page-leads .source-badge svg { width: 13px; height: 13px; }
+
+/* Action buttons */
+#page-leads .actions-cell { display: flex; align-items: center; gap: 6px; }
+#page-leads .act-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; background: #f4f6fb; color: var(--text-dim);
+  transition: background .13s, color .13s;
+}
+#page-leads .act-btn:hover { background: var(--blue-light); color: var(--blue); }
+#page-leads .act-btn.red:hover { background: var(--red-light); color: var(--red); }
+#page-leads .act-btn svg { width: 14px; height: 14px; }
+#page-leads .act-more-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; background: transparent; color: var(--text-dim);
+  font-size: 18px; font-weight: 700; letter-spacing: 1px;
+  position: relative; z-index: 1;
+}
+
+/* Highlighted row (today follow-up) */
+#page-leads .tr-today { border-left: 3px solid var(--orange); }
+#page-leads .tr-overdue { border-left: 3px solid var(--red); }
+
+/* ---- Pagination ---- */
+#page-leads .table-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-dim);
+}
+#page-leads .pagination { display: flex; align-items: center; gap: 4px; }
+#page-leads .pg-btn {
+  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text);
+  transition: background .13s;
+}
+#page-leads .pg-btn:hover { background: var(--blue-light); color: var(--blue); }
+#page-leads .pg-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+#page-leads .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
+#page-leads .rows-select {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-dim);
+}
+#page-leads .rows-select select {
+  border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px;
+  font-family: inherit; font-size: 13px; background: #fff; cursor: pointer;
+}
+
+/* ---- Loading / Empty ---- */
+#page-leads .leads-loading {
+  padding: 60px; text-align: center; color: var(--text-dim); font-size: 14px;
+}
+#page-leads .leads-loading svg {
+  width: 32px; height: 32px; margin-bottom: 12px; display: block; margin-inline: auto;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#page-leads .leads-empty {
+  padding: 60px; text-align: center; color: var(--text-dim);
+}
+#page-leads .leads-empty svg { width: 44px; height: 44px; margin-bottom: 12px; opacity: .35; display: block; margin-inline: auto; }
+#page-leads .leads-empty h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+
+/* ---- Modal / Drawer ---- */
+#leads-modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,20,40,.45);
+  z-index: 1000; display: none; align-items: flex-start; justify-content: flex-end;
+}
+#leads-modal-overlay.open { display: flex; }
+#leads-modal {
+  width: 480px; background: var(--card);
+  height: 100vh; overflow-y: auto;
+  box-shadow: -8px 0 32px rgba(16,24,40,.16);
+  display: flex; flex-direction: column;
+  animation: slideInRight .22s ease;
+}
+@keyframes slideInRight {
+  from { transform: translateX(60px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+#leads-modal .modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+#leads-modal .modal-head h3 { font-size: 16px; font-weight: 700; }
+#leads-modal .modal-close {
+  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-dim);
+}
+#leads-modal .modal-close svg { width: 16px; height: 16px; }
+#leads-modal .modal-body { padding: 24px; flex: 1; overflow-y: auto; }
+#leads-modal .form-row { margin-bottom: 16px; }
+#leads-modal .form-row label {
+  display: block; font-size: 12.5px; font-weight: 600; color: var(--text-dim);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px;
+}
+#leads-modal .form-row input,
+#leads-modal .form-row select,
+#leads-modal .form-row textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 13px; font-family: inherit; font-size: 13.5px;
+  color: var(--text); background: #fff; outline: none;
+  transition: border-color .15s;
+}
+#leads-modal .form-row input:focus,
+#leads-modal .form-row select:focus,
+#leads-modal .form-row textarea:focus { border-color: var(--blue); }
+#leads-modal .form-row textarea { resize: vertical; min-height: 80px; }
+#leads-modal .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#leads-modal .modal-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+#leads-modal .modal-footer .btn-cancel {
+  padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border);
+  background: #fff; font-family: inherit; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; color: var(--text);
+}
+#leads-modal .modal-footer .btn-save {
+  padding: 10px 22px; border-radius: 10px; border: none;
+  background: var(--blue); color: #fff; font-family: inherit;
+  font-size: 13.5px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 10px rgba(47,109,246,.25);
+}
+#leads-modal .modal-footer .btn-save:disabled { opacity: .6; cursor: not-allowed; }
+#leads-modal .error-msg { color: var(--red); font-size: 12.5px; margin-top: 6px; }
+
+/* View detail in modal */
+#leads-modal .lead-detail-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 22px;
+  padding-bottom: 18px; border-bottom: 1px solid var(--border);
+}
+#leads-modal .lead-detail-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; flex-shrink: 0;
+}
+#leads-modal .lead-detail-name { font-size: 17px; font-weight: 800; }
+#leads-modal .lead-detail-mobile { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+#leads-modal .detail-section-title {
+  font-size: 11.5px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .6px;
+  margin: 18px 0 10px;
+}
+#leads-modal .detail-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+#leads-modal .detail-row:last-child { border-bottom: none; }
+#leads-modal .detail-label { color: var(--text-dim); font-weight: 500; }
+#leads-modal .detail-val { font-weight: 600; text-align: right; }
+
+/* Notes */
+#leads-modal .notes-box {
+  background: var(--bg); border-radius: 10px; padding: 13px 15px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+  margin-top: 6px;
+}
+
+/* Toast */
+#leads-toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: #1c2333; color: #fff;
+  padding: 12px 20px; border-radius: 12px;
+  font-size: 13.5px; font-weight: 600;
+  display: none; align-items: center; gap: 10px;
+  z-index: 9999; box-shadow: 0 8px 24px rgba(16,24,40,.2);
+  animation: slideUp .25s ease;
+}
+#leads-toast.show { display: flex; }
+#leads-toast svg { width: 16px; height: 16px; }
+#leads-toast.success { background: var(--green); }
+#leads-toast.error   { background: var(--red); }
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Delete confirm mini modal */
+#leads-confirm {
+  position: fixed; inset: 0; background: rgba(15,20,40,.45);
+  z-index: 2000; display: none; align-items: center; justify-content: center;
+}
+#leads-confirm.open { display: flex; }
+#leads-confirm .confirm-box {
+  background: #fff; border-radius: 16px; padding: 28px 28px 22px;
+  box-shadow: 0 12px 40px rgba(16,24,40,.2); max-width: 360px; width: 100%; text-align: center;
+}
+#leads-confirm .confirm-icon {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--red-light); color: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; font-size: 22px;
+}
+#leads-confirm .confirm-icon svg { width: 24px; height: 24px; }
+#leads-confirm h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+#leads-confirm p  { font-size: 13.5px; color: var(--text-dim); margin-bottom: 20px; }
+#leads-confirm .confirm-btns { display: flex; gap: 10px; }
+#leads-confirm .confirm-btns button {
+  flex: 1; padding: 11px; border-radius: 10px; font-family: inherit;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; border: none;
+}
+#leads-confirm .btn-cancel-c { background: var(--bg); color: var(--text); border: 1px solid var(--border) !important; }
+#leads-confirm .btn-delete-c { background: var(--red); color: #fff; }
+
+/* Follow-up view filter active indicator */
+#page-leads .lsum-card.active-filter { box-shadow: 0 0 0 2px var(--blue); }
+
+/* Connection dot */
+#leads-conn-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+  background: var(--orange-light); color: #c9750f;
+}
+#leads-conn-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #c9750f;
+}
+</style>
+
+<!-- ═══════════════════════════════════════════════
+     LEADS PAGE — HTML
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-leads">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="menu-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
+      <div class="greeting">
+        <h1 class="greeting-title">Leads <span id="leads-conn-badge" style="font-size:11.5px;vertical-align:middle;"><span class="dot"></span>Connecting...</span></h1>
+        <p>Manage your marketing leads &amp; follow-ups</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="date-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span id="leads-date-display"></span>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge" id="leads-notif-count" style="display:none;">0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Page Head -->
+    <div class="page-head">
+      <div>
+        <h2>Leads</h2>
+        <p>Manage your leads &amp; follow ups</p>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn-outline" onclick="leads_exportCsv()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn-primary" onclick="leads_openModal('add')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Lead
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="leads-summary">
+      <div class="lsum-card blue" onclick="leads_filterByCard('today')" id="lsum-today">
+        <div class="lsum-card-top">
+          <div class="lsum-icon ic-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <div>
+            <div class="lsum-label">Today's Follow Ups</div>
+            <div class="lsum-val" id="lsum-val-today">—</div>
+          </div>
+        </div>
+        <div class="lsum-link">View Today <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+        <div class="lsum-card-accent"></div>
+      </div>
+      <div class="lsum-card red" onclick="leads_filterByCard('overdue')" id="lsum-overdue">
+        <div class="lsum-card-top">
+          <div class="lsum-icon ic-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <div class="lsum-label">Overdue</div>
+            <div class="lsum-val" id="lsum-val-overdue">—</div>
+          </div>
+        </div>
+        <div class="lsum-link">View Overdue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+        <div class="lsum-card-accent"></div>
+      </div>
+      <div class="lsum-card green" onclick="leads_filterByCard('onboarded')" id="lsum-onboarded">
+        <div class="lsum-card-top">
+          <div class="lsum-icon ic-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <div class="lsum-label">Onboarded</div>
+            <div class="lsum-val" id="lsum-val-onboarded">—</div>
+          </div>
+        </div>
+        <div class="lsum-link">Total Leads <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+        <div class="lsum-card-accent"></div>
+      </div>
+      <div class="lsum-card purple" onclick="leads_filterByCard('all')" id="lsum-all">
+        <div class="lsum-card-top">
+          <div class="lsum-icon ic-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="lsum-label">Total Leads</div>
+            <div class="lsum-val" id="lsum-val-all">—</div>
+          </div>
+        </div>
+        <div class="lsum-link">All Leads <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+        <div class="lsum-card-accent"></div>
+      </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="leads-search" placeholder="Search by name or mobile number..." oninput="leads_applyFilters()">
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">Status</span>
+        <select id="leads-filter-status" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+          <option value="">All Status</option>
+          <option value="New">New</option>
+          <option value="Follow Up">Follow Up</option>
+          <option value="Demo Requested">Demo Requested</option>
+          <option value="Onboarded">Onboarded</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">Follow Up</span>
+        <select id="leads-filter-followup" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+          <option value="">All</option>
+          <option value="today">Today</option>
+          <option value="overdue">Overdue</option>
+          <option value="upcoming">Upcoming</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">Source</span>
+        <select id="leads-filter-source" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+          <option value="">All</option>
+          <option value="Instagram">Instagram</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Website">Website</option>
+          <option value="Referral">Referral</option>
+          <option value="Walk-in">Walk-in</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">Last Contact</span>
+        <select id="leads-filter-lastcontact" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+          <option value="">All</option>
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="week">This Week</option>
+          <option value="older">Older</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="filters-spacer"></div>
+      <button class="reset-btn" onclick="leads_resetFilters()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset
+      </button>
+      <button class="filter-btn" onclick="leads_applyFilters()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filter
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-panel">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" onclick="leads_sort('name')">Name <span id="sort-name"></span></th>
+              <th>Mobile Number</th>
+              <th class="sortable" onclick="leads_sort('status')">Status <span id="sort-status"></span></th>
+              <th class="sortable" onclick="leads_sort('follow_up_date')">Follow Up Date <span id="sort-follow_up_date"></span></th>
+              <th class="sortable" onclick="leads_sort('last_contact')">Last Contact <span id="sort-last_contact"></span></th>
+              <th>Source</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody">
+            <tr><td colspan="7"><div class="leads-loading">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+              Loading leads from Supabase…
+            </div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <div id="leads-showing-text" style="font-size:13px;color:var(--text-dim);">Showing 0 leads</div>
+        <div style="display:flex;align-items:center;gap:24px;">
+          <div class="pagination" id="leads-pagination"></div>
+          <div class="rows-select">
+            Rows per page:
+            <select id="leads-rows-per-page" onchange="leads_changeRowsPerPage()" style="border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:inherit;font-size:13px;">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ---- Modal: Add / Edit Lead ---- -->
+<div id="leads-modal-overlay" onclick="leads_closeModal(event)">
+  <div id="leads-modal">
+    <div class="modal-head">
+      <h3 id="leads-modal-title">Add New Lead</h3>
+      <button class="modal-close" onclick="leads_closeModalDirect()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="leads-modal-body">
+      <!-- Filled by JS -->
+    </div>
+    <div class="modal-footer" id="leads-modal-footer">
+      <button class="btn-cancel" onclick="leads_closeModalDirect()">Cancel</button>
+      <button class="btn-save" id="leads-save-btn" onclick="leads_saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---- Delete Confirm ---- -->
+<div id="leads-confirm">
+  <div class="confirm-box">
+    <div class="confirm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+    <h4>Delete Lead?</h4>
+    <p id="leads-confirm-text">This will permanently delete this lead. This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel-c" onclick="leads_cancelDelete()">Cancel</button>
+      <button class="btn-delete-c" id="leads-confirm-del-btn" onclick="leads_confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---- Toast ---- -->
+<div id="leads-toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="leads-toast-msg"></span>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     LEADS PAGE — JAVASCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── Supabase Config ── */
+const SUPA_URL = "https://zkafglojonspzlsfxcdh.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ";
+const HDR = {
+  "Content-Type": "application/json",
+  "apikey": SUPA_KEY,
+  "Authorization": "Bearer " + SUPA_KEY,
+  "Prefer": "return=representation"
+};
+
+/* ── State ── */
+let allLeads     = [];
+let filteredLeads= [];
+let currentPage  = 1;
+let rowsPerPage  = 10;
+let sortKey      = 'created_at';
+let sortDir      = 'desc';
+let editingId    = null;
+let deletingId   = null;
+let cardFilter   = '';
+
+/* ── Avatar colours ── */
+const AVATAR_COLORS = [
+  {bg:'#eaf1ff',color:'#2f6df6'},{bg:'#e8f9ef',color:'#16a34a'},
+  {bg:'#f1eaff',color:'#7c3aed'},{bg:'#fdf0e1',color:'#ea8a1f'},
+  {bg:'#fdeaf1',color:'#e0518a'},{bg:'#e0f9f9',color:'#0ea5a4'},
+];
+function avatarColor(name){
+  const i = (name||'A').charCodeAt(0) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[i];
+}
+
+/* ── Date helpers ── */
+function today(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+function dateOf(s){ if(!s) return null; const d=new Date(s); d.setHours(0,0,0,0); return d; }
+function daysDiff(d){ return Math.round((d - today()) / 86400000); }
+function fmtDate(s){
+  if(!s) return '—';
+  const d=new Date(s);
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} (${days[d.getDay()]})`;
+}
+function fmtTime(s){
+  if(!s) return '';
+  const d=new Date(s);
+  let h=d.getHours(), m=d.getMinutes();
+  const ampm=h>=12?'PM':'AM';
+  h=h%12||12;
+  return `${h}:${m.toString().padStart(2,'0')} ${ampm}`;
+}
+function relativeDate(s){
+  if(!s) return {text:'—',cls:'fup-upcoming'};
+  const d=dateOf(s);
+  const diff=daysDiff(d);
+  if(diff===0) return {text:'Today',cls:'fup-today'};
+  if(diff===1) return {text:'Tomorrow',cls:'fup-tomorrow'};
+  if(diff===-1) return {text:'Yesterday',cls:'fup-today'};
+  if(diff<0) return {text:`Overdue by ${Math.abs(diff)} day${Math.abs(diff)>1?'s':''}`,cls:'fup-overdue'};
+  return {text:`${diff} days left`,cls:'fup-upcoming'};
+}
+function lastContactRelative(s){
+  if(!s) return {text:'—',cls:''};
+  const d=dateOf(s);
+  const diff=daysDiff(d);
+  if(diff===0)  return {text:'Today',cls:''};
+  if(diff===-1) return {text:'Yesterday',cls:''};
+  if(diff<0)    return {text:`${Math.abs(diff)} days ago`,cls:''};
+  return {text:`${Math.abs(diff)} days ago`,cls:''};
+}
+
+/* ── Status CSS ── */
+function statusCls(s){
+  const map={'New':'status-new','Follow Up':'status-followup','Demo Requested':'status-demo','Onboarded':'status-onboarded','Closed':'status-closed'};
+  return map[s]||'status-new';
+}
+
+/* ── Source badge ── */
+function sourceBadge(src){
+  if(!src) return '<span style="color:var(--text-faint);">—</span>';
+  const map={
+    'Instagram': {cls:'src-instagram', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>'},
+    'WhatsApp':  {cls:'src-whatsapp',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 20l1.05-5.4A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 10.5c.3 2 2 3.7 4 4"/></svg>'},
+    'Facebook':  {cls:'src-facebook',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>'},
+    'Website':   {cls:'src-website',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10A15.3 15.3 0 0 1 8 12 15.3 15.3 0 0 1 12 2z"/></svg>'},
+    'Referral':  {cls:'src-referral',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'},
+    'Walk-in':   {cls:'src-walk-in',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M12 7v7l-2 5"/><path d="M15 10l2 4"/><path d="M9 10l-2 4"/></svg>'},
+  };
+  const m = map[src] || {cls:'src-walk-in', icon:''};
+  return `<span class="source-badge ${m.cls}">${m.icon}${src}</span>`;
+}
+
+/* ── Fetch all leads ── */
+async function fetchLeads(){
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/leads?select=*&order=created_at.desc&limit=5000`,
+      { headers: HDR }
+    );
+    if(!res.ok) throw new Error(await res.text());
+    allLeads = await res.json();
+    updateConnBadge(true);
+    renderSummaryCards();
+    leads_applyFilters();
+    updateNotifBadge();
+  } catch(e) {
+    console.error('Leads fetch error:', e);
+    updateConnBadge(false);
+    document.getElementById('leads-tbody').innerHTML = `<tr><td colspan="7"><div class="leads-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      <h3>Could not connect to Supabase</h3>
+      <p style="font-size:13px;margin-top:4px;">Check that the <code>leads</code> table exists in your Supabase project.</p>
+    </div></td></tr>`;
+  }
+}
+
+function updateConnBadge(ok){
+  const b = document.getElementById('leads-conn-badge');
+  if(!b) return;
+  if(ok){
+    b.style.background='var(--green-light)'; b.style.color='var(--green)';
+    b.innerHTML='<span class="dot" style="background:var(--green);width:6px;height:6px;border-radius:50%;"></span>Live';
+  } else {
+    b.style.background='var(--red-light)'; b.style.color='var(--red)';
+    b.innerHTML='<span class="dot" style="background:var(--red);width:6px;height:6px;border-radius:50%;"></span>Offline';
+  }
+}
+
+function updateNotifBadge(){
+  const overdue = allLeads.filter(l => {
+    if(!l.follow_up_date) return false;
+    return daysDiff(dateOf(l.follow_up_date)) < 0 && l.status !== 'Onboarded' && l.status !== 'Closed';
+  }).length;
+  const el = document.getElementById('leads-notif-count');
+  if(el){ el.textContent = overdue; el.style.display = overdue > 0 ? 'flex' : 'none'; }
+}
+
+/* ── Summary cards ── */
+function renderSummaryCards(){
+  const todayFollowUps = allLeads.filter(l => {
+    if(!l.follow_up_date) return false;
+    return daysDiff(dateOf(l.follow_up_date)) === 0;
+  }).length;
+  const overdue = allLeads.filter(l => {
+    if(!l.follow_up_date) return false;
+    return daysDiff(dateOf(l.follow_up_date)) < 0 && l.status !== 'Onboarded' && l.status !== 'Closed';
+  }).length;
+  const onboarded = allLeads.filter(l => l.status === 'Onboarded').length;
+  document.getElementById('lsum-val-today').textContent     = todayFollowUps;
+  document.getElementById('lsum-val-overdue').textContent   = overdue;
+  document.getElementById('lsum-val-onboarded').textContent = onboarded;
+  document.getElementById('lsum-val-all').textContent       = allLeads.length;
+}
+
+/* ── Filter by card click ── */
+window.leads_filterByCard = function(type){
+  document.querySelectorAll('.lsum-card').forEach(c=>c.classList.remove('active-filter'));
+  if(cardFilter === type){ cardFilter=''; leads_resetFilters(); return; }
+  cardFilter = type;
+  document.getElementById(`lsum-${type==='all'?'all':type==='today'?'today':type==='overdue'?'overdue':'onboarded'}`).classList.add('active-filter');
+  // Set filter dropdowns
+  document.getElementById('leads-filter-status').value='';
+  document.getElementById('leads-filter-followup').value='';
+  document.getElementById('leads-filter-source').value='';
+  document.getElementById('leads-filter-lastcontact').value='';
+  document.getElementById('leads-search').value='';
+  if(type==='today')    document.getElementById('leads-filter-followup').value='today';
+  if(type==='overdue')  document.getElementById('leads-filter-followup').value='overdue';
+  if(type==='onboarded')document.getElementById('leads-filter-status').value='Onboarded';
+  leads_applyFilters();
+};
+
+/* ── Sort ── */
+window.leads_sort = function(key){
+  if(sortKey===key){ sortDir = sortDir==='asc'?'desc':'asc'; }
+  else { sortKey=key; sortDir='asc'; }
+  document.querySelectorAll('thead th span[id^="sort-"]').forEach(s=>s.textContent='');
+  const el = document.getElementById('sort-'+key);
+  if(el) el.textContent = sortDir==='asc'?' ↑':' ↓';
+  leads_applyFilters();
+};
+
+/* ── Apply filters ── */
+window.leads_applyFilters = function(){
+  const q     = (document.getElementById('leads-search')?.value||'').toLowerCase();
+  const status= document.getElementById('leads-filter-status')?.value||'';
+  const fup   = document.getElementById('leads-filter-followup')?.value||'';
+  const source= document.getElementById('leads-filter-source')?.value||'';
+  const lc    = document.getElementById('leads-filter-lastcontact')?.value||'';
+
+  filteredLeads = allLeads.filter(l => {
+    if(q && !((l.name||'').toLowerCase().includes(q) || (l.mobile||'').includes(q))) return false;
+    if(status && l.status !== status) return false;
+    if(source && l.source !== source) return false;
+
+    if(fup){
+      if(!l.follow_up_date) return fup===''?true:false;
+      const diff = daysDiff(dateOf(l.follow_up_date));
+      if(fup==='today'    && diff!==0)  return false;
+      if(fup==='overdue'  && diff>=0)   return false;
+      if(fup==='upcoming' && diff<=0)   return false;
+    }
+
+    if(lc && l.last_contact){
+      const diff = daysDiff(dateOf(l.last_contact));
+      if(lc==='today'     && diff!==0)  return false;
+      if(lc==='yesterday' && diff!==-1) return false;
+      if(lc==='week'      && (diff<-7||diff>0)) return false;
+      if(lc==='older'     && diff>=-7)  return false;
+    }
+    return true;
+  });
+
+  // Sort
+  filteredLeads.sort((a,b)=>{
+    let av=a[sortKey]||'', bv=b[sortKey]||'';
+    if(av<bv) return sortDir==='asc'?-1:1;
+    if(av>bv) return sortDir==='asc'?1:-1;
+    return 0;
+  });
+
+  currentPage = 1;
+  renderTable();
+};
+
+/* ── Render table ── */
+function renderTable(){
+  const tbody = document.getElementById('leads-tbody');
+  const start = (currentPage-1)*rowsPerPage;
+  const page  = filteredLeads.slice(start, start+rowsPerPage);
+
+  if(!filteredLeads.length){
+    tbody.innerHTML = `<tr><td colspan="7"><div class="leads-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <h3>No leads found</h3>
+      <p style="font-size:13px;margin-top:4px;">Try adjusting your filters or add a new lead.</p>
+    </div></td></tr>`;
+    document.getElementById('leads-showing-text').textContent = 'Showing 0 leads';
+    renderPagination();
+    return;
+  }
+
+  const total = filteredLeads.length;
+  const from  = start+1, to = Math.min(start+rowsPerPage, total);
+  document.getElementById('leads-showing-text').textContent = `Showing ${from} to ${to} of ${total} leads`;
+
+  tbody.innerHTML = page.map(l => {
+    const av      = avatarColor(l.name);
+    const rel     = relativeDate(l.follow_up_date);
+    const lcrel   = lastContactRelative(l.last_contact);
+    const isToday   = l.follow_up_date && daysDiff(dateOf(l.follow_up_date))===0;
+    const isOverdue = l.follow_up_date && daysDiff(dateOf(l.follow_up_date))<0;
+    const trCls = isOverdue?'tr-overdue':isToday?'tr-today':'';
+
+    return `<tr class="${trCls}">
+      <td>
+        <div class="name-cell">
+          <div class="lead-avatar" style="background:${av.bg};color:${av.color};">${(l.name||'?')[0].toUpperCase()}</div>
+          <span class="lead-name">${escHtml(l.name||'—')}</span>
+        </div>
+      </td>
+      <td style="font-weight:500;">${escHtml(l.mobile||'—')}</td>
+      <td><span class="status-badge ${statusCls(l.status)}">${escHtml(l.status||'New')}</span></td>
+      <td>
+        ${l.follow_up_date ? `
+        <div class="fup-date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <div>
+            <div class="fup-main">${fmtDate(l.follow_up_date)}</div>
+            <div class="fup-relative ${rel.cls}">${rel.text}</div>
+          </div>
+        </div>` : '<span style="color:var(--text-faint);">—</span>'}
+      </td>
+      <td>
+        ${l.last_contact ? `
+        <div class="lc-cell">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.12 4.18 2 2 0 0 1 5.09 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L9.91 9a16 16 0 0 0 6 6l.44-.44a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 23 17z"/></svg>
+          <div>
+            <div class="lc-main">${lcrel.text}</div>
+            <div class="lc-time">${fmtTime(l.last_contact)}</div>
+          </div>
+        </div>` : '<span style="color:var(--text-faint);">—</span>'}
+      </td>
+      <td>${sourceBadge(l.source)}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="act-btn" title="Call" onclick="leads_call('${escHtml(l.mobile||'')}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.12 4.18 2 2 0 0 1 5.09 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L9.91 9a16 16 0 0 0 6 6l.44-.44a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 23 17z"/></svg>
+          </button>
+          <button class="act-btn" title="WhatsApp" onclick="leads_whatsapp('${escHtml(l.mobile||'')}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 20l1.05-5.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+          </button>
+          <button class="act-btn" title="Edit" onclick="leads_openModal('edit','${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="act-btn" title="View" onclick="leads_openModal('view','${l.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="act-btn red" title="Delete" onclick="leads_askDelete('${l.id}','${escHtml(l.name||'')}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  renderPagination();
+}
+
+/* ── Pagination ── */
+function renderPagination(){
+  const total = filteredLeads.length;
+  const pages = Math.ceil(total/rowsPerPage);
+  const el = document.getElementById('leads-pagination');
+  if(!el) return;
+  if(pages<=1){ el.innerHTML=''; return; }
+
+  let html='';
+  html+=`<button class="pg-btn" onclick="leads_goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>`;
+
+  const range=[];
+  if(pages<=6){ for(let i=1;i<=pages;i++) range.push(i); }
+  else {
+    range.push(1);
+    if(currentPage>3) range.push('…');
+    for(let i=Math.max(2,currentPage-1); i<=Math.min(pages-1,currentPage+1); i++) range.push(i);
+    if(currentPage<pages-2) range.push('…');
+    range.push(pages);
+  }
+
+  range.forEach(p => {
+    if(p==='…') html+=`<button class="pg-btn" disabled style="border:none;background:transparent;">…</button>`;
+    else html+=`<button class="pg-btn ${p===currentPage?'active':''}" onclick="leads_goPage(${p})">${p}</button>`;
+  });
+
+  html+=`<button class="pg-btn" onclick="leads_goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+  </button>`;
+
+  el.innerHTML = html;
+}
+
+window.leads_goPage = function(p){
+  const pages = Math.ceil(filteredLeads.length/rowsPerPage);
+  if(p<1||p>pages) return;
+  currentPage=p; renderTable();
+};
+
+window.leads_changeRowsPerPage = function(){
+  rowsPerPage = parseInt(document.getElementById('leads-rows-per-page').value)||10;
+  currentPage=1; renderTable();
+};
+
+/* ── Reset filters ── */
+window.leads_resetFilters = function(){
+  document.getElementById('leads-search').value='';
+  document.getElementById('leads-filter-status').value='';
+  document.getElementById('leads-filter-followup').value='';
+  document.getElementById('leads-filter-source').value='';
+  document.getElementById('leads-filter-lastcontact').value='';
+  cardFilter='';
+  document.querySelectorAll('.lsum-card').forEach(c=>c.classList.remove('active-filter'));
+  leads_applyFilters();
+};
+
+/* ── Modal: Add / Edit / View ── */
+window.leads_openModal = function(mode, id){
+  editingId = null;
+  const overlay = document.getElementById('leads-modal-overlay');
+  const title   = document.getElementById('leads-modal-title');
+  const body    = document.getElementById('leads-modal-body');
+  const footer  = document.getElementById('leads-modal-footer');
+  const saveBtn = document.getElementById('leads-save-btn');
+
+  if(mode === 'add'){
+    title.textContent = 'Add New Lead';
+    body.innerHTML = leads_formHTML({});
+    footer.style.display='flex';
+    saveBtn.textContent='Save Lead';
+    saveBtn.onclick=leads_saveLead;
+  } else if(mode === 'edit'){
+    const lead = allLeads.find(l=>String(l.id)===String(id));
+    if(!lead) return;
+    editingId = lead.id;
+    title.textContent = 'Edit Lead';
+    body.innerHTML = leads_formHTML(lead);
+    footer.style.display='flex';
+    saveBtn.textContent='Update Lead';
+    saveBtn.onclick=leads_saveLead;
+  } else if(mode === 'view'){
+    const lead = allLeads.find(l=>String(l.id)===String(id));
+    if(!lead) return;
+    title.textContent = 'Lead Details';
+    body.innerHTML = leads_viewHTML(lead);
+    footer.innerHTML=`
+      <button class="btn-cancel" onclick="leads_closeModalDirect()">Close</button>
+      <button class="btn-save" onclick="leads_openModal('edit','${lead.id}')">Edit Lead</button>`;
+  }
+
+  overlay.classList.add('open');
+};
+
+function leads_formHTML(l){
+  return `
+  <div class="form-grid-2">
+    <div class="form-row">
+      <label>Full Name *</label>
+      <input type="text" id="lf-name" value="${escHtml(l.name||'')}" placeholder="e.g. Kumar">
+    </div>
+    <div class="form-row">
+      <label>Mobile Number *</label>
+      <input type="text" id="lf-mobile" value="${escHtml(l.mobile||'')}" placeholder="98765 43210">
+    </div>
+  </div>
+  <div class="form-grid-2">
+    <div class="form-row">
+      <label>Status</label>
+      <select id="lf-status">
+        ${['New','Follow Up','Demo Requested','Onboarded','Closed'].map(s=>`<option ${l.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Source</label>
+      <select id="lf-source">
+        <option value="">— Select —</option>
+        ${['Instagram','WhatsApp','Facebook','Website','Referral','Walk-in'].map(s=>`<option value="${s}" ${l.source===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+  </div>
+  <div class="form-grid-2">
+    <div class="form-row">
+      <label>Follow Up Date</label>
+      <input type="date" id="lf-followup" value="${l.follow_up_date?l.follow_up_date.slice(0,10):''}">
+    </div>
+    <div class="form-row">
+      <label>Last Contact</label>
+      <input type="datetime-local" id="lf-lastcontact" value="${l.last_contact?l.last_contact.slice(0,16):''}">
+    </div>
+  </div>
+  <div class="form-row">
+    <label>Notes</label>
+    <textarea id="lf-notes" placeholder="Any notes about this lead…">${escHtml(l.notes||'')}</textarea>
+  </div>
+  <div id="lf-error" class="error-msg" style="display:none;"></div>
+  `;
+}
+
+function leads_viewHTML(l){
+  const av  = avatarColor(l.name);
+  const rel = relativeDate(l.follow_up_date);
+  const lcr = lastContactRelative(l.last_contact);
+  return `
+  <div class="lead-detail-header">
+    <div class="lead-detail-avatar" style="background:${av.bg};color:${av.color};">${(l.name||'?')[0].toUpperCase()}</div>
+    <div>
+      <div class="lead-detail-name">${escHtml(l.name||'—')}</div>
+      <div class="lead-detail-mobile">${escHtml(l.mobile||'—')}</div>
+    </div>
+  </div>
+  <div class="detail-section-title">Lead Info</div>
+  <div class="detail-row"><span class="detail-label">Status</span><span class="detail-val"><span class="status-badge ${statusCls(l.status)}">${l.status||'New'}</span></span></div>
+  <div class="detail-row"><span class="detail-label">Source</span><span class="detail-val">${sourceBadge(l.source)}</span></div>
+  <div class="detail-row"><span class="detail-label">Follow Up Date</span><span class="detail-val" style="${rel.cls==='fup-overdue'?'color:var(--red)':''}">
+    ${l.follow_up_date ? fmtDate(l.follow_up_date)+' · '+rel.text : '—'}
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Last Contact</span><span class="detail-val">
+    ${l.last_contact ? lcr.text+' · '+fmtTime(l.last_contact) : '—'}
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Added On</span><span class="detail-val">${l.created_at ? fmtDate(l.created_at) : '—'}</span></div>
+  ${l.notes ? `<div class="detail-section-title">Notes</div><div class="notes-box">${escHtml(l.notes)}</div>` : ''}
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn-outline" style="flex:1;justify-content:center;padding:11px;" onclick="leads_call('${escHtml(l.mobile||'')}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.12 4.18 2 2 0 0 1 5.09 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L9.91 9a16 16 0 0 0 6 6l.44-.44a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 23 17z"/></svg>
+      Call
+    </button>
+    <button class="btn-outline" style="flex:1;justify-content:center;padding:11px;color:#16a34a;" onclick="leads_whatsapp('${escHtml(l.mobile||'')}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 20l1.05-5.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+      WhatsApp
+    </button>
+  </div>`;
+}
+
+window.leads_closeModal = function(e){
+  if(e.target === document.getElementById('leads-modal-overlay')) leads_closeModalDirect();
+};
+window.leads_closeModalDirect = function(){
+  document.getElementById('leads-modal-overlay').classList.remove('open');
+  editingId=null;
+};
+
+/* ── Save Lead ── */
+window.leads_saveLead = async function(){
+  const name    = (document.getElementById('lf-name')?.value||'').trim();
+  const mobile  = (document.getElementById('lf-mobile')?.value||'').trim();
+  const status  = document.getElementById('lf-status')?.value||'New';
+  const source  = document.getElementById('lf-source')?.value||'';
+  const followup= document.getElementById('lf-followup')?.value||'';
+  const lastc   = document.getElementById('lf-lastcontact')?.value||'';
+  const notes   = (document.getElementById('lf-notes')?.value||'').trim();
+  const errEl   = document.getElementById('lf-error');
+
+  if(!name){ errEl.textContent='Name is required.'; errEl.style.display='block'; return; }
+  if(!mobile){ errEl.textContent='Mobile number is required.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const saveBtn = document.getElementById('leads-save-btn');
+  saveBtn.disabled=true; saveBtn.textContent='Saving…';
+
+  const payload = {
+    name, mobile, status,
+    source: source||null,
+    follow_up_date: followup||null,
+    last_contact: lastc ? new Date(lastc).toISOString() : null,
+    notes: notes||null,
+  };
+
+  try {
+    let res, data;
+    if(editingId){
+      res = await fetch(`${SUPA_URL}/rest/v1/leads?id=eq.${editingId}`, {
+        method:'PATCH', headers: HDR, body: JSON.stringify(payload)
+      });
+    } else {
+      res = await fetch(`${SUPA_URL}/rest/v1/leads`, {
+        method:'POST', headers: HDR, body: JSON.stringify(payload)
+      });
+    }
+
+    if(!res.ok){
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    leads_closeModalDirect();
+    showToast(editingId ? 'Lead updated successfully!' : 'New lead added!', 'success');
+    await fetchLeads();
+  } catch(e){
+    console.error(e);
+    showToast('Error: ' + (e.message||'Could not save lead'), 'error');
+  } finally {
+    saveBtn.disabled=false;
+    saveBtn.textContent = editingId ? 'Update Lead' : 'Save Lead';
+  }
+};
+
+/* ── Delete ── */
+window.leads_askDelete = function(id, name){
+  deletingId = id;
+  document.getElementById('leads-confirm-text').textContent = `This will permanently delete "${name}". This action cannot be undone.`;
+  document.getElementById('leads-confirm').classList.add('open');
+};
+window.leads_cancelDelete = function(){
+  deletingId=null;
+  document.getElementById('leads-confirm').classList.remove('open');
+};
+window.leads_confirmDelete = async function(){
+  if(!deletingId) return;
+  const btn = document.getElementById('leads-confirm-del-btn');
+  btn.textContent='Deleting…'; btn.disabled=true;
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/leads?id=eq.${deletingId}`, {
+      method:'DELETE', headers: HDR
+    });
+    if(!res.ok) throw new Error(await res.text());
+    document.getElementById('leads-confirm').classList.remove('open');
+    showToast('Lead deleted.', 'success');
+    deletingId=null;
+    await fetchLeads();
+  } catch(e){
+    showToast('Delete failed: ' + (e.message||'Unknown error'), 'error');
+  } finally {
+    btn.textContent='Delete'; btn.disabled=false;
+  }
+};
+
+/* ── Quick actions ── */
+window.leads_call = function(mobile){
+  if(!mobile){ showToast('No mobile number available.','error'); return; }
+  window.open('tel:' + mobile.replace(/\s/g,''));
+};
+window.leads_whatsapp = function(mobile){
+  if(!mobile){ showToast('No mobile number available.','error'); return; }
+  window.open('https://wa.me/91' + mobile.replace(/\D/g,'').replace(/^91/,''), '_blank');
+};
+
+/* ── Export CSV ── */
+window.leads_exportCsv = function(){
+  const fields=['name','mobile','status','source','follow_up_date','last_contact','notes'];
+  const header=fields.map(f=>f.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()));
+  const rows = filteredLeads.map(l => fields.map(f => `"${(l[f]||'').toString().replace(/"/g,'""')}"`));
+  const csv  = [header, ...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`leads-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('CSV exported!','success');
+};
+
+/* ── Toast ── */
+function showToast(msg, type='success'){
+  const el = document.getElementById('leads-toast');
+  const ms = document.getElementById('leads-toast-msg');
+  el.className='show '+(type||'success');
+  ms.textContent=msg;
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{ el.className=''; },3200);
+}
+
+/* ── Date display ── */
+function leads_updateDate(){
+  const el = document.getElementById('leads-date-display');
+  if(!el) return;
+  const d=new Date();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  el.textContent=`${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* ── HTML escape ── */
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ── Init ── */
+leads_updateDate();
+
+// Fetch when page becomes active
+const origGoToPage = window.goToPage;
+window.goToPage = function(evt, pageId){
+  if(typeof origGoToPage === 'function') origGoToPage(evt, pageId);
+  if(pageId === 'leads'){ fetchLeads(); }
+};
+
+// Also fetch if leads page is somehow already active on load
+if(document.getElementById('page-leads')?.classList.contains('active')){
+  fetchLeads();
+}
+
+})();
+</script>
+
 </body>
 </html>

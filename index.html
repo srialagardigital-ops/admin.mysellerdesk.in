@@ -4519,8 +4519,8 @@ button{font-family:inherit;}
 
     </div>
 <!-- ORDER DETAILS DRAWER -->
-<div class="drawer-overlay" id="orders-drawerOverlay" onclick="orders_closeDrawer()"></div>
-<div class="drawer" id="orders-drawer">
+<div class="drawer-overlay" id="orders-drawerOverlay" onclick="orders_closeDrawer()" style="display:none;position:fixed;inset:0;background:rgba(15,20,40,.35);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s;"></div>
+<div class="drawer" id="orders-drawer" style="position:fixed;top:0;right:0;height:100vh;width:440px;max-width:92vw;background:#fff;box-shadow:-8px 0 30px rgba(15,20,40,.18);transform:translateX(100%);transition:transform .25s ease;z-index:41;display:flex;flex-direction:column;">
   <div class="drawer-head">
     <h3>Order Details</h3>
     <div class="drawer-close" onclick="orders_closeDrawer()">
@@ -7098,8 +7098,18 @@ function orders_resetFilters(){
 /* ---------------- DRAWER ---------------- */
 const drawer = document.getElementById("orders-drawer");
 const overlay = document.getElementById("orders-drawerOverlay");
-function orders_openDrawer(){ drawer.classList.add('open'); overlay.classList.add('open'); }
-function orders_closeDrawer(){ drawer.classList.remove('open'); overlay.classList.remove('open'); }
+function orders_openDrawer(){ 
+  drawer.style.transform = 'translateX(0)'; 
+  overlay.style.display = 'block'; 
+  overlay.style.opacity = '1'; 
+  overlay.style.pointerEvents = 'auto'; 
+}
+function orders_closeDrawer(){ 
+  drawer.style.transform = 'translateX(100%)'; 
+  overlay.style.opacity = '0'; 
+  overlay.style.pointerEvents = 'none'; 
+  setTimeout(function(){ overlay.style.display = 'none'; }, 200); 
+}
 
 function orders_openOrderDetails(id){
   const o = orders.find(x => x.id === id);

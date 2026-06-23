@@ -3307,7 +3307,7 @@ button{font-family:inherit;}
         <div class="ao-head">
           <div class="ao-title">
             <h3>Analytics Overview</h3>
-            <span class="ao-live"><span class="dot"></span>Live</span>
+            <span class="ao-live" style="background:#fdf0e1;color:var(--orange);"><span class="dot" style="background:var(--orange);"></span>Not Connected</span>
           </div>
         </div>
 
@@ -3347,9 +3347,9 @@ button{font-family:inherit;}
               </div>
             </div>
             <div class="ao-footer">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Top Source: <strong>Google</strong></span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Top Device: <strong>Mobile</strong></span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Top Country: <strong>India</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Top Source: <strong>—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Top Device: <strong>—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Top Country: <strong>—</strong></span>
             </div>
           </div>
 
@@ -3388,8 +3388,8 @@ button{font-family:inherit;}
               </div>
             </div>
             <div class="ao-footer">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" fill-opacity="0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Top Feature: <strong>Product Management</strong></span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h20"/><path d="M5 18l2-9 5 4 5-7 2 12"/></svg>Upgrade Clicks: <strong>312</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" fill-opacity="0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Top Feature: <strong>—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h20"/><path d="M5 18l2-9 5 4 5-7 2 12"/></svg>Upgrade Clicks: <strong>—</strong></span>
             </div>
           </div>
         </div>
@@ -3611,23 +3611,23 @@ button{font-family:inherit;}
       <div class="stat-grid">
         <div class="stat-card-simple">
           <div class="lbl">Total Sellers</div>
-          <div class="val">1,254</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>12.5%</span> from last month</div>
+          <div class="val" id="sellers-stat-total">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl">Active Sellers</div>
-          <div class="val">982</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>11.3%</span> from last month</div>
+          <div class="val" id="sellers-stat-active">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl">Suspended Sellers</div>
-          <div class="val">227</div>
-          <div class="chg"><span class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7 7 7-7M12 19V5"/></svg>6.1%</span> from last month</div>
+          <div class="val" id="sellers-stat-suspended">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl">Email Verification Pending</div>
-          <div class="val">38</div>
-          <div class="chg"><span class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7 7 7-7M12 19V5"/></svg>2.8%</span> from last month</div>
+          <div class="val" id="sellers-stat-pending">—</div>
+          <div class="chg"><span class="dim">Needs backend setup</span></div>
         </div>
       </div>
 
@@ -4430,34 +4430,35 @@ button{font-family:inherit;}
       <div class="stat-grid">
         <div class="stat-card-simple">
           <div class="lbl">Total Orders</div>
-          <div class="val">2,845</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>16.4%</span> from last month</div>
+          <div class="val" id="orders-stat-total">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl"><span class="dot" style="background:#ea8a1f;"></span>Pending</div>
-          <div class="val">312</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>10.2%</span> from last month</div>
+          <div class="val" id="orders-stat-pending">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl"><span class="dot" style="background:#2f6df6;"></span>Processing</div>
-          <div class="val">634</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>12.8%</span> from last month</div>
+          <div class="val" id="orders-stat-processing">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl"><span class="dot" style="background:#16a34a;"></span>Completed</div>
-          <div class="val">1,521</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>18.7%</span> from last month</div>
+          <div class="val" id="orders-stat-completed">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl"><span class="dot" style="background:#dc2626;"></span>Cancelled</div>
-          <div class="val">378</div>
-          <div class="chg"><span class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7 7 7-7M12 19V5"/></svg>6.3%</span> from last month</div>
+          <div class="val" id="orders-stat-cancelled">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
         <div class="stat-card-simple">
           <div class="lbl"><span class="dot" style="background:#7c3aed;"></span>Refunded</div>
-          <div class="val">108</div>
-          <div class="chg"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>4.6%</span> from last month</div>
+          <div class="val" id="orders-stat-refunded">0</div>
+          <div class="chg"><span class="dim">Live from Supabase</span></div>
         </div>
+      </div>
       </div>
 
       <!-- FILTERS -->
@@ -5551,8 +5552,8 @@ button{font-family:inherit;}
           <div class="stat-box">
             <div class="stat-box-left">
               <div class="s-label">Open</div>
-              <div class="s-val blue">124</div>
-              <div class="s-change"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>12.5%</span><span class="dim">from last month</span></div>
+              <div class="s-val blue" id="support-stat-open">0</div>
+              <div class="s-change"><span class="dim">Live from Supabase</span></div>
             </div>
             <div class="stat-box-right ic-blue">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -5561,8 +5562,8 @@ button{font-family:inherit;}
           <div class="stat-box">
             <div class="stat-box-left">
               <div class="s-label">In Progress</div>
-              <div class="s-val orange">56</div>
-              <div class="s-change"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>8.2%</span><span class="dim">from last month</span></div>
+              <div class="s-val orange" id="support-stat-inprogress">0</div>
+              <div class="s-change"><span class="dim">Live from Supabase</span></div>
             </div>
             <div class="stat-box-right ic-orange">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2H3v16h5l3 3 3-3h7V2z"/><path d="M9 9h6M9 13h4"/></svg>
@@ -5571,8 +5572,8 @@ button{font-family:inherit;}
           <div class="stat-box">
             <div class="stat-box-left">
               <div class="s-label">Closed</div>
-              <div class="s-val green">389</div>
-              <div class="s-change"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>18.7%</span><span class="dim">from last month</span></div>
+              <div class="s-val green" id="support-stat-closed">0</div>
+              <div class="s-change"><span class="dim">Live from Supabase</span></div>
             </div>
             <div class="stat-box-right ic-green">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
@@ -5581,8 +5582,8 @@ button{font-family:inherit;}
           <div class="stat-box">
             <div class="stat-box-left">
               <div class="s-label">Resolved Today</div>
-              <div class="s-val purple">18</div>
-              <div class="s-change"><span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7-7 7 7M12 5v14"/></svg>5.6%</span><span class="dim">from yesterday</span></div>
+              <div class="s-val purple" id="support-stat-resolvedtoday">0</div>
+              <div class="s-change"><span class="dim">Live from Supabase</span></div>
             </div>
             <div class="stat-box-right ic-purple">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
@@ -5591,8 +5592,8 @@ button{font-family:inherit;}
           <div class="stat-box">
             <div class="stat-box-left">
               <div class="s-label">Avg. Response Time</div>
-              <div class="s-val dark" style="font-size:20px;">2h 34m</div>
-              <div class="s-change"><span class="down" style="color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l7 7 7-7M12 19V5"/></svg>15%</span><span class="dim">faster than last month</span></div>
+              <div class="s-val dark" style="font-size:20px;" id="support-stat-avgresponse">—</div>
+              <div class="s-change"><span class="dim">Needs backend setup</span></div>
             </div>
             <div class="stat-box-right ic-gray">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -5958,7 +5959,7 @@ const renewals = []; // populated from Supabase
   const panels = document.querySelectorAll('.mid-grid .panel');
   const renewalsPanel = panels[1];
   const container = renewalsPanel.querySelector('.panel-head').nextElementSibling;
-  container.innerHTML = renewals.map(r => `
+  container.innerHTML = renewals.length ? renewals.map(r => `
     <div class="list-row">
       <div class="row-avatar ${r.cls}">${r.av}</div>
       <div class="row-main"><div class="name">${r.name}</div><div class="sub">${r.plan}</div></div>
@@ -5968,12 +5969,12 @@ const renewals = []; // populated from Supabase
         <div class="pill pill-green">Renewed</div>
       </div>
     </div>
-  `).join('');
+  `).join('') : '<div style="text-align:center;padding:24px;color:var(--text-faint);font-size:13px;">No recent renewals</div>';
 })();
 
 /* ---------------- EXPIRING PLANS LIST ---------------- */
 const expiring = []; // populated from Supabase
-document.getElementById("dashboard-expiring-list").innerHTML = expiring.map(e => `
+document.getElementById("dashboard-expiring-list").innerHTML = expiring.length ? expiring.map(e => `
   <div class="list-row">
     <div class="row-avatar ${e.cls}">${e.av}</div>
     <div class="row-mid">
@@ -5984,7 +5985,7 @@ document.getElementById("dashboard-expiring-list").innerHTML = expiring.map(e =>
     <div class="row-date">${e.date}</div>
     <div class="exp-pill ${e.pillCls}">${e.days}</div>
   </div>
-`).join('');
+`).join('') : '<div style="text-align:center;padding:24px;color:var(--text-faint);font-size:13px;">No subscriptions expiring soon</div>';
 
 /* ---------------- ACTIVITY TABLE ---------------- */
 const icons = {
@@ -6008,37 +6009,14 @@ document.getElementById("dashboard-activity-body").innerHTML = activity.length ?
 window.dashboard_buildGrowthChart = dashboard_buildGrowthChart;
 window.dashboard_buildSparkline = dashboard_buildSparkline;
 
-/* ---------------- ANALYTICS OVERVIEW: LIVE SIMULATION ---------------- */
-const ao_liveStats = [
-  'ao-val-totalVisitors', 'ao-val-uniqueVisitors', 'ao-val-pageViews', 'ao-val-conversions',
-  'ao-val-activeSellers', 'ao-val-logins', 'ao-val-productsAdded', 'ao-val-ordersManaged'
-];
-function ao_pulseLiveStats(){
-  // pick 1-2 random stats to bump on this tick, so it doesn't feel uniform/fake
-  const pickCount = Math.random() < 0.5 ? 1 : 2;
-  const picked = new Set();
-  while(picked.size < pickCount){
-    picked.add(ao_liveStats[Math.floor(Math.random() * ao_liveStats.length)]);
-  }
-  picked.forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    const current = parseInt(el.textContent.replace(/,/g, ''), 10) || 0;
-    const bump = Math.floor(Math.random() * 4) + 1; // +1 to +4
-    const next = current + bump;
-    el.textContent = next.toLocaleString('en-IN');
-    el.classList.remove('ao-pulse');
-    void el.offsetWidth; // restart animation
-    el.classList.add('ao-pulse');
-  });
-}
-function ao_scheduleNextPulse(){
-  setTimeout(() => {
-    ao_pulseLiveStats();
-    ao_scheduleNextPulse();
-  }, 3000 + Math.random() * 2000);
-}
-ao_scheduleNextPulse();
+/* ---------------- ANALYTICS OVERVIEW ----------------
+   NOTE: This section previously showed randomly-animated FAKE numbers.
+   That fake "live" simulation has been removed. These values now show "—"
+   until a real analytics/visitor-tracking table is connected in Supabase.
+   (Active Sellers / Logins Today / Products Added / Orders Managed could be
+   computed for real right now from the sellers/orders arrays already loaded —
+   ask if you'd like that wired up next.)
+*/
 })();
 
 /* ===== Sellers JS ===== */
@@ -7778,6 +7756,21 @@ async function loadOrdersFromSupabase(){
     });
     orders.length = 0;
     newOrders.forEach(o => orders.push(o));
+
+    // Update Orders page stat cards (real counts, not demo)
+    const orderStatusCounts = { pending:0, processing:0, completed:0, cancelled:0, refunded:0 };
+    orders.forEach(o => {
+      const key = (o.status || '').toLowerCase();
+      if(orderStatusCounts.hasOwnProperty(key)) orderStatusCounts[key]++;
+    });
+    const setOrdersStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val.toLocaleString('en-IN'); };
+    setOrdersStat('orders-stat-total', orders.length);
+    setOrdersStat('orders-stat-pending', orderStatusCounts.pending);
+    setOrdersStat('orders-stat-processing', orderStatusCounts.processing);
+    setOrdersStat('orders-stat-completed', orderStatusCounts.completed);
+    setOrdersStat('orders-stat-cancelled', orderStatusCounts.cancelled);
+    setOrdersStat('orders-stat-refunded', orderStatusCounts.refunded);
+
     // Update dashboard stat
     const dashOrders = document.getElementById('dash-stat-orders');
     if(dashOrders) dashOrders.textContent = orders.length.toLocaleString('en-IN');
@@ -7813,6 +7806,26 @@ async function loadTicketsFromSupabase(){
     }));
     tickets.length = 0;
     newTickets.forEach(t => tickets.push(t));
+
+    // Update Support page stat strip (real counts, not demo)
+    const ticketStatusCounts = { 'Open':0, 'In Progress':0, 'Closed':0 };
+    tickets.forEach(t => { if(ticketStatusCounts.hasOwnProperty(t.status)) ticketStatusCounts[t.status]++; });
+    const setSupportStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val.toLocaleString('en-IN'); };
+    setSupportStat('support-stat-open', ticketStatusCounts['Open']);
+    setSupportStat('support-stat-inprogress', ticketStatusCounts['In Progress']);
+    setSupportStat('support-stat-closed', ticketStatusCounts['Closed']);
+
+    // Resolved Today — only counts if the table has a resolved_at/updated_at column
+    const todayStr = new Date().toDateString();
+    let resolvedToday = 0;
+    rows.forEach(t => {
+      const rDate = t.resolved_at || t.updated_at;
+      const mappedStatus = statMap[t.status] || 'Open';
+      if(rDate && mappedStatus === 'Closed' && new Date(rDate).toDateString() === todayStr) resolvedToday++;
+    });
+    setSupportStat('support-stat-resolvedtoday', resolvedToday);
+    // Avg. Response Time needs a first-response timestamp column we don't have yet — left as "—"
+
     if(typeof support_renderList === 'function') support_renderList();
     console.log('✅ Tickets loaded from Supabase:', tickets.length);
   } catch(e){ console.warn('⚠️ Tickets load failed:', e); }

@@ -4579,6 +4579,7 @@ button{font-family:inherit;}
     <button class="btn-primary" onclick="orders_closeDrawer()">Close</button>
   </div>
 </div>
+
 </div>
 
 <div class="page" id="page-reports">
@@ -9652,12 +9653,23 @@ performers_renderDetailPanel();
 
   async function fetchAndRender() {
     try {
-      // Get all visitor events from today onwards for counts
+      // ── 1. Live visitors from active_sessions ──
+      const liveRes = await fetch(
+        `${SUPA_URL}/rest/v1/active_sessions?select=*`,
+        { headers: HEADERS }
+      );
+      if(liveRes.ok) {
+        const liveSessions = await liveRes.json();
+        setVal('ao-val-totalVisitors', liveSessions.length);
+      }
+
+      // ── 2. Today's stats from visitor_events ──
       const today = new Date();
       today.setHours(0,0,0,0);
+      const todayISO = today.toISOString();
 
       const res = await fetch(
-        `${SUPA_URL}/rest/v1/visitor_events?select=*&order=created_at.desc&limit=5000`,
+        `${SUPA_URL}/rest/v1/visitor_events?select=*&created_at=gte.${todayISO}&order=created_at.desc&limit=5000`,
         { headers: HEADERS }
       );
       if(!res.ok) return;
@@ -9675,9 +9687,7 @@ performers_renderDetailPanel();
       const pageviews   = rows.filter(r => r.event_type === 'pageview');
       const conversions = rows.filter(r => r.event_type === 'conversion');
       const uniqueVids  = new Set(rows.map(r => r.visitor_id));
-      const sessions    = new Set(rows.map(r => r.session_id));
 
-      setVal('ao-val-totalVisitors',  sessions.size);
       setVal('ao-val-uniqueVisitors', uniqueVids.size);
       setVal('ao-val-pageViews',      pageviews.length);
       setVal('ao-val-conversions',    conversions.length);

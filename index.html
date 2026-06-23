@@ -3347,9 +3347,9 @@ button{font-family:inherit;}
               </div>
             </div>
             <div class="ao-footer">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Top Source: <strong>—</strong></span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Top Device: <strong>—</strong></span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Top Country: <strong>—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Top Source: <strong id="ao-top-source">—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Top Device: <strong id="ao-top-device">—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Top Country: <strong id="ao-top-country">—</strong></span>
             </div>
           </div>
 
@@ -3388,8 +3388,8 @@ button{font-family:inherit;}
               </div>
             </div>
             <div class="ao-footer">
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" fill-opacity="0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Top Feature: <strong>—</strong></span>
-              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h20"/><path d="M5 18l2-9 5 4 5-7 2 12"/></svg>Upgrade Clicks: <strong>—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" fill-opacity="0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Top Feature: <strong id="ao-top-feature">—</strong></span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h20"/><path d="M5 18l2-9 5 4 5-7 2 12"/></svg>Upgrade Clicks: <strong id="ao-top-upgrade">—</strong></span>
             </div>
           </div>
         </div>
@@ -5384,7 +5384,7 @@ button{font-family:inherit;}
               <span id="performers-monthLabel">June 2026</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;margin-left:2px;"><path d="M6 9l6 6 6-6"/></svg>
             </div>
-            <button class="btn-primary" onclick="performers_recalculate()">
+            <button class="btn-primary" onclick="performers_recalculate(event)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
               Recalculate Rankings
             </button>
@@ -6725,7 +6725,38 @@ function sellers_renderActivityTab(s){
   }
 }
 
-function sellers_saveSeller(){
+async function sellers_saveSeller(){
+  const id = document.getElementById('sellers-f_id') ? document.getElementById('sellers-f_id').value : null;
+  const name = document.getElementById('sellers-f_name') ? document.getElementById('sellers-f_name').value : null;
+  const whatsapp = document.getElementById('sellers-f_whatsapp') ? document.getElementById('sellers-f_whatsapp').value : null;
+  const address = document.getElementById('sellers-f_address') ? document.getElementById('sellers-f_address').value : null;
+  const district = document.getElementById('sellers-f_district') ? document.getElementById('sellers-f_district').value : null;
+  const pincode = document.getElementById('sellers-f_pincode') ? document.getElementById('sellers-f_pincode').value : null;
+  const supaId = sellers.find(s => s.id === id)?._supaId;
+
+  if(supaId && name){
+    try {
+      await supa('seller_details?user_id=eq.' + supaId, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: { shop_name: name, whatsapp_number: whatsapp, address: address, district: district }
+      });
+      console.log('✅ Seller saved to Supabase:', supaId);
+    } catch(e) {
+      console.warn('⚠️ Seller save failed:', e);
+    }
+  }
+
+  // Update local sellers array
+  const localSeller = sellers.find(s => s.id === id);
+  if(localSeller){
+    if(name) localSeller.name = name;
+    if(whatsapp) localSeller.phone = whatsapp;
+    if(address) localSeller.address = address;
+    if(district) localSeller.district = district;
+    if(typeof sellers_renderTable === 'function') sellers_renderTable();
+  }
+
   sellers_closeDrawer();
 }
 
@@ -6767,7 +6798,8 @@ function sellers_renderSubscriptionTab(s){
   sellers_subCurrent = s;
   sellers_subExpiry = expiryDate;
 
-  const today = new Date(2026,5,21);
+  const today = new Date();
+  today.setHours(0,0,0,0);
   const daysRemaining = Math.max(0, Math.round((expiryDate - today) / 86400000));
 
   document.getElementById('sellers-sub_currentplanname').textContent = s.plan + ' Plan';
@@ -6848,7 +6880,8 @@ function sellers_addBonusDays(days){
   if(!sellers_subExpiry) return;
   sellers_subExpiry.setDate(sellers_subExpiry.getDate() + days);
   document.getElementById('sellers-sub_expirydatetext').textContent = sellers_fmtDate(sellers_subExpiry);
-  const today = new Date(2026,5,21);
+  const today = new Date();
+  today.setHours(0,0,0,0);
   const daysRemaining = Math.max(0, Math.round((sellers_subExpiry - today) / 86400000));
   document.getElementById('sellers-sub_daysremaining').textContent = daysRemaining + ' Days';
 }
@@ -6871,7 +6904,8 @@ function sellers_renewPlan(){
   const planInfo = SELLERS_PLAN_INFO[sellers_subCurrent.plan] || SELLERS_PLAN_INFO.Starter;
   sellers_subExpiry.setMonth(sellers_subExpiry.getMonth() + planInfo.months);
   document.getElementById('sellers-sub_expirydatetext').textContent = sellers_fmtDate(sellers_subExpiry);
-  const today = new Date(2026,5,21);
+  const today = new Date();
+  today.setHours(0,0,0,0);
   const daysRemaining = Math.max(0, Math.round((sellers_subExpiry - today) / 86400000));
   document.getElementById('sellers-sub_daysremaining').textContent = daysRemaining + ' Days';
 }
@@ -7627,7 +7661,7 @@ async function loadSellersFromSupabase(){
       const joinDate = p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '-';
       const rawPlan = p.plan || sub.plan || 'starter';
       const plan = rawPlan.charAt(0).toUpperCase() + rawPlan.slice(1).toLowerCase();
-      const status = (sub.status === 'active' || !sub.status) ? 'Active' : 'Suspended';
+      const status = sub.status === 'active' ? 'Active' : (sub.status === 'suspended' ? 'Suspended' : (!sub.status ? 'Inactive' : 'Suspended'));
       return {
         av: initials,
         cls: avClasses[i % avClasses.length],
@@ -7702,7 +7736,7 @@ async function loadOrdersStats(){
   try {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const orders = await supa('orders?select=id&created_at=gte.' + encodeURIComponent(firstDay));
+    const orders = await supa('orders?select=id&created_at=gte.' + firstDay);
     if(!orders) return;
     document.querySelectorAll('.stat-label').forEach(el => {
       if(el.textContent.trim() === 'Orders This Month'){
@@ -8234,7 +8268,7 @@ function wt_render(panel){
 
   const cats = wt_categories;
   const catItems = cats.map(c => `
-    <div class="wt-cat-item ${c.cls} ${wt_state.selectedCat===c.key?'active':''}" onclick="wt_selectCat('${c.key}')">
+    <div class="wt-cat-item ${c.cls} ${wt_state.selectedCat===c.key?'active':''}" data-cat="${c.key}" onclick="wt_selectCat('${c.key}')">
       <div class="wt-cat-item-left">${c.icon}<span>${c.label}</span></div>
       <span class="wt-cat-badge">${wt_catCount(c.key)}</span>
     </div>`).join('');
@@ -8384,7 +8418,7 @@ function wt_filtered(){
 function wt_selectCat(key){
   wt_state.selectedCat = key;
   document.querySelectorAll('.wt-cat-item').forEach(el=>{
-    const cat = el.getAttribute('onclick').match(/'(\w+)'/)[1];
+    const cat = el.getAttribute('data-cat') || (el.getAttribute('onclick')||'').match(/'(\w+)'/)?.[1];
     el.classList.toggle('active', cat===key);
   });
   wt_reRenderList();
@@ -9518,7 +9552,7 @@ function performers_toggleMonth(evt){
   document.getElementById('performers-monthLabel').textContent = months[(idx+1) % months.length];
 }
 
-function performers_recalculate(){
+function performers_recalculate(event){
   const btn = event.currentTarget;
   const original = btn.innerHTML;
   btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg> Recalculating...';
@@ -9550,6 +9584,13 @@ function performers_exportCsv(){
 
 function performers_viewFullProfile(id){
   goToPage(null, 'sellers');
+  // After navigating, open the drawer for the matching seller
+  setTimeout(() => {
+    const match = sellers.find(s => s.id === id || String(s.id) === String(id));
+    if(match && typeof sellers_openDrawer === 'function'){
+      sellers_openDrawer(match);
+    }
+  }, 150);
 }
 
 window.performers_cycleFilter = performers_cycleFilter;
@@ -9568,6 +9609,112 @@ performers_renderDetailPanel();
 
 })();
 
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════
+   MySellerDesk — Landing Page Visitor Tracker
+   Reads from Supabase → Updates Dashboard Live
+═══════════════════════════════════════════════ */
+(function(){
+  const SUPA_URL = "https://zkafglojonspzlsfxcdh.supabase.co";
+  const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ";
+  const HEADERS = { "Content-Type": "application/json", "apikey": SUPA_KEY, "Authorization": "Bearer " + SUPA_KEY };
+
+  function topOf(arr, key) {
+    const counts = {};
+    arr.forEach(r => { if(r[key]) counts[r[key]] = (counts[r[key]]||0)+1; });
+    return Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0] || "—";
+  }
+
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if(el) el.textContent = val;
+  }
+
+  function pulse(id) {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.remove('ao-pulse');
+    void el.offsetWidth;
+    el.classList.add('ao-pulse');
+  }
+
+  function setVal(id, val) {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const span = el.querySelector ? el : el;
+    if(el.textContent !== String(val)) {
+      el.textContent = val;
+      pulse(id);
+    }
+  }
+
+  async function fetchAndRender() {
+    try {
+      // Get all visitor events from today onwards for counts
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      const res = await fetch(
+        `${SUPA_URL}/rest/v1/visitor_events?select=*&order=created_at.desc&limit=5000`,
+        { headers: HEADERS }
+      );
+      if(!res.ok) return;
+      const rows = await res.json();
+
+      // ── Landing Page Stats ──
+      const pageviews   = rows.filter(r => r.event_type === 'pageview');
+      const conversions = rows.filter(r => r.event_type === 'conversion');
+      const uniqueVids  = new Set(rows.map(r => r.visitor_id));
+      const sessions    = new Set(rows.map(r => r.session_id));
+
+      setVal('ao-val-totalVisitors',  sessions.size);
+      setVal('ao-val-uniqueVisitors', uniqueVids.size);
+      setVal('ao-val-pageViews',      pageviews.length);
+      setVal('ao-val-conversions',    conversions.length);
+
+      // Top Source / Device / Country
+      const topSource  = topOf(rows, 'source');
+      const topDevice  = topOf(rows, 'device');
+      const topCountry = topOf(rows, 'country').replace('Asia/','').replace('America/','').replace('Europe/','');
+      setText('ao-top-source',  topSource);
+      setText('ao-top-device',  topDevice);
+      setText('ao-top-country', topCountry);
+
+    } catch(e) {
+      console.error('Tracker fetch error:', e);
+    }
+  }
+
+  // Run on load
+  fetchAndRender();
+  // Auto refresh every 30 seconds
+  setInterval(fetchAndRender, 30000);
+
+  // Supabase Realtime — instant update when new visitor arrives
+  try {
+    const ws = new WebSocket(
+      `wss://zkafglojonspzlsfxcdh.supabase.co/realtime/v1/websocket?apikey=${SUPA_KEY}&vsn=1.0.0`
+    );
+    ws.onopen = () => {
+      ws.send(JSON.stringify({
+        topic: "realtime:public:visitor_events",
+        event: "phx_join",
+        payload: {},
+        ref: "1"
+      }));
+    };
+    ws.onmessage = (msg) => {
+      const data = JSON.parse(msg.data);
+      if(data.event === 'INSERT' || data.event === 'UPDATE') {
+        fetchAndRender();
+      }
+    };
+    ws.onerror = () => {}; // silent fail, polling backup covers it
+  } catch(e) {}
+
+})();
 </script>
 </body>
 </html>

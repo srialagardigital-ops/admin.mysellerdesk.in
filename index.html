@@ -3307,7 +3307,7 @@ button{font-family:inherit;}
         <div class="ao-head">
           <div class="ao-title">
             <h3>Analytics Overview</h3>
-            <span class="ao-live" style="background:#fdf0e1;color:var(--orange);"><span class="dot" style="background:var(--orange);"></span>Not Connected</span>
+            <span id="ao-connection-badge" class="ao-live" style="background:#fdf0e1;color:var(--orange);"><span class="dot" style="background:var(--orange);"></span>Not Connected</span>
           </div>
         </div>
 
@@ -9662,6 +9662,14 @@ performers_renderDetailPanel();
       );
       if(!res.ok) return;
       const rows = await res.json();
+
+      // ── Update connection badge ──
+      const badge = document.getElementById('ao-connection-badge');
+      if(badge) {
+        badge.style.background = '#e8f9ef';
+        badge.style.color = 'var(--green)';
+        badge.innerHTML = '<span class="dot" style="background:var(--green);"></span>Live';
+      }
 
       // ── Landing Page Stats ──
       const pageviews   = rows.filter(r => r.event_type === 'pageview');

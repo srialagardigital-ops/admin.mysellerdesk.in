@@ -8990,8 +8990,7 @@ function toggleProfileMenu(e, el){
 
 // ===== INLINE LOGIN OVERLAY (merged from login.html) =====
 (function(){
-  /* Self-contained Supabase config — avoids dependency on outer SUPA_URL/SUPA_KEY
-     which may not be defined yet when this IIFE runs */
+  /* Self-contained Supabase config */
   const _SUPA_URL = 'https://zkafglojonspzlsfxcdh.supabase.co';
   const _SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
 
@@ -9000,60 +8999,210 @@ function toggleProfileMenu(e, el){
   loginStyle.textContent = `
     #msd-login-overlay {
       position:fixed;inset:0;z-index:9999;
-      background:linear-gradient(135deg,#0b1437 0%,#121b44 60%,#1a2452 100%);
-      display:flex;align-items:center;justify-content:center;
+      display:flex;
       font-family:'Inter',system-ui,-apple-system,sans-serif;
+      -webkit-font-smoothing:antialiased;
     }
-    #msd-login-overlay.hidden { display:none; }
+    #msd-login-overlay.hidden { display:none !important; }
+
+    /* ── LEFT PANEL ── */
+    .msd-lo-left {
+      width:48%;min-height:100vh;
+      background:linear-gradient(160deg,#0d0f2e 0%,#0e1040 40%,#130d3a 70%,#1a0638 100%);
+      display:flex;flex-direction:column;
+      padding:36px 48px;
+      position:relative;overflow:hidden;flex-shrink:0;
+    }
+    .msd-lo-blob {
+      position:absolute;border-radius:50%;
+      filter:blur(1px);pointer-events:none;
+    }
+    .msd-lo-blob-1{width:220px;height:220px;top:-60px;right:60px;
+      background:radial-gradient(circle,#7b4fdc 0%,#5e35b1 40%,#2d1b69 80%,transparent 100%);opacity:.85;}
+    .msd-lo-blob-2{width:160px;height:160px;top:40px;right:0;
+      background:radial-gradient(circle,#e040fb 0%,#c94ded 40%,#9c27b0 70%,transparent 100%);opacity:.9;}
+    .msd-lo-blob-3{width:130px;height:130px;top:180px;right:130px;
+      background:radial-gradient(circle,#3949ab 0%,#1a237e 60%,transparent 100%);opacity:.7;}
+    .msd-lo-blob-4{width:100px;height:100px;top:380px;right:60px;
+      background:radial-gradient(circle,#283593 0%,#1a1a5e 60%,transparent 100%);opacity:.8;}
+    .msd-lo-blob-5{width:340px;height:340px;bottom:-120px;left:-80px;
+      background:radial-gradient(circle,#7b1fa2 0%,#6a1b9a 30%,#4a148c 60%,transparent 100%);opacity:.75;}
+    .msd-lo-blob-6{width:200px;height:200px;bottom:60px;left:160px;
+      background:radial-gradient(circle,#e91e8c 0%,#c2185b 40%,#880e4f 70%,transparent 100%);opacity:.65;}
+    .msd-lo-blob-7{width:90px;height:90px;bottom:200px;right:30px;
+      background:radial-gradient(circle,#512da8 0%,#311b92 60%,transparent 100%);opacity:.9;}
+    .msd-lo-dotgrid {
+      position:absolute;inset:0;pointer-events:none;
+      background-image:radial-gradient(circle,rgba(100,120,255,.18) 1px,transparent 1px);
+      background-size:22px 22px;
+    }
+    .msd-lo-brand {
+      display:flex;align-items:center;gap:12px;
+      position:relative;z-index:2;
+    }
+    .msd-lo-brand-icon {
+      width:42px;height:42px;border-radius:12px;
+      background:rgba(255,255,255,.12);
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,.2);flex-shrink:0;
+    }
+    .msd-lo-brand-icon svg{width:22px;height:22px;}
+    .msd-lo-brand-name{display:block;font-size:16px;font-weight:700;color:#fff;letter-spacing:.2px;}
+    .msd-lo-brand-badge{
+      display:inline-block;margin-top:3px;
+      background:#3b3fe8;color:#fff;
+      font-size:9.5px;font-weight:700;letter-spacing:.8px;
+      padding:2.5px 7px;border-radius:4px;text-transform:uppercase;
+    }
+    .msd-lo-content {
+      flex:1;display:flex;flex-direction:column;justify-content:center;
+      position:relative;z-index:2;padding-bottom:40px;
+    }
+    .msd-lo-welcome{font-size:15px;color:rgba(255,255,255,.55);font-weight:500;margin-bottom:8px;letter-spacing:.3px;}
+    .msd-lo-h1{font-size:58px;font-weight:900;color:#fff;line-height:1.05;letter-spacing:-1.5px;margin:0;}
+    .msd-lo-h1-name{
+      display:block;
+      background:linear-gradient(135deg,#e040fb,#ff80ab);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .msd-lo-accent{width:48px;height:4px;border-radius:2px;background:linear-gradient(90deg,#e040fb,#7c4dff);margin:20px 0 24px;}
+    .msd-lo-role{font-size:22px;font-weight:800;color:#fff;margin-bottom:14px;letter-spacing:-.2px;}
+    .msd-lo-desc{font-size:15px;color:rgba(255,255,255,.5);line-height:1.65;max-width:320px;font-weight:400;}
+    .msd-lo-foot{position:relative;z-index:2;font-size:13px;color:rgba(255,255,255,.35);}
+
+    /* ── RIGHT PANEL ── */
+    .msd-lo-right {
+      flex:1;background:#f4f4fb;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      padding:40px 32px;position:relative;overflow:hidden;
+    }
+    .msd-lo-right::before{
+      content:'';position:absolute;top:-80px;right:-80px;
+      width:260px;height:260px;border-radius:50%;
+      background:rgba(123,77,220,.07);pointer-events:none;
+    }
+    .msd-lo-right::after{
+      content:'';position:absolute;bottom:-40px;left:20px;
+      width:150px;height:150px;border-radius:50%;
+      background:rgba(224,64,251,.05);pointer-events:none;
+    }
+
+    /* ── CARD ── */
     .msd-login-card {
-      background:#fff;border-radius:20px;
-      padding:40px 38px 36px;
-      width:100%;max-width:420px;
-      box-shadow:0 24px 64px rgba(0,0,0,.32);
+      background:#fff;border-radius:24px;
+      padding:44px 44px 40px;
+      width:100%;max-width:440px;
+      box-shadow:0 4px 6px rgba(16,24,40,.04),0 12px 40px rgba(16,24,40,.08);
+      border:1px solid rgba(220,220,235,.6);
     }
-    .msd-login-brand {
-      display:flex;align-items:center;gap:12px;margin-bottom:28px;
+    .msd-lo-lock-wrap{
+      width:72px;height:72px;border-radius:50%;
+      background:linear-gradient(145deg,#ede8ff,#f0ecff);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 22px;
     }
-    .msd-login-brand-icon {
-      width:44px;height:44px;border-radius:12px;
-      background:linear-gradient(135deg,#3b82f6,#1d4ed8);
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    .msd-lo-lock-wrap svg{width:30px;height:30px;color:#5c35de;}
+    .msd-lo-card-title{text-align:center;font-size:26px;font-weight:800;color:#13132b;letter-spacing:-.4px;margin-bottom:6px;}
+    .msd-lo-card-sub{text-align:center;font-size:13.5px;color:#8890a8;margin-bottom:32px;font-weight:400;}
+
+    .msd-login-field{margin-bottom:20px;}
+    .msd-login-label{display:block;font-size:13.5px;font-weight:600;color:#23263a;margin-bottom:7px;}
+    .msd-lo-input-wrap{
+      position:relative;display:flex;align-items:center;
+      background:#f8f8fc;border:1.5px solid #e4e4ef;border-radius:12px;
+      transition:border .18s,box-shadow .18s;
     }
-    .msd-login-brand-icon svg { width:22px;height:22px; }
-    .msd-login-brand-text strong { display:block;font-size:17px;font-weight:800;color:#0b1437;letter-spacing:.2px; }
-    .msd-login-brand-text span { display:block;font-size:12px;color:#6b7180;margin-top:1px; }
-    .msd-login-title { font-size:22px;font-weight:800;color:#0b1437;margin-bottom:6px; }
-    .msd-login-sub { font-size:13.5px;color:#6b7180;margin-bottom:28px; }
-    .msd-login-field { margin-bottom:16px; }
-    .msd-login-label {
-      display:block;font-size:12.5px;font-weight:700;color:#15192e;margin-bottom:6px;
+    .msd-lo-input-wrap:focus-within{
+      border-color:#6c4ff6;box-shadow:0 0 0 3px rgba(108,79,246,.12);background:#fff;
     }
+    .msd-lo-input-wrap.error-field{border-color:#dc2626;}
+    .msd-lo-input-icon{position:absolute;left:14px;color:#a0a8c0;display:flex;align-items:center;}
+    .msd-lo-input-icon svg{width:17px;height:17px;}
     .msd-login-input {
-      width:100%;padding:11px 14px;border:1.5px solid #e9ecf3;border-radius:10px;
-      font-size:14px;font-family:inherit;color:#15192e;outline:none;
-      transition:border-color .15s;
+      flex:1;border:none;outline:none;background:transparent;
+      font-family:inherit;font-size:14px;color:#13132b;
+      padding:13px 14px 13px 44px;border-radius:12px;font-weight:400;
     }
-    .msd-login-input:focus { border-color:#2f6df6; }
-    .msd-login-input.error { border-color:#dc2626; }
+    .msd-login-input::placeholder{color:#b0b8d0;}
+    .msd-lo-eye{
+      position:absolute;right:14px;background:none;border:none;cursor:pointer;
+      color:#a0a8c0;display:flex;align-items:center;padding:4px;border-radius:6px;transition:color .15s;
+    }
+    .msd-lo-eye:hover{color:#6c4ff6;}
+    .msd-lo-eye svg{width:17px;height:17px;}
+
+    .msd-lo-row-opts{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;}
+    .msd-lo-remember{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;color:#5a6280;font-weight:500;}
+    .msd-lo-remember input[type=checkbox]{display:none;}
+    .msd-lo-chkbox{
+      width:18px;height:18px;border-radius:5px;border:1.5px solid #d0d4e8;background:#fff;
+      display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
+    }
+    .msd-lo-remember input:checked ~ .msd-lo-chkbox{background:#6c4ff6;border-color:#6c4ff6;}
+    .msd-lo-chkbox svg{display:none;width:11px;height:11px;color:#fff;}
+    .msd-lo-remember input:checked ~ .msd-lo-chkbox svg{display:block;}
+    .msd-lo-forgot{font-size:13.5px;font-weight:600;color:#6c4ff6;text-decoration:none;cursor:pointer;}
+    .msd-lo-forgot:hover{color:#5038e0;}
+
     .msd-login-btn {
-      width:100%;padding:13px;border:none;border-radius:11px;
-      background:#2f6df6;color:#fff;
-      font-size:14.5px;font-weight:700;font-family:inherit;
-      cursor:pointer;margin-top:6px;
-      box-shadow:0 4px 14px rgba(47,109,246,.35);
-      transition:background .15s, transform .1s;
+      width:100%;padding:14px;border:none;border-radius:12px;
+      background:linear-gradient(135deg,#6c4ff6,#5038e0);
+      color:#fff;font-family:inherit;font-size:15px;font-weight:700;
+      cursor:pointer;letter-spacing:.2px;
+      box-shadow:0 6px 20px rgba(108,79,246,.38);
+      transition:transform .12s,box-shadow .12s,background .15s;
+      display:flex;align-items:center;justify-content:center;gap:10px;
     }
-    .msd-login-btn:hover { background:#2459d9; }
-    .msd-login-btn:active { transform:scale(.98); }
-    .msd-login-btn:disabled { background:#9ab3f8;cursor:not-allowed;transform:none; }
+    .msd-login-btn:hover{
+      background:linear-gradient(135deg,#7b5cf7,#5c44e8);
+      box-shadow:0 8px 28px rgba(108,79,246,.48);transform:translateY(-1px);
+    }
+    .msd-login-btn:active{transform:translateY(0);box-shadow:0 4px 14px rgba(108,79,246,.3);}
+    .msd-login-btn:disabled{opacity:.7;cursor:not-allowed;transform:none !important;}
+
+    .msd-lo-divider{display:flex;align-items:center;gap:14px;margin:22px 0;}
+    .msd-lo-divider::before,.msd-lo-divider::after{content:'';flex:1;height:1px;background:#eaecf4;}
+    .msd-lo-divider span{font-size:13px;color:#b0b8d0;font-weight:500;}
+
+    .msd-lo-google{
+      width:100%;padding:13px;border-radius:12px;
+      border:1.5px solid #e4e4ef;background:#fff;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      font-family:inherit;font-size:14.5px;font-weight:600;color:#23263a;
+      cursor:pointer;transition:border .15s,box-shadow .15s,background .15s;
+    }
+    .msd-lo-google:hover{border-color:#d0d4e8;background:#fafafe;box-shadow:0 2px 8px rgba(16,24,40,.08);}
+
     .msd-login-err {
-      background:#fdecec;border:1px solid #fca5a5;border-radius:9px;
-      color:#dc2626;font-size:13px;font-weight:600;
-      padding:10px 13px;margin-bottom:16px;display:none;
+      background:#fff1f1;border:1px solid #fecaca;border-radius:10px;
+      padding:10px 14px;display:none;
+      align-items:center;gap:8px;
+      font-size:13px;color:#dc2626;font-weight:500;margin-bottom:18px;
     }
-    .msd-login-err.show { display:block; }
-    .msd-login-footer {
-      margin-top:22px;text-align:center;font-size:12px;color:#9298a8;
+    .msd-login-err.show{display:flex;}
+    .msd-login-err svg{width:15px;height:15px;flex-shrink:0;}
+
+    .msd-lo-secure{
+      display:flex;align-items:center;justify-content:center;gap:7px;
+      font-size:12.5px;color:#a0a8c0;margin-top:28px;
+    }
+    .msd-lo-secure svg{width:13px;height:13px;color:#c0c8dc;}
+
+    @keyframes msd-spin{to{transform:rotate(360deg);}}
+    .msd-lo-spinner{
+      width:16px;height:16px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+      animation:msd-spin .7s linear infinite;flex-shrink:0;
+    }
+
+    @media(max-width:860px){
+      #msd-login-overlay{flex-direction:column;}
+      .msd-lo-left{width:100%;min-height:auto;padding:32px 28px 48px;}
+      .msd-lo-h1{font-size:40px;}
+      .msd-lo-foot{display:none;}
+      .msd-lo-right{padding:36px 20px 40px;}
+      .msd-login-card{padding:32px 24px;}
     }
   `;
   document.head.appendChild(loginStyle);
@@ -9062,65 +9211,172 @@ function toggleProfileMenu(e, el){
   const overlay = document.createElement('div');
   overlay.id = 'msd-login-overlay';
   overlay.innerHTML = `
-    <div class="msd-login-card">
-      <div class="msd-login-brand">
-        <div class="msd-login-brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+    <!-- LEFT -->
+    <div class="msd-lo-left">
+      <div class="msd-lo-dotgrid"></div>
+      <div class="msd-lo-blob msd-lo-blob-1"></div>
+      <div class="msd-lo-blob msd-lo-blob-2"></div>
+      <div class="msd-lo-blob msd-lo-blob-3"></div>
+      <div class="msd-lo-blob msd-lo-blob-4"></div>
+      <div class="msd-lo-blob msd-lo-blob-5"></div>
+      <div class="msd-lo-blob msd-lo-blob-6"></div>
+      <div class="msd-lo-blob msd-lo-blob-7"></div>
+
+      <div class="msd-lo-brand">
+        <div class="msd-lo-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" fill="white" fill-opacity=".95"/>
+            <path d="M12 2L21 7L12 12L3 7L12 2Z" fill="white"/>
           </svg>
         </div>
-        <div class="msd-login-brand-text">
-          <strong>MySellerDesk</strong>
-          <span>Admin Panel</span>
+        <div>
+          <span class="msd-lo-brand-name">MySellerDesk</span>
+          <span class="msd-lo-brand-badge">Admin Panel</span>
         </div>
       </div>
-      <div class="msd-login-title">Welcome back 👋</div>
-      <div class="msd-login-sub">Sign in with your admin credentials to continue.</div>
-      <div id="msd-login-err" class="msd-login-err">Invalid email or password. Please try again.</div>
-      <div class="msd-login-field">
-        <label class="msd-login-label" for="msd-email">Email</label>
-        <input class="msd-login-input" id="msd-email" type="email" placeholder="admin@mysellerdesk.com" autocomplete="email"/>
+
+      <div class="msd-lo-content">
+        <div class="msd-lo-welcome">Welcome Back,</div>
+        <h1 class="msd-lo-h1"><span class="msd-lo-h1-name">Alagar</span></h1>
+        <div class="msd-lo-accent"></div>
+        <div class="msd-lo-role">Master Admin</div>
+        <p class="msd-lo-desc">Sign in to access and manage your platform with complete control and insights.</p>
       </div>
-      <div class="msd-login-field">
-        <label class="msd-login-label" for="msd-password">Password</label>
-        <input class="msd-login-input" id="msd-password" type="password" placeholder="••••••••" autocomplete="current-password"/>
+
+      <div class="msd-lo-foot">© 2025 MySellerDesk. All rights reserved.</div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="msd-lo-right">
+      <div class="msd-login-card">
+
+        <div class="msd-lo-lock-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+
+        <div class="msd-lo-card-title">Admin Login</div>
+        <p class="msd-lo-card-sub">Enter your credentials to continue</p>
+
+        <div id="msd-login-err" class="msd-login-err">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span id="msd-login-err-text">Invalid email or password.</span>
+        </div>
+
+        <div class="msd-login-field">
+          <label class="msd-login-label" for="msd-email">Email Address</label>
+          <div class="msd-lo-input-wrap" id="msd-email-wrap">
+            <span class="msd-lo-input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+            </span>
+            <input class="msd-login-input" id="msd-email" type="email" placeholder="Enter your email" autocomplete="email"/>
+          </div>
+        </div>
+
+        <div class="msd-login-field">
+          <label class="msd-login-label" for="msd-password">Password</label>
+          <div class="msd-lo-input-wrap" id="msd-pwd-wrap">
+            <span class="msd-lo-input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input class="msd-login-input" id="msd-password" type="password" placeholder="Enter your password" autocomplete="current-password"/>
+            <button class="msd-lo-eye" type="button" onclick="msdTogglePwd()" id="msd-eye-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="msd-eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="msd-lo-row-opts">
+          <label class="msd-lo-remember">
+            <input type="checkbox" id="msd-remember">
+            <div class="msd-lo-chkbox">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 6l3 3 5-5"/></svg>
+            </div>
+            Remember me
+          </label>
+          <span class="msd-lo-forgot">Forgot Password?</span>
+        </div>
+
+        <button class="msd-login-btn" id="msd-login-btn" onclick="msdDoLogin()">
+          <span id="msd-login-btn-text">Sign In</span>
+        </button>
+
+        <div class="msd-lo-divider"><span>or</span></div>
+
+        <button class="msd-lo-google" onclick="msdGoogleLogin()">
+          <svg width="18" height="18" viewBox="0 0 18 18">
+            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
+          </svg>
+          Sign in with Google
+        </button>
+
       </div>
-      <button class="msd-login-btn" id="msd-login-btn" onclick="msdDoLogin()">Sign In</button>
-      <div class="msd-login-footer">MySellerDesk &copy; 2026 &mdash; Admin access only</div>
+
+      <div class="msd-lo-secure">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secure admin access to manage your platform.
+      </div>
     </div>
   `;
   document.body.prepend(overlay);
 
+  /* --- Password toggle --- */
+  window.msdTogglePwd = function(){
+    const inp = document.getElementById('msd-password');
+    const icon = document.getElementById('msd-eye-icon');
+    if(inp.type === 'password'){
+      inp.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      inp.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  };
+
+  /* --- Google Login --- */
+  window.msdGoogleLogin = function(){
+    window.location.href = _SUPA_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(window.location.href) + '&apikey=' + _SUPA_KEY;
+  };
+
   /* --- Supabase Auth Sign-In --- */
   window.msdDoLogin = async function(){
-    var SUPABASE_URL = "https://zkafglojonspzlsfxcdh.supabase.co";
-    var SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ";
-    const email = document.getElementById('msd-email').value.trim();
+    const email    = document.getElementById('msd-email').value.trim();
     const password = document.getElementById('msd-password').value;
-    const btn = document.getElementById('msd-login-btn');
-    const errEl = document.getElementById('msd-login-err');
+    const btn      = document.getElementById('msd-login-btn');
+    const btnText  = document.getElementById('msd-login-btn-text');
+    const errEl    = document.getElementById('msd-login-err');
+    const errText  = document.getElementById('msd-login-err-text');
 
     errEl.classList.remove('show');
-    document.getElementById('msd-email').classList.remove('error');
-    document.getElementById('msd-password').classList.remove('error');
+    document.getElementById('msd-email-wrap').classList.remove('error-field');
+    document.getElementById('msd-pwd-wrap').classList.remove('error-field');
 
-    if(!email || !password){
-      errEl.textContent = 'Please enter both email and password.';
+    if(!email){
+      errText.textContent = 'Please enter your email address.';
       errEl.classList.add('show');
+      document.getElementById('msd-email-wrap').classList.add('error-field');
+      return;
+    }
+    if(!password){
+      errText.textContent = 'Please enter your password.';
+      errEl.classList.add('show');
+      document.getElementById('msd-pwd-wrap').classList.add('error-field');
       return;
     }
 
     btn.disabled = true;
-    btn.textContent = 'Signing in…';
+    btnText.textContent = 'Signing in…';
+    btn.insertAdjacentHTML('beforeend','<div class="msd-lo-spinner" id="msd-spin"></div>');
 
     try {
-      const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+      const res = await fetch(_SUPA_URL + '/auth/v1/token?grant_type=password', {
         method:'POST',
-        headers:{
-          'apikey': SUPABASE_ANON,
-          'Content-Type': 'application/json'
-        },
+        headers:{ 'apikey': _SUPA_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
@@ -9147,7 +9403,6 @@ function toggleProfileMenu(e, el){
       (function(){
         const _accessToken = data.access_token;
         sessionStorage.setItem('msd_access_token', _accessToken);
-        // Override global supa() to inject user JWT so RLS policies pass
         if(typeof window.supa === 'function' && !window._supaPatched){
           window._supaPatched = true;
           const _orig = window.supa;
@@ -9158,19 +9413,20 @@ function toggleProfileMenu(e, el){
             return _orig(path, opts);
           };
         }
-        // Reload all Supabase data now that we are authenticated
         if(typeof supabase_initLoad === 'function'){
           setTimeout(supabase_initLoad, 200);
         }
       })();
 
     } catch(err){
-      errEl.textContent = err.message || 'Login failed. Please try again.';
-      errEl.classList.add('show');
-      document.getElementById('msd-email').classList.add('error');
-      document.getElementById('msd-password').classList.add('error');
+      const sp = document.getElementById('msd-spin');
+      if(sp) sp.remove();
       btn.disabled = false;
-      btn.textContent = 'Sign In';
+      btnText.textContent = 'Sign In';
+      errText.textContent = err.message || 'Login failed. Please try again.';
+      errEl.classList.add('show');
+      document.getElementById('msd-email-wrap').classList.add('error-field');
+      document.getElementById('msd-pwd-wrap').classList.add('error-field');
     }
   };
 
@@ -9181,12 +9437,9 @@ function toggleProfileMenu(e, el){
     }
   });
 
-  /* --- Auth guard: check existing session, else show overlay --- */
+  /* --- Auth guard: check existing session --- */
   const alreadyLoggedIn = sessionStorage.getItem('msd_admin_logged_in') === 'true';
-  if(!alreadyLoggedIn){
-    // Overlay is already visible (rendered above). App content stays hidden behind it.
-  } else {
-    // Already authenticated — hide overlay immediately
+  if(alreadyLoggedIn){
     overlay.classList.add('hidden');
   }
 

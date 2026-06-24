@@ -7061,6 +7061,7 @@ function orders_sellerId(sellerName){
   return s ? s.id : '—';
 }
 const orders = []; // populated from Supabase
+window.orders_list = orders; // exposed so loadOrdersFromSupabase() (defined in a different scope) can write into this same array
 
 function orders_statusClass(s){
   return 'status-' + s.toLowerCase();
@@ -7168,6 +7169,7 @@ window.orders_openDrawer = orders_openDrawer;
 (function(){
 
 const tickets = []; // populated from Supabase
+window.support_tickets = tickets; // exposed so loadTicketsFromSupabase() (defined in a different scope) can write into this same array
 
 const priClass = {High:'pri-high', Medium:'pri-medium', Low:'pri-low'};
 const statusClass = {Open:'s-open','In Progress':'s-inprogress',Closed:'s-closed'};
@@ -7795,6 +7797,7 @@ async function loadOrdersFromSupabase(){
         av: custName[0].toUpperCase(),
         cls: avCls[i % avCls.length],
         seller: o.seller_id || '—',
+        amountRaw: amt,
         items: '—',
         amount: amtStr,
         pay: o.payment || o.payment_method || '—',
@@ -7807,6 +7810,7 @@ async function loadOrdersFromSupabase(){
         lines: [], subtotal: amtStr, shipping: '₹0', discount: '₹0', total: amtStr
       };
     });
+    const orders = window.orders_list;
     orders.length = 0;
     newOrders.forEach(o => orders.push(o));
 
@@ -7857,6 +7861,7 @@ async function loadTicketsFromSupabase(){
       date: t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—',
       time: t.created_at ? new Date(t.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—'
     }));
+    const tickets = window.support_tickets;
     tickets.length = 0;
     newTickets.forEach(t => tickets.push(t));
 
@@ -7879,9 +7884,60 @@ async function loadTicketsFromSupabase(){
     setSupportStat('support-stat-resolvedtoday', resolvedToday);
     // Avg. Response Time needs a first-response timestamp column we don't have yet — left as "—"
 
-    if(typeof support_renderList === 'function') support_renderList();
+    if(typeof window.support_renderTable === 'function') window.support_renderTable();
     console.log('✅ Tickets loaded from Supabase:', tickets.length);
   } catch(e){ console.warn('⚠️ Tickets load failed:', e); }
+}
+
+/* Top Performers had NO data pipeline at all — the `performers` array was declared
+   but never populated from anywhere. This builds it from the sellers + orders data
+   we already fetch, so the podium/table show real seller names, order counts and
+   revenue instead of staying empty forever. Growth %/trend need historical snapshots
+   we don't store yet, so those are left neutral (0% / stable) rather than invented. */
+function buildPerformersFromData(){
+  const sellersArr = window.sellers || [];
+  const ordersArr  = window.orders_list || [];
+  if(!sellersArr.length) return;
+
+  const bySeller = {};
+  sellersArr.forEach(s => { bySeller[s._supaId] = { orders: 0, revenue: 0 }; });
+  ordersArr.forEach(o => {
+    const m = bySeller[o.seller];
+    if(m){ m.orders++; m.revenue += (o.amountRaw || 0); }
+  });
+
+  const built = sellersArr.map(s => {
+    const m = bySeller[s._supaId] || { orders: 0, revenue: 0 };
+    return {
+      id: s.id,
+      name: s.name,
+      district: (s.district && s.district !== '-') ? s.district : '—',
+      status: s.status,
+      plan: s.plan,
+      orders: m.orders,
+      revenue: m.revenue,
+      ordersPct: 0,
+      revenuePct: 0,
+      score: Math.min(100, m.orders * 5),
+      shield: 'prime',
+      trend: 'stable',
+      rank: 0,
+    };
+  });
+
+  built.sort((a,b) => b.revenue - a.revenue || b.orders - a.orders);
+  built.forEach((p,i) => {
+    p.rank = i + 1;
+    p.shield = i===0 ? 'diamond' : i < 3 ? 'gold' : i < 10 ? 'silver' : 'prime';
+  });
+
+  const performers = window.performers_list;
+  performers.length = 0;
+  built.forEach(p => performers.push(p));
+
+  if(typeof window.performers_renderPodium === 'function') window.performers_renderPodium();
+  if(typeof window.performers_renderTable === 'function') window.performers_renderTable();
+  console.log('✅ Top Performers built from sellers+orders:', performers.length);
 }
 
 async function supabase_initLoad(){
@@ -7892,6 +7948,7 @@ async function supabase_initLoad(){
     loadOrdersFromSupabase(),
     loadTicketsFromSupabase()
   ]);
+  buildPerformersFromData();
 }
 
 if(document.readyState === 'loading'){
@@ -9485,6 +9542,7 @@ window.adminLogout = adminLogout;
 const PALETTE = ['#2f6df6','#ea8a1f','#7c3aed','#16a34a','#e0518a','#0ea5a4','#f43f5e','#6366f1','#d97706','#0891b2'];
 
 const performers = []; // populated from Supabase
+window.performers_list = performers; // exposed so buildPerformersFromData() (defined in a different scope) can fill this
 
 let pf_state = {search:'', badge:'All Badges', district:'All Districts', plan:'All Plans', page:1, pageSize:10, selectedId:null};
 
@@ -9867,6 +9925,7 @@ function performers_viewFullProfile(id){
 
 window.performers_cycleFilter = performers_cycleFilter;
 window.performers_renderTable = performers_renderTable;
+window.performers_renderPodium = performers_renderPodium;
 window.performers_goPage = performers_goPage;
 window.performers_selectSeller = performers_selectSeller;
 window.performers_closeDetail = performers_closeDetail;

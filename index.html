@@ -4809,12 +4809,14 @@ button{font-family:inherit;}
           <div class="donut-wrap">
             <svg viewBox="0 0 200 200" width="150" height="150">
               <circle cx="100" cy="100" r="70" fill="none" stroke="#eef0f5" stroke-width="28"/>
+              <g id="rr-plan-donut-arcs">
               <circle cx="100" cy="100" r="70" fill="none" stroke="#2f6df6" stroke-width="28"
                 stroke-dasharray="314.7 440" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
               <circle cx="100" cy="100" r="70" fill="none" stroke="#ea8a1f" stroke-width="28"
                 stroke-dasharray="118 440" stroke-dashoffset="-314.7" transform="rotate(-90 100 100)"/>
               <circle cx="100" cy="100" r="70" fill="none" stroke="#16a34a" stroke-width="28"
                 stroke-dasharray="7.9 440" stroke-dashoffset="-432.7" transform="rotate(-90 100 100)"/>
+              </g>
               <text x="100" y="96" text-anchor="middle" font-family="Inter" font-size="18" font-weight="800" fill="#15192e" id="rr-donut-plan-total">—</text>
               <text x="100" y="115" text-anchor="middle" font-family="Inter" font-size="10.5" fill="#6b7180">Total</text>
             </svg>
@@ -4878,7 +4880,7 @@ button{font-family:inherit;}
           </div>
           <div class="panel-sub">Top 10 Districts by Revenue</div>
           <div class="district-split">
-            <div class="district-bars">
+            <div class="district-bars" id="rr-district-bars">
               <div class="dbar-row"><span class="dbar-name">Coimbatore</span><div class="dbar-track"><div class="dbar-fill" style="width:0%;"></div></div><span class="dbar-val">—</span></div>
               <div class="dbar-row"><span class="dbar-name">Madurai</span><div class="dbar-track"><div class="dbar-fill" style="width:0%;"></div></div><span class="dbar-val">—</span></div>
               <div class="dbar-row"><span class="dbar-name">Tiruchirappalli</span><div class="dbar-track"><div class="dbar-fill" style="width:0%;"></div></div><span class="dbar-val">—</span></div>
@@ -4894,7 +4896,7 @@ button{font-family:inherit;}
               <thead>
                 <tr><th>#</th><th>District</th><th>Sellers</th><th>Revenue (₹)</th><th>Avg. Revenue / Seller</th></tr>
               </thead>
-              <tbody>
+              <tbody id="rr-district-tbody">
                 <tr><td>1</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
                 <tr><td>2</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
                 <tr><td>3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -5148,12 +5150,14 @@ button{font-family:inherit;}
           <div class="donut-wrap">
             <svg viewBox="0 0 200 200" width="160" height="160">
               <circle cx="100" cy="100" r="70" fill="none" stroke="#eef0f5" stroke-width="28"/>
+              <g id="rr-status-donut-arcs">
               <circle cx="100" cy="100" r="70" fill="none" stroke="#16a34a" stroke-width="28"
                 stroke-dasharray="387.5 440" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
               <circle cx="100" cy="100" r="70" fill="none" stroke="#ea8a1f" stroke-width="28"
                 stroke-dasharray="32.6 440" stroke-dashoffset="-387.5" transform="rotate(-90 100 100)"/>
               <circle cx="100" cy="100" r="70" fill="none" stroke="#dc2626" stroke-width="28"
                 stroke-dasharray="25.5 440" stroke-dashoffset="-420.1" transform="rotate(-90 100 100)"/>
+              </g>
               <text x="100" y="96" text-anchor="middle" font-family="Inter" font-size="20" font-weight="800" fill="#15192e" id="rr-status-donut-total">—</text>
               <text x="100" y="116" text-anchor="middle" font-family="Inter" font-size="11.5" fill="#6b7180">Total</text>
             </svg>
@@ -5178,7 +5182,7 @@ button{font-family:inherit;}
           <div class="panel-sub">Top 10 Districts by Total Sellers</div>
 
           <div class="district-map-split">
-            <div class="district-bars">
+            <div class="district-bars" id="rr-seller-district-bars">
               <div class="dbar-row"><span class="dbar-name">Coimbatore</span><div class="dbar-track"><div class="dbar-fill" style="width:0%;"></div></div><span class="dbar-val">—</span></div>
               <div class="dbar-row"><span class="dbar-name">Madurai</span><div class="dbar-track"><div class="dbar-fill" style="width:0%;"></div></div><span class="dbar-val">—</span></div>
               <div class="dbar-row"><span class="dbar-name">Tiruchirappalli</span><div class="dbar-track"><div class="dbar-fill" style="width:0%;"></div></div><span class="dbar-val">—</span></div>
@@ -7235,6 +7239,323 @@ function reports_switchTab(tab){
   });
 }
 window.reports_switchTab = reports_switchTab;
+
+/* ---- Local Supabase access (self-contained, mirrors the Leads module pattern) ---- */
+const RR_SUPA_URL = 'https://zkafglojonspzlsfxcdh.supabase.co';
+const RR_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprYWZnbG9qb25zcHpsc2Z4Y2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDc5NDAsImV4cCI6MjA5MTk4Mzk0MH0._fjfrv1G_n6jAUxqnCYRTNN-ferzfbydmy-bxOzWLIQ';
+const RR_HDR = { 'apikey': RR_SUPA_KEY, 'Authorization': 'Bearer ' + RR_SUPA_KEY, 'Content-Type': 'application/json' };
+
+async function rrFetch(path){
+  try {
+    const res = await fetch(RR_SUPA_URL + '/rest/v1/' + path, { headers: RR_HDR });
+    if(!res.ok){ console.warn('Reports: fetch failed for', path, res.status); return []; }
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
+  } catch(e){ console.warn('Reports: fetch error for', path, e); return []; }
+}
+
+/* ---- Small helpers ---- */
+const RR_PLAN_PRICE = { starter:0, growth:199, elite:1999, 'diwali offer':99, 'launch special':149 };
+function rrPlanPrice(planRaw){
+  const key = (planRaw||'').toString().trim().toLowerCase();
+  return RR_PLAN_PRICE.hasOwnProperty(key) ? RR_PLAN_PRICE[key] : 0;
+}
+function rrCapitalize(s){ s=(s||'').toString().trim(); return s ? s.charAt(0).toUpperCase()+s.slice(1).toLowerCase() : 'Unknown'; }
+function rrMoney(n){ return '₹' + Math.round(n||0).toLocaleString('en-IN'); }
+function rrNum(n){ return Math.round(n||0).toLocaleString('en-IN'); }
+function rrEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function rrInRange(dateStr, start, end){
+  if(!dateStr) return false;
+  const d = new Date(dateStr);
+  return d >= start && d < end;
+}
+function rrSet(id, val){ const el=document.getElementById(id); if(el) el.textContent = val; }
+function rrPctChange(curr, prev){
+  if(!prev){
+    return curr > 0 ? {cls:'up', text:'↑ New this month'} : {cls:'dim', text:'No change'};
+  }
+  const change = ((curr - prev) / prev) * 100;
+  const cls = change >= 0 ? 'up' : 'down';
+  const arrow = change >= 0 ? '↑' : '↓';
+  return {cls, text: arrow + ' ' + Math.abs(change).toFixed(1) + '%'};
+}
+function rrApplyChange(valId, lblId, curr, prev, suffix){
+  const c = rrPctChange(curr, prev);
+  const valEl = document.getElementById(valId);
+  if(valEl){ valEl.textContent = c.text; valEl.className = c.cls; }
+  const lblEl = document.getElementById(lblId);
+  if(lblEl) lblEl.textContent = suffix || 'vs last month';
+}
+
+let rrLoaded = false;
+let rrLoading = false;
+
+async function reports_loadData(){
+  if(rrLoading) return;
+  rrLoading = true;
+  try {
+    const [profiles, details, subs] = await Promise.all([
+      rrFetch('profiles?select=id,email,plan,role,whatsapp_number,created_at'),
+      rrFetch('seller_details?select=user_id,district,whatsapp_number'),
+      rrFetch('subscriptions?select=user_id,status,plan,expires_at,created_at&order=created_at.asc')
+    ]);
+
+    const detailMap = {};
+    details.forEach(d => detailMap[d.user_id] = d);
+
+    // First & latest subscription per user (subs already ascending by created_at)
+    const firstSubByUser = {}, latestSubByUser = {};
+    subs.forEach(s => {
+      if(!firstSubByUser[s.user_id]) firstSubByUser[s.user_id] = s;
+      latestSubByUser[s.user_id] = s;
+    });
+
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth()+1, 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+
+    /* ---------------- REVENUE REPORTS ---------------- */
+    let totalRevenue=0, revThis=0, revLast=0;
+    let newSubsThis=0, newSubsLast=0, renewalsThis=0, renewalsLast=0;
+    const planRevenue = {};
+    subs.forEach(s => {
+      const price = rrPlanPrice(s.plan);
+      totalRevenue += price;
+      const planName = rrCapitalize(s.plan);
+      planRevenue[planName] = (planRevenue[planName]||0) + price;
+      const isFirst = firstSubByUser[s.user_id] === s;
+      if(rrInRange(s.created_at, thisMonthStart, nextMonthStart)){
+        revThis += price;
+        if(isFirst) newSubsThis++; else renewalsThis++;
+      } else if(rrInRange(s.created_at, lastMonthStart, thisMonthStart)){
+        revLast += price;
+        if(isFirst) newSubsLast++; else renewalsLast++;
+      }
+    });
+
+    let expiredTotal=0, expiredThis=0, expiredLast=0;
+    Object.values(latestSubByUser).forEach(s => {
+      const expDate = s.expires_at ? new Date(s.expires_at) : null;
+      const isExpired = s.status === 'expired' || (expDate && expDate < now && s.status !== 'active');
+      if(isExpired){
+        expiredTotal++;
+        if(expDate && rrInRange(s.expires_at, thisMonthStart, nextMonthStart)) expiredThis++;
+        else if(expDate && rrInRange(s.expires_at, lastMonthStart, thisMonthStart)) expiredLast++;
+      }
+    });
+    const renewalsTotal = subs.filter(s => firstSubByUser[s.user_id] !== s).length;
+
+    rrSet('rr-stat-revenue', rrMoney(totalRevenue));
+    rrApplyChange('rr-stat-revenue-chg','rr-stat-revenue-chg-lbl', revThis, revLast);
+    rrSet('rr-stat-newsubs', rrNum(newSubsThis));
+    rrSet('rr-stat-renewals', rrNum(renewalsTotal));
+    rrApplyChange('rr-stat-renewals-chg','rr-stat-renewals-chg-lbl', renewalsThis, renewalsLast);
+    rrSet('rr-stat-expired', rrNum(expiredTotal));
+    rrApplyChange('rr-stat-expired-chg','rr-stat-expired-chg-lbl', expiredThis, expiredLast);
+
+    // Revenue by Plan donut
+    const planEntries = Object.keys(planRevenue).map(name => ({name, value: planRevenue[name]}))
+      .filter(p => p.value > 0).sort((a,b) => b.value - a.value);
+    const planTotal = planEntries.reduce((sum,p) => sum + p.value, 0);
+    rrSet('rr-donut-plan-total', planTotal > 0 ? rrMoney(planTotal) : '—');
+    const planColors = ['#2f6df6','#ea8a1f','#16a34a','#7c3aed','#e0518a'];
+    const planArcsEl = document.getElementById('rr-plan-donut-arcs');
+    const planLegendEl = document.getElementById('rr-plan-legend');
+    if(planEntries.length && planArcsEl && planLegendEl){
+      const circumference = 2 * Math.PI * 70;
+      let offset = 0;
+      planArcsEl.innerHTML = planEntries.map((p,i) => {
+        const frac = p.value / planTotal;
+        const len = frac * circumference;
+        const arc = `<circle cx="100" cy="100" r="70" fill="none" stroke="${planColors[i%planColors.length]}" stroke-width="28" stroke-dasharray="${len.toFixed(1)} ${circumference.toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}" transform="rotate(-90 100 100)"/>`;
+        offset += len;
+        return arc;
+      }).join('');
+      planLegendEl.innerHTML = planEntries.map((p,i) => `<div class="legend-row"><span class="dot" style="background:${planColors[i%planColors.length]};"></span><span class="l-name">${rrEsc(p.name)}</span><span class="l-val">${rrMoney(p.value)}</span></div>`).join('');
+    } else if(planLegendEl){
+      planLegendEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px;">No subscription data available</div>';
+    }
+
+    /* ---------------- SELLERS (shared between both tabs) ---------------- */
+    const sellerProfiles = profiles.filter(p => (p.role||'').toString().toLowerCase() !== 'admin');
+    const revenueByUser = {};
+    subs.forEach(s => { revenueByUser[s.user_id] = (revenueByUser[s.user_id]||0) + rrPlanPrice(s.plan); });
+
+    const sellerRows = sellerProfiles.map(p => {
+      const sub = latestSubByUser[p.id];
+      const status = !sub ? 'Inactive' : (sub.status === 'active' ? 'Active' : (sub.status === 'suspended' ? 'Suspended' : 'Suspended'));
+      const det = detailMap[p.id] || {};
+      const district = (det.district || '').toString().trim() || null;
+      const email = (p.email || '').toString().trim();
+      const phone = (det.whatsapp_number || p.whatsapp_number || '').toString().trim();
+      return {
+        id: p.id, status, district,
+        plan: (sub && sub.plan) || p.plan || 'starter',
+        email, phone,
+        created_at: p.created_at,
+        revenueLifetime: revenueByUser[p.id] || 0
+      };
+    });
+
+    const totalSellers = sellerRows.length;
+    const activeSellers = sellerRows.filter(s => s.status === 'Active').length;
+    const suspendedSellers = sellerRows.filter(s => s.status === 'Suspended').length;
+    const inactiveSellers = totalSellers - activeSellers - suspendedSellers;
+
+    let newSellersThis=0, newSellersLast=0, newActiveThis=0, newActiveLast=0, newSuspThis=0, newSuspLast=0;
+    sellerRows.forEach(s => {
+      const inThis = rrInRange(s.created_at, thisMonthStart, nextMonthStart);
+      const inLast = rrInRange(s.created_at, lastMonthStart, thisMonthStart);
+      if(inThis){ newSellersThis++; if(s.status==='Active') newActiveThis++; if(s.status==='Suspended') newSuspThis++; }
+      else if(inLast){ newSellersLast++; if(s.status==='Active') newActiveLast++; if(s.status==='Suspended') newSuspLast++; }
+    });
+
+    rrSet('rr-sel-total', rrNum(totalSellers));
+    rrSet('rr-sel-active', rrNum(activeSellers));
+    rrApplyChange('rr-sel-active-chg','rr-sel-active-chg-lbl', newActiveThis, newActiveLast);
+    rrSet('rr-sel-suspended', rrNum(suspendedSellers));
+    rrApplyChange('rr-sel-susp-chg','rr-sel-susp-chg-lbl', newSuspThis, newSuspLast);
+    rrSet('rr-sel-new', rrNum(newSellersThis));
+    rrApplyChange('rr-sel-new-chg','rr-sel-new-chg-lbl', newSellersThis, newSellersLast);
+
+    // Seller Status Distribution donut
+    rrSet('rr-status-donut-total', rrNum(totalSellers));
+    rrSet('rr-status-active-val', rrNum(activeSellers));
+    rrSet('rr-status-inactive-val', rrNum(inactiveSellers));
+    rrSet('rr-status-susp-val', rrNum(suspendedSellers));
+    const statusArcsEl = document.getElementById('rr-status-donut-arcs');
+    if(statusArcsEl && totalSellers > 0){
+      const circumference = 2 * Math.PI * 70;
+      const segs = [
+        {val: activeSellers, color:'#16a34a'},
+        {val: inactiveSellers, color:'#ea8a1f'},
+        {val: suspendedSellers, color:'#dc2626'}
+      ];
+      let offset = 0;
+      statusArcsEl.innerHTML = segs.map(seg => {
+        const len = (seg.val/totalSellers) * circumference;
+        const arc = `<circle cx="100" cy="100" r="70" fill="none" stroke="${seg.color}" stroke-width="28" stroke-dasharray="${len.toFixed(1)} ${circumference.toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}" transform="rotate(-90 100 100)"/>`;
+        offset += len;
+        return arc;
+      }).join('');
+    }
+
+    // Account Status Summary
+    rrSet('rr-acct-active', rrNum(activeSellers));
+    rrSet('rr-acct-active-pct', totalSellers ? (activeSellers/totalSellers*100).toFixed(1)+'% of total' : '—');
+    rrSet('rr-acct-inactive', rrNum(inactiveSellers));
+    rrSet('rr-acct-inactive-pct', totalSellers ? (inactiveSellers/totalSellers*100).toFixed(1)+'% of total' : '—');
+    rrSet('rr-acct-suspended', rrNum(suspendedSellers));
+    rrSet('rr-acct-suspended-pct', totalSellers ? (suspendedSellers/totalSellers*100).toFixed(1)+'% of total' : '—');
+
+    // Verification Summary (proxy: based on which contact fields are on file — schema has no explicit verified flag)
+    const emailOk = sellerRows.filter(s => s.email && s.email.includes('@')).length;
+    const mobileOk = sellerRows.filter(s => s.phone && s.phone.length >= 8).length;
+    const pendingBoth = sellerRows.filter(s => !(s.email && s.email.includes('@')) && !(s.phone && s.phone.length >= 8)).length;
+    rrSet('rr-verif-email', rrNum(emailOk));
+    rrSet('rr-verif-email-pct', totalSellers ? (emailOk/totalSellers*100).toFixed(1)+'% of total' : '—');
+    rrSet('rr-verif-mobile', rrNum(mobileOk));
+    rrSet('rr-verif-mobile-pct', totalSellers ? (mobileOk/totalSellers*100).toFixed(1)+'% of total' : '—');
+    rrSet('rr-verif-pending', rrNum(pendingBoth));
+    rrSet('rr-verif-pending-pct', totalSellers ? (pendingBoth/totalSellers*100).toFixed(1)+'% of total' : '—');
+
+    /* ---------------- DISTRICT AGGREGATION (used by both tabs) ---------------- */
+    const distAgg = {};
+    sellerRows.forEach(s => {
+      if(!s.district) return;
+      if(!distAgg[s.district]) distAgg[s.district] = {name:s.district, sellers:0, active:0, premium:0, revenue:0};
+      const d = distAgg[s.district];
+      d.sellers++;
+      if(s.status === 'Active') d.active++;
+      if(rrPlanPrice(s.plan) >= 1000) d.premium++;
+      d.revenue += s.revenueLifetime;
+    });
+    const distList = Object.values(distAgg);
+    const distCount = distList.length;
+    const sellersWithDistrict = distList.reduce((sum,d) => sum + d.sellers, 0);
+
+    // -- Revenue tab: district-wise revenue --
+    const byRevenue = [...distList].sort((a,b) => b.revenue - a.revenue);
+    const revBarsEl = document.getElementById('rr-district-bars');
+    if(revBarsEl){
+      if(!byRevenue.length){
+        revBarsEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px;padding:6px 0;">No district data available yet</div>';
+      } else {
+        const maxRev = Math.max(...byRevenue.slice(0,10).map(d => d.revenue), 1);
+        revBarsEl.innerHTML = byRevenue.slice(0,10).map(d => `<div class="dbar-row"><span class="dbar-name">${rrEsc(d.name)}</span><div class="dbar-track"><div class="dbar-fill" style="width:${Math.round(d.revenue/maxRev*100)}%;"></div></div><span class="dbar-val">${rrMoney(d.revenue)}</span></div>`).join('');
+      }
+    }
+    const distTbody = document.getElementById('rr-district-tbody');
+    if(distTbody){
+      if(!byRevenue.length){
+        distTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:16px;">No district data available yet</td></tr>';
+      } else {
+        const top10 = byRevenue.slice(0,10);
+        const rowHtml = (d,i) => `<tr><td>${i+1}</td><td>${rrEsc(d.name)}</td><td>${d.sellers}</td><td>${rrMoney(d.revenue)}</td><td>${rrMoney(d.sellers ? d.revenue/d.sellers : 0)}</td></tr>`;
+        if(top10.length <= 6){
+          distTbody.innerHTML = top10.map(rowHtml).join('');
+        } else {
+          const last = top10[top10.length-1];
+          distTbody.innerHTML = top10.slice(0,5).map(rowHtml).join('')
+            + '<tr class="ellipsis-row"><td colspan="5">⋯</td></tr>'
+            + rowHtml(last, top10.length-1);
+        }
+      }
+    }
+    rrSet('rr-district-count', rrNum(distCount));
+    rrSet('rr-district-total-rev', rrMoney(byRevenue.reduce((s,d) => s+d.revenue, 0)));
+    rrSet('rr-district-total-sellers', rrNum(sellersWithDistrict));
+
+    // -- Seller tab: district-wise sellers --
+    const bySellers = [...distList].sort((a,b) => b.sellers - a.sellers);
+    const selBarsEl = document.getElementById('rr-seller-district-bars');
+    if(selBarsEl){
+      if(!bySellers.length){
+        selBarsEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px;padding:6px 0;">No district data available yet</div>';
+      } else {
+        const maxSellers = Math.max(...bySellers.slice(0,10).map(d => d.sellers), 1);
+        const axisMax = Math.max(5, Math.ceil(maxSellers/5)*5);
+        selBarsEl.innerHTML = bySellers.slice(0,10).map(d => `<div class="dbar-row"><span class="dbar-name">${rrEsc(d.name)}</span><div class="dbar-track"><div class="dbar-fill" style="width:${Math.round(d.sellers/maxSellers*100)}%;"></div></div><span class="dbar-val">${d.sellers}</span></div>`).join('')
+          + `<div class="dbar-axis"><span>0</span><span>${Math.round(axisMax*0.25)}</span><span>${Math.round(axisMax*0.5)}</span><span>${Math.round(axisMax*0.75)}</span><span>${axisMax}</span></div>`
+          + `<div class="dbar-axis-label">Total Sellers</div>`;
+      }
+    }
+    if(bySellers.length){
+      rrSet('rr-top-district', bySellers[0].name);
+      rrSet('rr-top-district-sellers', bySellers[0].sellers + ' Sellers (' + (sellersWithDistrict ? (bySellers[0].sellers/sellersWithDistrict*100).toFixed(0) : 0) + '%)');
+      const byPremium = [...distList].sort((a,b) => b.premium - a.premium);
+      rrSet('rr-premium-district', byPremium[0].premium > 0 ? byPremium[0].name : '—');
+      rrSet('rr-premium-district-count', byPremium[0].premium > 0 ? byPremium[0].premium + ' Premium Sellers' : 'No premium sellers yet');
+    } else {
+      rrSet('rr-top-district', '—'); rrSet('rr-top-district-sellers', '—');
+      rrSet('rr-premium-district', '—'); rrSet('rr-premium-district-count', '—');
+    }
+    rrSet('rr-avg-sellers-district', distCount ? (sellersWithDistrict/distCount).toFixed(1) : '0');
+    rrSet('rr-total-districts', rrNum(distCount));
+    rrSet('rr-st-districts', rrNum(distCount));
+    rrSet('rr-st-total', rrNum(totalSellers));
+    rrSet('rr-st-active', rrNum(activeSellers));
+    rrSet('rr-st-inactive', rrNum(inactiveSellers));
+    rrSet('rr-st-suspended', rrNum(suspendedSellers));
+
+    rrLoaded = true;
+    console.log('✅ Reports loaded from Supabase:', totalSellers, 'sellers,', subs.length, 'subscription records');
+  } catch(e){
+    console.warn('⚠️ Reports: failed to load data:', e);
+  } finally {
+    rrLoading = false;
+  }
+}
+window.reports_loadData = reports_loadData;
+
+// Load when the Reports page is opened (mirrors the Leads-page pattern)
+const rrOrigGoToPage = window.goToPage;
+window.goToPage = function(evt, pageId){
+  if(typeof rrOrigGoToPage === 'function') rrOrigGoToPage(evt, pageId);
+  if(pageId === 'reports') reports_loadData();
+};
+if(document.getElementById('page-reports')?.classList.contains('active')) reports_loadData();
 })();
 
 /* ===== Settings JS ===== */

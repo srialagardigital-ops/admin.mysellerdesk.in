@@ -10722,223 +10722,262 @@ performers_renderDetailPanel();
      LEADS PAGE — CSS
 ═══════════════════════════════════════════════ -->
 <style>
-/* ---- Leads Page Layout ---- */
-#page-leads .content { padding: 4px 28px 32px; }
+/* ══════════════════════════════════════════
+   LEADS PAGE — REDESIGNED CSS (screenshot match)
+══════════════════════════════════════════ */
 
+/* Layout */
+#page-leads .content { padding: 6px 28px 36px; }
+
+/* Page head */
 #page-leads .page-head {
   display: flex; align-items: flex-start; justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
-#page-leads .page-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -.3px; }
-#page-leads .page-head p  { font-size: 13.5px; color: var(--text-dim); margin-top: 3px; }
+#page-leads .page-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -.4px; }
+#page-leads .page-head p  { font-size: 13px; color: var(--text-dim); margin-top: 3px; }
 #page-leads .page-head-actions { display: flex; gap: 10px; align-items: center; }
 
 #page-leads .btn-primary {
-  display: flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; gap: 8px;
   background: var(--blue); color: #fff; border: none;
-  padding: 11px 18px; border-radius: 10px;
-  font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit;
-  box-shadow: 0 4px 10px rgba(47,109,246,.25);
+  padding: 11px 20px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(47,109,246,.28);
   transition: background .15s, transform .1s;
 }
 #page-leads .btn-primary:hover { background: #2459d9; }
+#page-leads .btn-primary:active { transform: scale(.98); }
 #page-leads .btn-primary svg { width: 15px; height: 15px; }
 
 #page-leads .btn-outline {
-  display: flex; align-items: center; gap: 8px;
-  background: #fff; color: var(--text); border: 1px solid var(--border);
-  padding: 11px 18px; border-radius: 10px;
-  font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; color: var(--text); border: 1.5px solid var(--border);
+  padding: 10px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
   box-shadow: var(--shadow); transition: background .15s;
 }
 #page-leads .btn-outline:hover { background: #f7f8fc; }
 #page-leads .btn-outline svg { width: 15px; height: 15px; color: var(--text-dim); }
 
-/* ---- Summary Cards ---- */
+/* ── Summary Cards ── */
 #page-leads .leads-summary {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 22px;
 }
 #page-leads .lsum-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 18px 20px 14px;
-  box-shadow: var(--shadow); cursor: pointer; transition: box-shadow .15s;
-  position: relative; overflow: hidden;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 18px 20px 0;
+  box-shadow: var(--shadow); cursor: pointer;
+  transition: box-shadow .15s, transform .12s;
+  overflow: hidden; position: relative;
 }
-#page-leads .lsum-card:hover { box-shadow: 0 4px 16px rgba(16,24,40,.1); }
-#page-leads .lsum-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+#page-leads .lsum-card:hover { box-shadow: 0 6px 22px rgba(16,24,40,.1); transform: translateY(-1px); }
+#page-leads .lsum-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 #page-leads .lsum-icon {
-  width: 40px; height: 40px; border-radius: 11px;
+  width: 46px; height: 46px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-#page-leads .lsum-icon svg { width: 20px; height: 20px; }
-#page-leads .lsum-label { font-size: 12.5px; color: var(--text-dim); font-weight: 500; }
-#page-leads .lsum-val { font-size: 28px; font-weight: 800; letter-spacing: -.5px; line-height: 1; }
+#page-leads .lsum-icon svg { width: 22px; height: 22px; }
+#page-leads .lsum-label { font-size: 12.5px; color: var(--text-dim); font-weight: 600; margin-bottom: 4px; }
+#page-leads .lsum-val { font-size: 32px; font-weight: 800; letter-spacing: -.6px; line-height: 1; }
 #page-leads .lsum-link {
-  margin-top: 10px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 4px;
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12.5px; font-weight: 700;
+  padding: 10px 0 12px; border-top: 1px solid var(--border); margin-top: 4px;
 }
 #page-leads .lsum-link svg { width: 13px; height: 13px; }
-#page-leads .lsum-card.blue .lsum-link  { color: var(--blue); }
-#page-leads .lsum-card.red .lsum-link   { color: var(--red); }
-#page-leads .lsum-card.green .lsum-link { color: var(--green); }
-#page-leads .lsum-card.purple .lsum-link{ color: var(--purple); }
+#page-leads .lsum-card.blue   .lsum-link { color: var(--blue); }
+#page-leads .lsum-card.red    .lsum-link { color: var(--red); }
+#page-leads .lsum-card.green  .lsum-link { color: var(--green); }
+#page-leads .lsum-card.purple .lsum-link { color: var(--purple); }
 #page-leads .ic-blue   { background: var(--blue-light);   color: var(--blue); }
 #page-leads .ic-red    { background: var(--red-light);    color: var(--red); }
 #page-leads .ic-green  { background: var(--green-light);  color: var(--green); }
 #page-leads .ic-purple { background: var(--purple-light); color: var(--purple); }
-#page-leads .lsum-card-accent {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-}
-#page-leads .lsum-card.blue  .lsum-card-accent { background: var(--blue); }
-#page-leads .lsum-card.red   .lsum-card-accent { background: var(--red); }
-#page-leads .lsum-card.green .lsum-card-accent { background: var(--green); }
-#page-leads .lsum-card.purple.lsum-card-accent { background: var(--purple); }
+#page-leads .lsum-card-accent { display: none; }
+#page-leads .lsum-card.active-filter { box-shadow: 0 0 0 2px var(--blue); }
 
-/* ---- Filters Bar ---- */
+/* card left accent bar */
+#page-leads .lsum-card.blue   { border-left: 4px solid var(--blue); }
+#page-leads .lsum-card.red    { border-left: 4px solid var(--red); }
+#page-leads .lsum-card.green  { border-left: 4px solid var(--green); }
+#page-leads .lsum-card.purple { border-left: 4px solid var(--purple); }
+
+/* ── Filters Bar ── */
 #page-leads .filters-bar {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 16px;
+  box-shadow: var(--shadow);
 }
 #page-leads .search-box {
-  flex: 1; display: flex; align-items: center; gap: 10px;
-  background: #fff; border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 14px; box-shadow: var(--shadow); max-width: 360px;
+  flex: 1; display: flex; align-items: center; gap: 9px;
+  background: #f7f8fc; border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 9px 14px; min-width: 200px; max-width: 340px;
+  transition: border-color .15s;
 }
-#page-leads .search-box svg { width: 16px; height: 16px; color: var(--text-faint); flex-shrink: 0; }
+#page-leads .search-box:focus-within { border-color: var(--blue); background: #fff; }
+#page-leads .search-box svg { width: 15px; height: 15px; color: var(--text-faint); flex-shrink: 0; }
 #page-leads .search-box input {
-  border: none; outline: none; font-family: inherit; font-size: 13.5px;
+  border: none; outline: none; font-family: inherit; font-size: 13px;
   width: 100%; background: transparent; color: var(--text);
 }
 #page-leads .search-box input::placeholder { color: var(--text-faint); }
+
 #page-leads .filter-select {
-  display: flex; align-items: center; gap: 8px;
-  background: #fff; border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--text);
-  cursor: pointer; box-shadow: var(--shadow); white-space: nowrap; position: relative;
+  display: flex; align-items: center; gap: 6px;
+  background: #f7f8fc; border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text);
+  cursor: pointer; white-space: nowrap; transition: border-color .15s;
 }
-#page-leads .filter-select svg { width: 14px; height: 14px; color: var(--text-dim); }
-#page-leads .filter-select .filter-label { font-size: 10.5px; color: var(--text-faint); font-weight: 600; margin-right: 2px; }
+#page-leads .filter-select:hover { border-color: #c5cce0; }
+#page-leads .filter-select svg { width: 13px; height: 13px; color: var(--text-dim); margin-left: 2px; }
+#page-leads .filter-select .filter-label {
+  font-size: 10px; color: var(--text-faint); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; display: block; line-height: 1;
+}
+#page-leads .filter-select-inner { display: flex; flex-direction: column; }
+#page-leads .filter-select-val { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
 #page-leads .filters-spacer { flex: 1; }
 #page-leads .reset-btn {
-  display: flex; align-items: center; gap: 7px;
-  background: #fff; border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-dim);
-  cursor: pointer; box-shadow: var(--shadow);
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #f7f8fc; border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 9px 14px; font-size: 13px; font-weight: 600; color: var(--text-dim);
+  cursor: pointer; transition: background .13s, border-color .13s;
 }
+#page-leads .reset-btn:hover { background: #eef0f7; border-color: #c5cce0; }
 #page-leads .reset-btn svg { width: 14px; height: 14px; }
 #page-leads .filter-btn {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--blue); color: #fff; border: none; border-radius: 10px;
-  padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--blue); color: #fff; border: none; border-radius: 9px;
+  padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background .13s;
 }
+#page-leads .filter-btn:hover { background: #2459d9; }
 #page-leads .filter-btn svg { width: 14px; height: 14px; }
 
-/* ---- Table ---- */
+/* ── Table Panel ── */
 #page-leads .table-panel {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  border-radius: 14px; box-shadow: var(--shadow); overflow: hidden;
 }
 #page-leads .table-scroll { overflow-x: auto; }
 #page-leads table { width: 100%; border-collapse: collapse; min-width: 980px; }
+
 #page-leads thead th {
-  text-align: left; font-size: 11.5px; font-weight: 700; color: var(--text-faint);
-  letter-spacing: .2px; white-space: nowrap;
-  padding: 13px 16px; border-bottom: 1px solid var(--border); background: #fbfcfe;
+  text-align: left; font-size: 12px; font-weight: 700; color: var(--text-dim);
+  letter-spacing: .15px; white-space: nowrap;
+  padding: 13px 16px; border-bottom: 1.5px solid var(--border);
+  background: #f8f9fc;
 }
+#page-leads thead th .sort-icon { display: inline-block; margin-left: 4px; opacity: .5; }
 #page-leads thead th.sortable { cursor: pointer; user-select: none; }
 #page-leads thead th.sortable:hover { color: var(--text); }
+
 #page-leads tbody td {
-  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
   font-size: 13px; vertical-align: middle;
 }
 #page-leads tbody tr:last-child td { border-bottom: none; }
 #page-leads tbody tr:hover { background: #fafbfd; }
 
+/* Highlighted rows */
+#page-leads .tr-today  td:first-child { border-left: 3px solid var(--orange); }
+#page-leads .tr-overdue td:first-child { border-left: 3px solid var(--red); }
+
 /* Name cell */
 #page-leads .name-cell { display: flex; align-items: center; gap: 10px; }
 #page-leads .lead-avatar {
-  width: 34px; height: 34px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  font-size: 13px; font-weight: 800; flex-shrink: 0;
 }
-#page-leads .lead-name { font-size: 13.3px; font-weight: 600; }
+#page-leads .lead-name { font-size: 13.5px; font-weight: 700; }
 
 /* Status badge */
 #page-leads .status-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 11.5px; font-weight: 700; padding: 4px 11px; border-radius: 20px;
-  white-space: nowrap;
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: 20px;
+  white-space: nowrap; letter-spacing: .1px;
 }
-#page-leads .status-new         { background: #f0f2f8; color: #444b6a; }
-#page-leads .status-followup    { background: var(--orange-light); color: #c9750f; }
-#page-leads .status-demo        { background: var(--blue-light);   color: var(--blue); }
-#page-leads .status-onboarded   { background: var(--green-light);  color: var(--green); }
-#page-leads .status-closed      { background: var(--red-light);    color: var(--red); }
+#page-leads .status-new       { background: #f0f2f8; color: #444b6a; border: 1px solid #dde1ef; }
+#page-leads .status-followup  { background: #fff4e5; color: #c9750f; border: 1px solid #fcd9a0; }
+#page-leads .status-demo      { background: var(--blue-light); color: var(--blue); border: 1px solid #c7d9fd; }
+#page-leads .status-onboarded { background: var(--green-light); color: var(--green); border: 1px solid #b3e8cc; }
+#page-leads .status-closed    { background: #fde8e8; color: var(--red); border: 1px solid #f9bcbc; }
 
 /* Follow-up date */
-#page-leads .fup-date { display: flex; align-items: center; gap: 6px; }
-#page-leads .fup-date svg { width: 14px; height: 14px; color: var(--text-faint); flex-shrink: 0; }
-#page-leads .fup-main { font-size: 13px; font-weight: 500; }
-#page-leads .fup-relative { font-size: 11.5px; font-weight: 600; margin-top: 1px; }
+#page-leads .fup-date { display: flex; align-items: flex-start; gap: 7px; }
+#page-leads .fup-date svg { width: 14px; height: 14px; color: var(--text-faint); flex-shrink: 0; margin-top: 2px; }
+#page-leads .fup-main { font-size: 13px; font-weight: 500; color: var(--text); }
+#page-leads .fup-relative { font-size: 11.5px; font-weight: 700; margin-top: 2px; }
 #page-leads .fup-today    { color: var(--green); }
 #page-leads .fup-tomorrow { color: var(--blue); }
 #page-leads .fup-overdue  { color: var(--red); }
 #page-leads .fup-upcoming { color: var(--text-dim); }
 
 /* Last contact */
-#page-leads .lc-cell { display: flex; align-items: center; gap: 7px; }
-#page-leads .lc-cell svg { width: 14px; height: 14px; color: var(--text-faint); }
-#page-leads .lc-main { font-size: 13px; font-weight: 500; }
-#page-leads .lc-time { font-size: 11.5px; color: var(--text-faint); }
+#page-leads .lc-cell { display: flex; align-items: flex-start; gap: 7px; }
+#page-leads .lc-cell svg { width: 14px; height: 14px; color: var(--text-faint); flex-shrink: 0; margin-top: 2px; }
+#page-leads .lc-main { font-size: 13px; font-weight: 600; color: var(--text); }
+#page-leads .lc-time { font-size: 11.5px; color: var(--text-faint); margin-top: 1px; }
 
 /* Source badge */
 #page-leads .source-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+  white-space: nowrap;
 }
+#page-leads .source-badge svg { width: 13px; height: 13px; }
 #page-leads .src-instagram { background: #fde8f5; color: #c2297a; }
 #page-leads .src-whatsapp  { background: #e8f9ef; color: #16a34a; }
 #page-leads .src-facebook  { background: #e7f0ff; color: #1877f2; }
 #page-leads .src-website   { background: var(--purple-light); color: var(--purple); }
 #page-leads .src-referral  { background: var(--orange-light); color: #c9750f; }
 #page-leads .src-walk-in   { background: #f0f2f8; color: #444b6a; }
-#page-leads .source-badge svg { width: 13px; height: 13px; }
 
 /* Action buttons */
-#page-leads .actions-cell { display: flex; align-items: center; gap: 6px; }
+#page-leads .actions-cell { display: flex; align-items: center; gap: 5px; }
 #page-leads .act-btn {
-  width: 30px; height: 30px; border-radius: 8px; border: none;
+  width: 32px; height: 32px; border-radius: 9px; border: none;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; background: #f4f6fb; color: var(--text-dim);
-  transition: background .13s, color .13s;
+  transition: background .12s, color .12s;
 }
 #page-leads .act-btn:hover { background: var(--blue-light); color: var(--blue); }
-#page-leads .act-btn.red:hover { background: var(--red-light); color: var(--red); }
-#page-leads .act-btn svg { width: 14px; height: 14px; }
+#page-leads .act-btn.green-btn { color: #16a34a; background: #e8f9ef; }
+#page-leads .act-btn.green-btn:hover { background: #c5f0d8; }
+#page-leads .act-btn.wa-btn { color: #16a34a; background: #e8f9ef; }
+#page-leads .act-btn.wa-btn:hover { background: #c5f0d8; }
+#page-leads .act-btn.edit-btn { color: var(--blue); background: var(--blue-light); }
+#page-leads .act-btn.edit-btn:hover { background: #c7d9fd; }
+#page-leads .act-btn svg { width: 15px; height: 15px; }
 #page-leads .act-more-btn {
-  width: 30px; height: 30px; border-radius: 8px; border: none;
+  width: 32px; height: 32px; border-radius: 9px; border: none;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; background: transparent; color: var(--text-dim);
   font-size: 18px; font-weight: 700; letter-spacing: 1px;
-  position: relative; z-index: 1;
+  position: relative; transition: background .12s;
 }
+#page-leads .act-more-btn:hover { background: #f0f2f8; }
 
-/* Highlighted row (today follow-up) */
-#page-leads .tr-today { border-left: 3px solid var(--orange); }
-#page-leads .tr-overdue { border-left: 3px solid var(--red); }
-
-/* ---- Pagination ---- */
+/* ── Pagination ── */
 #page-leads .table-footer {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; border-top: 1px solid var(--border);
-  font-size: 13px; color: var(--text-dim);
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-dim); flex-wrap: wrap; gap: 10px;
 }
 #page-leads .pagination { display: flex; align-items: center; gap: 4px; }
 #page-leads .pg-btn {
-  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+  min-width: 34px; height: 34px; padding: 0 6px;
+  border-radius: 8px; border: 1.5px solid var(--border);
   background: #fff; display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text);
-  transition: background .13s;
+  transition: background .12s, border-color .12s;
 }
-#page-leads .pg-btn:hover { background: var(--blue-light); color: var(--blue); }
+#page-leads .pg-btn:hover { background: var(--blue-light); color: var(--blue); border-color: #c7d9fd; }
 #page-leads .pg-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 #page-leads .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
 #page-leads .rows-select {
@@ -10946,13 +10985,13 @@ performers_renderDetailPanel();
   font-size: 13px; color: var(--text-dim);
 }
 #page-leads .rows-select select {
-  border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px;
+  border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 10px;
   font-family: inherit; font-size: 13px; background: #fff; cursor: pointer;
 }
 
-/* ---- Loading / Empty ---- */
+/* ── Loading / Empty ── */
 #page-leads .leads-loading {
-  padding: 60px; text-align: center; color: var(--text-dim); font-size: 14px;
+  padding: 64px; text-align: center; color: var(--text-dim); font-size: 14px;
 }
 #page-leads .leads-loading svg {
   width: 32px; height: 32px; margin-bottom: 12px; display: block; margin-inline: auto;
@@ -10960,12 +10999,12 @@ performers_renderDetailPanel();
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 #page-leads .leads-empty {
-  padding: 60px; text-align: center; color: var(--text-dim);
+  padding: 64px; text-align: center; color: var(--text-dim);
 }
-#page-leads .leads-empty svg { width: 44px; height: 44px; margin-bottom: 12px; opacity: .35; display: block; margin-inline: auto; }
+#page-leads .leads-empty svg { width: 44px; height: 44px; margin-bottom: 12px; opacity: .3; display: block; margin-inline: auto; }
 #page-leads .leads-empty h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 
-/* ---- Modal / Drawer ---- */
+/* ── Modal / Drawer ── */
 #leads-modal-overlay {
   position: fixed; inset: 0; background: rgba(15,20,40,.45);
   z-index: 1000; display: none; align-items: flex-start; justify-content: flex-end;
@@ -10996,16 +11035,16 @@ performers_renderDetailPanel();
 #leads-modal .modal-body { padding: 24px; flex: 1; overflow-y: auto; }
 #leads-modal .form-row { margin-bottom: 16px; }
 #leads-modal .form-row label {
-  display: block; font-size: 12.5px; font-weight: 600; color: var(--text-dim);
-  margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px;
+  display: block; font-size: 12px; font-weight: 700; color: var(--text-dim);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px;
 }
 #leads-modal .form-row input,
 #leads-modal .form-row select,
 #leads-modal .form-row textarea {
-  width: 100%; border: 1px solid var(--border); border-radius: 10px;
+  width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
   padding: 10px 13px; font-family: inherit; font-size: 13.5px;
   color: var(--text); background: #fff; outline: none;
-  transition: border-color .15s;
+  transition: border-color .15s; box-sizing: border-box;
 }
 #leads-modal .form-row input:focus,
 #leads-modal .form-row select:focus,
@@ -11017,15 +11056,15 @@ performers_renderDetailPanel();
   padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0;
 }
 #leads-modal .modal-footer .btn-cancel {
-  padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border);
+  padding: 10px 20px; border-radius: 10px; border: 1.5px solid var(--border);
   background: #fff; font-family: inherit; font-size: 13.5px; font-weight: 600;
   cursor: pointer; color: var(--text);
 }
 #leads-modal .modal-footer .btn-save {
   padding: 10px 22px; border-radius: 10px; border: none;
   background: var(--blue); color: #fff; font-family: inherit;
-  font-size: 13.5px; font-weight: 600; cursor: pointer;
-  box-shadow: 0 4px 10px rgba(47,109,246,.25);
+  font-size: 13.5px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(47,109,246,.28);
 }
 #leads-modal .modal-footer .btn-save:disabled { opacity: .6; cursor: not-allowed; }
 #leads-modal .error-msg { color: var(--red); font-size: 12.5px; margin-top: 6px; }
@@ -11043,27 +11082,22 @@ performers_renderDetailPanel();
 #leads-modal .lead-detail-name { font-size: 17px; font-weight: 800; }
 #leads-modal .lead-detail-mobile { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
 #leads-modal .detail-section-title {
-  font-size: 11.5px; font-weight: 700; color: var(--text-faint);
-  text-transform: uppercase; letter-spacing: .6px;
-  margin: 18px 0 10px;
+  font-size: 11px; font-weight: 700; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .6px; margin: 18px 0 10px;
 }
 #leads-modal .detail-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
 }
 #leads-modal .detail-row:last-child { border-bottom: none; }
 #leads-modal .detail-label { color: var(--text-dim); font-weight: 500; }
 #leads-modal .detail-val { font-weight: 600; text-align: right; }
-
-/* Notes */
 #leads-modal .notes-box {
   background: var(--bg); border-radius: 10px; padding: 13px 15px;
-  font-size: 13px; color: var(--text); line-height: 1.6;
-  margin-top: 6px;
+  font-size: 13px; color: var(--text); line-height: 1.6; margin-top: 6px;
 }
 
-/* Toast */
+/* ── Toast ── */
 #leads-toast {
   position: fixed; bottom: 28px; right: 28px;
   background: #1c2333; color: #fff;
@@ -11082,7 +11116,7 @@ performers_renderDetailPanel();
   to   { transform: translateY(0);    opacity: 1; }
 }
 
-/* Delete confirm mini modal */
+/* ── Delete confirm ── */
 #leads-confirm {
   position: fixed; inset: 0; background: rgba(15,20,40,.45);
   z-index: 2000; display: none; align-items: center; justify-content: center;
@@ -11096,7 +11130,7 @@ performers_renderDetailPanel();
   width: 52px; height: 52px; border-radius: 50%;
   background: var(--red-light); color: var(--red);
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px; font-size: 22px;
+  margin: 0 auto 16px;
 }
 #leads-confirm .confirm-icon svg { width: 24px; height: 24px; }
 #leads-confirm h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
@@ -11106,21 +11140,16 @@ performers_renderDetailPanel();
   flex: 1; padding: 11px; border-radius: 10px; font-family: inherit;
   font-size: 13.5px; font-weight: 600; cursor: pointer; border: none;
 }
-#leads-confirm .btn-cancel-c { background: var(--bg); color: var(--text); border: 1px solid var(--border) !important; }
+#leads-confirm .btn-cancel-c { background: var(--bg); color: var(--text); border: 1.5px solid var(--border) !important; }
 #leads-confirm .btn-delete-c { background: var(--red); color: #fff; }
 
-/* Follow-up view filter active indicator */
-#page-leads .lsum-card.active-filter { box-shadow: 0 0 0 2px var(--blue); }
-
-/* Connection dot */
+/* Connection badge */
 #leads-conn-badge {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-  background: var(--orange-light); color: #c9750f;
+  background: var(--orange-light); color: #c9750f; vertical-align: middle; margin-left: 8px;
 }
-#leads-conn-badge .dot {
-  width: 6px; height: 6px; border-radius: 50%; background: #c9750f;
-}
+#leads-conn-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #c9750f; }
 </style>
 
 <!-- ═══════════════════════════════════════════════
@@ -11233,49 +11262,57 @@ performers_renderDetailPanel();
         <input type="text" id="leads-search" placeholder="Search by name or mobile number..." oninput="leads_applyFilters()">
       </div>
       <div class="filter-select">
-        <span class="filter-label">Status</span>
-        <select id="leads-filter-status" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
-          <option value="">All Status</option>
-          <option value="New">New</option>
-          <option value="Follow Up">Follow Up</option>
-          <option value="Demo Requested">Demo Requested</option>
-          <option value="Onboarded">Onboarded</option>
-          <option value="Closed">Closed</option>
-        </select>
+        <div class="filter-select-inner">
+          <span class="filter-label">Status</span>
+          <select id="leads-filter-status" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:600;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+            <option value="">All Status</option>
+            <option value="New">New</option>
+            <option value="Follow Up">Follow Up</option>
+            <option value="Demo Requested">Demo Requested</option>
+            <option value="Onboarded">Onboarded</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
       </div>
       <div class="filter-select">
-        <span class="filter-label">Follow Up</span>
-        <select id="leads-filter-followup" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
-          <option value="">All</option>
-          <option value="today">Today</option>
-          <option value="overdue">Overdue</option>
-          <option value="upcoming">Upcoming</option>
-        </select>
+        <div class="filter-select-inner">
+          <span class="filter-label">Follow Up</span>
+          <select id="leads-filter-followup" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:600;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+            <option value="">All</option>
+            <option value="today">Today</option>
+            <option value="overdue">Overdue</option>
+            <option value="upcoming">Upcoming</option>
+          </select>
+        </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
       </div>
       <div class="filter-select">
-        <span class="filter-label">Source</span>
-        <select id="leads-filter-source" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
-          <option value="">All</option>
-          <option value="Instagram">Instagram</option>
-          <option value="WhatsApp">WhatsApp</option>
-          <option value="Facebook">Facebook</option>
-          <option value="Website">Website</option>
-          <option value="Referral">Referral</option>
-          <option value="Walk-in">Walk-in</option>
-        </select>
+        <div class="filter-select-inner">
+          <span class="filter-label">Last Contact</span>
+          <select id="leads-filter-lastcontact" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:600;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+            <option value="">All</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="week">This Week</option>
+            <option value="older">Older</option>
+          </select>
+        </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
       </div>
       <div class="filter-select">
-        <span class="filter-label">Last Contact</span>
-        <select id="leads-filter-lastcontact" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:500;background:transparent;cursor:pointer;padding:0;color:var(--text);">
-          <option value="">All</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="week">This Week</option>
-          <option value="older">Older</option>
-        </select>
+        <div class="filter-select-inner">
+          <span class="filter-label">Source</span>
+          <select id="leads-filter-source" onchange="leads_applyFilters()" style="border:none;outline:none;font-family:inherit;font-size:13px;font-weight:600;background:transparent;cursor:pointer;padding:0;color:var(--text);">
+            <option value="">All</option>
+            <option value="Instagram">Instagram</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Website">Website</option>
+            <option value="Referral">Referral</option>
+            <option value="Walk-in">Walk-in</option>
+          </select>
+        </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
       </div>
       <div class="filters-spacer"></div>
@@ -11295,11 +11332,11 @@ performers_renderDetailPanel();
         <table>
           <thead>
             <tr>
-              <th class="sortable" onclick="leads_sort('name')">Name <span id="sort-name"></span></th>
+              <th class="sortable" onclick="leads_sort('name')">Name <span id="sort-name">↕</span></th>
               <th>Mobile Number</th>
-              <th class="sortable" onclick="leads_sort('status')">Status <span id="sort-status"></span></th>
-              <th class="sortable" onclick="leads_sort('follow_up_date')">Follow Up Date <span id="sort-follow_up_date"></span></th>
-              <th class="sortable" onclick="leads_sort('last_contact')">Last Contact <span id="sort-last_contact"></span></th>
+              <th class="sortable" onclick="leads_sort('status')">Status <span id="sort-status">↕</span></th>
+              <th class="sortable" onclick="leads_sort('follow_up_date')">Follow Up Date <span id="sort-follow_up_date">↕</span></th>
+              <th class="sortable" onclick="leads_sort('last_contact')">Last Contact <span id="sort-last_contact">↕</span></th>
               <th>Source</th>
               <th>Actions</th>
             </tr>
@@ -11318,7 +11355,7 @@ performers_renderDetailPanel();
           <div class="pagination" id="leads-pagination"></div>
           <div class="rows-select">
             Rows per page:
-            <select id="leads-rows-per-page" onchange="leads_changeRowsPerPage()" style="border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-family:inherit;font-size:13px;">
+            <select id="leads-rows-per-page" onchange="leads_changeRowsPerPage()">
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
@@ -11662,21 +11699,16 @@ function renderTable(){
       <td>${sourceBadge(l.source)}</td>
       <td>
         <div class="actions-cell">
-          <button class="act-btn" title="Call" onclick="leads_call('${escHtml(l.mobile||'')}')">
+          <button class="act-btn green-btn" title="Call" onclick="leads_call('${escHtml(l.mobile||'')}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.12 4.18 2 2 0 0 1 5.09 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L9.91 9a16 16 0 0 0 6 6l.44-.44a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 23 17z"/></svg>
           </button>
-          <button class="act-btn" title="WhatsApp" onclick="leads_whatsapp('${escHtml(l.mobile||'')}')">
+          <button class="act-btn wa-btn" title="WhatsApp" onclick="leads_whatsapp('${escHtml(l.mobile||'')}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 20l1.05-5.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>
           </button>
-          <button class="act-btn" title="Edit" onclick="leads_openModal('edit','${l.id}')">
+          <button class="act-btn edit-btn" title="Edit" onclick="leads_openModal('edit','${l.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="act-btn" title="View" onclick="leads_openModal('view','${l.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <button class="act-btn red" title="Delete" onclick="leads_askDelete('${l.id}','${escHtml(l.name||'')}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          </button>
+          <button class="act-more-btn" title="More" onclick="leads_openModal('view','${l.id}')">⋮</button>
         </div>
       </td>
     </tr>`;

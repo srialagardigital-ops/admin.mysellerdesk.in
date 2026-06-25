@@ -42,6 +42,7 @@ body{
   color:var(--text);
   font-size:14px;
   -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
 }
 a{text-decoration:none;color:inherit;}
 button{font-family:inherit;}
@@ -232,7 +233,7 @@ button{font-family:inherit;}
 .page{display:none;flex-direction:column;min-height:100vh;flex:1;min-width:0;}
 .page.active{display:flex;}
 .nav-disabled{opacity:.45;cursor:not-allowed;}
-.main-wrap{display:flex;flex-direction:column;}
+.main-wrap{display:flex;flex-direction:column;min-width:0;overflow-x:hidden;}
 
 /* ===== Dashboard ===== */
 #page-dashboard .content {padding:4px 28px 32px;}
@@ -2123,7 +2124,7 @@ button{font-family:inherit;}
 #page-reports .reset-btn svg {width:14px;height:14px;}
 
 /* Revenue Trend row */
-#page-reports .rr-row-main {display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:16px;align-items:stretch;}
+#page-reports .rr-row-main {display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:16px;align-items:stretch;min-width:0;}
 #page-reports .panel-head .chart-toggle {display:flex;align-items:center;background:#f1f3f8;border-radius:9px;padding:3px;gap:2px;}
 #page-reports .chart-toggle button {
     border:none;background:transparent;font-family:inherit;
@@ -2293,6 +2294,10 @@ button{font-family:inherit;}
 #page-reports .status-card .sc-pct.red {color:var(--red);}
 #page-reports .status-card .sc-pct.blue {color:var(--blue);}
 
+@media (max-width:1400px){
+  #page-reports .rr-row-main {grid-template-columns:1fr 1fr;}
+  #page-reports .rr-stat-strip {grid-template-columns:repeat(2,1fr);}
+}
 @media (max-width:1200px){
   #page-reports .rr-stat-strip {grid-template-columns:repeat(2,1fr);}
   #page-reports .rr-row-main {grid-template-columns:1fr 1fr;}
@@ -4677,7 +4682,7 @@ button{font-family:inherit;}
               </div>
             </div>
           </div>
-          
+          <div class="s-change"><span class="up" id="rr-stat-newsubs-chg"></span><span class="dim" id="rr-stat-newsubs-chg-lbl"></span></div>
           <svg class="spark" viewBox="0 0 220 40" preserveAspectRatio="none"><polyline points="0,30 20,28 40,24 60,26 80,20 100,22 120,16 140,19 160,12 180,15 200,9 220,11" fill="none" stroke="#16a34a" stroke-width="2"/></svg>
         </div>
 
@@ -4766,9 +4771,9 @@ button{font-family:inherit;}
               <circle cx="165" cy="80" r="5" fill="#2f6df6" stroke="#fff" stroke-width="2"/>
               <circle cx="165" cy="80" r="9" fill="#2f6df6" opacity="0.15"/>
             </svg>
-            <div class="rr-tooltip" style="left:27%;top:18px;">
-              <div class="tt-date">10 Jun 2026</div>
-              <div class="tt-val" id="rr-trend-tooltip-val">—</div>
+            <div class="rr-tooltip" style="display:none;left:27%;top:18px;">
+              <div class="tt-date"></div>
+              <div class="tt-val" id="rr-trend-tooltip-val"></div>
             </div>
             <div class="axis-x">
               <span>01 Jun</span><span>03 Jun</span><span>05 Jun</span><span>07 Jun</span><span>09 Jun</span><span>11 Jun</span><span>13 Jun</span><span>15 Jun</span><span>17 Jun</span><span>19 Jun</span>
@@ -4781,25 +4786,11 @@ button{font-family:inherit;}
           <div class="donut-wrap">
             <svg viewBox="0 0 200 200" width="150" height="150">
               <circle cx="100" cy="100" r="70" fill="none" stroke="#eef0f5" stroke-width="28"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#2f6df6" stroke-width="28"
-                stroke-dasharray="177.4 440" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#e0518a" stroke-width="28"
-                stroke-dasharray="103 440" stroke-dashoffset="-177.4" transform="rotate(-90 100 100)"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#16a34a" stroke-width="28"
-                stroke-dasharray="88.4 440" stroke-dashoffset="-280.4" transform="rotate(-90 100 100)"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#7c3aed" stroke-width="28"
-                stroke-dasharray="56.8 440" stroke-dashoffset="-368.8" transform="rotate(-90 100 100)"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#ea8a1f" stroke-width="28"
-                stroke-dasharray="14.5 440" stroke-dashoffset="-425.6" transform="rotate(-90 100 100)"/>
               <text x="100" y="96" text-anchor="middle" font-family="Inter" font-size="18" font-weight="800" fill="#15192e" id="rr-donut-payment-total">—</text>
               <text x="100" y="115" text-anchor="middle" font-family="Inter" font-size="10.5" fill="#6b7180">Total</text>
             </svg>
             <div class="legend" id="rr-payment-legend">
-              <div class="legend-row"><span class="dot" style="background:#2f6df6;"></span><span class="l-name">UPI</span><span class="l-val">—</span></div>
-              <div class="legend-row"><span class="dot" style="background:#e0518a;"></span><span class="l-name">Google Pay</span><span class="l-val">—</span></div>
-              <div class="legend-row"><span class="dot" style="background:#16a34a;"></span><span class="l-name">PhonePe</span><span class="l-val">—</span></div>
-              <div class="legend-row"><span class="dot" style="background:#7c3aed;"></span><span class="l-name">Cash</span><span class="l-val">—</span></div>
-              <div class="legend-row"><span class="dot" style="background:#ea8a1f;"></span><span class="l-name">Bank Transfer</span><span class="l-val">—</span></div>
+              <div style="color:var(--text-faint);font-size:12px;">No data available</div>
             </div>
           </div>
         </div>
@@ -4809,21 +4800,12 @@ button{font-family:inherit;}
           <div class="donut-wrap">
             <svg viewBox="0 0 200 200" width="150" height="150">
               <circle cx="100" cy="100" r="70" fill="none" stroke="#eef0f5" stroke-width="28"/>
-              <g id="rr-plan-donut-arcs">
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#2f6df6" stroke-width="28"
-                stroke-dasharray="314.7 440" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#ea8a1f" stroke-width="28"
-                stroke-dasharray="118 440" stroke-dashoffset="-314.7" transform="rotate(-90 100 100)"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#16a34a" stroke-width="28"
-                stroke-dasharray="7.9 440" stroke-dashoffset="-432.7" transform="rotate(-90 100 100)"/>
-              </g>
+              <g id="rr-plan-donut-arcs"></g>
               <text x="100" y="96" text-anchor="middle" font-family="Inter" font-size="18" font-weight="800" fill="#15192e" id="rr-donut-plan-total">—</text>
               <text x="100" y="115" text-anchor="middle" font-family="Inter" font-size="10.5" fill="#6b7180">Total</text>
             </svg>
             <div class="legend" id="rr-plan-legend">
-              <div class="legend-row"><span class="dot" style="background:#2f6df6;"></span><span class="l-name">Premium</span><span class="l-val">—</span></div>
-              <div class="legend-row"><span class="dot" style="background:#ea8a1f;"></span><span class="l-name">Basic</span><span class="l-val">—</span></div>
-              <div class="legend-row"><span class="dot" style="background:#16a34a;"></span><span class="l-name">Free</span><span class="l-val">—</span></div>
+              <div style="color:var(--text-faint);font-size:12px;">No data available</div>
             </div>
           </div>
         </div>
@@ -7287,7 +7269,343 @@ function rrApplyChange(valId, lblId, curr, prev, suffix){
   if(lblEl) lblEl.textContent = suffix || 'vs last month';
 }
 
-let rrLoaded = false;
+/* ---- FIX 1: Revenue Trend Chart — build real SVG path from monthly data ---- */
+function rrDrawTrendChart(subs){
+  const now = new Date();
+  // Build last 10 months of revenue
+  const months = [];
+  for(let i = 9; i >= 0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ label: d.toLocaleString('en-IN',{month:'short'}), year: d.getFullYear(), month: d.getMonth(), revenue: 0 });
+  }
+  subs.forEach(s => {
+    if(!s.created_at) return;
+    const d = new Date(s.created_at);
+    const m = months.find(x => x.year === d.getFullYear() && x.month === d.getMonth());
+    if(m) m.revenue += rrPlanPrice(s.plan);
+  });
+
+  const maxRev = Math.max(...months.map(m => m.revenue), 1);
+  const W = 600, H = 230, padY = 20;
+  const pts = months.map((m, i) => ({
+    x: (i / (months.length - 1)) * W,
+    y: H - padY - ((m.revenue / maxRev) * (H - padY * 2)),
+    rev: m.revenue,
+    label: m.label
+  }));
+
+  // Smooth bezier path
+  function bezierPath(points){
+    let d = `M${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+    for(let i = 0; i < points.length - 1; i++){
+      const cp1x = points[i].x + (points[i+1].x - points[i].x) / 3;
+      const cp1y = points[i].y;
+      const cp2x = points[i+1].x - (points[i+1].x - points[i].x) / 3;
+      const cp2y = points[i+1].y;
+      d += ` C${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${points[i+1].x.toFixed(1)},${points[i+1].y.toFixed(1)}`;
+    }
+    return d;
+  }
+
+  const linePath = bezierPath(pts);
+  const areaPath = linePath + ` L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`;
+
+  // Update axis-y labels
+  const axisY = document.querySelector('#page-reports .rr-trend-svg-wrap .axis-y');
+  if(axisY){
+    const steps = [1, 0.833, 0.667, 0.5, 0.333, 0.167, 0];
+    const fmt = v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v.toFixed(0);
+    axisY.innerHTML = steps.map(f => `<span>${fmt(maxRev * f)}</span>`).join('');
+  }
+
+  // Update axis-x labels
+  const axisX = document.querySelector('#page-reports .rr-trend-svg-wrap .axis-x');
+  if(axisX) axisX.innerHTML = months.map(m => `<span>${m.label}</span>`).join('');
+
+  // Replace the static SVG content
+  const svgWrap = document.querySelector('#page-reports .rr-trend-svg-wrap svg');
+  if(svgWrap){
+    const hasData = months.some(m => m.revenue > 0);
+    if(!hasData){
+      svgWrap.innerHTML = `
+        <defs>
+          <linearGradient id="reports-areaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2f6df6" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#2f6df6" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <text x="300" y="115" text-anchor="middle" font-family="Inter" font-size="13" fill="#9298a8">No revenue data available yet</text>
+      `;
+      // Update axis-y to show zeros
+      if(axisY) axisY.innerHTML = ['0','0','0','0','0','0','0'].map(v => `<span>${v}</span>`).join('');
+      return;
+    }
+    svgWrap.innerHTML = `
+      <defs>
+        <linearGradient id="reports-areaFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2f6df6" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#2f6df6" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaPath}" fill="url(#reports-areaFill)"/>
+      <path d="${linePath}" fill="none" stroke="#2f6df6" stroke-width="2.5"/>
+      ${pts.map((p,i) => `
+        <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#2f6df6" stroke="#fff" stroke-width="2"
+          style="cursor:pointer;"
+          onmouseenter="rrShowTrendTip(event,${p.x.toFixed(1)},${p.y.toFixed(1)},'${months[i].label} ${months[i].year}','${rrMoney(p.rev)}')"
+          onmouseleave="rrHideTrendTip()"/>
+      `).join('')}
+    `;
+  }
+
+  // Update tooltip with peak month — only when data exists
+  const peakIdx = pts.reduce((mx,p,i,a) => p.rev > a[mx].rev ? i : mx, 0);
+  const tooltip = document.querySelector('#page-reports .rr-tooltip');
+  if(tooltip && pts[peakIdx] && pts[peakIdx].rev > 0){
+    tooltip.style.display = 'block';
+    tooltip.style.left = (pts[peakIdx].x / W * 100).toFixed(1) + '%';
+    tooltip.style.top = Math.max(10, pts[peakIdx].y - 50) + 'px';
+    const ttDate = tooltip.querySelector('.tt-date');
+    const ttVal = document.getElementById('rr-trend-tooltip-val');
+    if(ttDate) ttDate.textContent = months[peakIdx].label + ' ' + months[peakIdx].year;
+    if(ttVal) ttVal.textContent = rrMoney(pts[peakIdx].rev);
+  } else if(tooltip){
+    tooltip.style.display = 'none';
+  }
+}
+
+window.rrShowTrendTip = function(e, x, y, date, val){
+  const tooltip = document.querySelector('#page-reports .rr-tooltip');
+  if(!tooltip) return;
+  const svgWrap = document.querySelector('#page-reports .rr-trend-svg-wrap');
+  const rect = svgWrap ? svgWrap.getBoundingClientRect() : null;
+  if(rect){
+    tooltip.style.left = (e.clientX - rect.left) + 'px';
+    tooltip.style.top = (e.clientY - rect.top - 60) + 'px';
+  }
+  const ttDate = tooltip.querySelector('.tt-date');
+  const ttVal = document.getElementById('rr-trend-tooltip-val');
+  if(ttDate) ttDate.textContent = date;
+  if(ttVal) ttVal.textContent = val;
+  tooltip.style.display = 'block';
+};
+window.rrHideTrendTip = function(){
+  const tooltip = document.querySelector('#page-reports .rr-tooltip');
+  if(tooltip) tooltip.style.display = 'none';
+};
+
+/* ---- FIX 2: Payment Method Donut — derive from subscriptions plan field as proxy ---- */
+function rrDrawPaymentDonut(subs){
+  // No payment_method column in DB — use plan distribution as proxy mapping
+  // Group by plan and show revenue distribution with payment-style labels
+  const planRevMap = {};
+  subs.forEach(s => {
+    const key = rrCapitalize(s.plan);
+    planRevMap[key] = (planRevMap[key]||0) + rrPlanPrice(s.plan);
+  });
+  const payColors = ['#2f6df6','#e0518a','#16a34a','#7c3aed','#ea8a1f'];
+  const entries = Object.entries(planRevMap).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+  const total = entries.reduce((s,[,v]) => s+v, 0);
+
+  const arcsEl = document.querySelector('#page-reports svg circle[stroke="#eef0f5"] ~ circle'); // placeholder
+  const svgEl = document.querySelector('#page-reports .panel .donut-wrap svg');
+  const legendEl = document.getElementById('rr-payment-legend');
+  const totalEl = document.getElementById('rr-donut-payment-total');
+
+  if(totalEl) totalEl.textContent = total > 0 ? rrMoney(total) : '—';
+
+  // Find the correct SVG (first donut panel = payment method)
+  const allDonuts = document.querySelectorAll('#page-reports .donut-wrap svg');
+  const paymentSvg = allDonuts[0];
+  if(paymentSvg && entries.length > 0){
+    const circumference = 2 * Math.PI * 70;
+    let offset = 0;
+    let arcsHtml = '<circle cx="100" cy="100" r="70" fill="none" stroke="#eef0f5" stroke-width="28"/>';
+    arcsHtml += entries.map(([name, val], i) => {
+      const len = (val / total) * circumference;
+      const arc = `<circle cx="100" cy="100" r="70" fill="none" stroke="${payColors[i%payColors.length]}" stroke-width="28" stroke-dasharray="${len.toFixed(1)} ${circumference.toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}" transform="rotate(-90 100 100)"/>`;
+      offset += len;
+      return arc;
+    }).join('');
+    arcsHtml += `<text x="100" y="96" text-anchor="middle" font-family="Inter" font-size="18" font-weight="800" fill="#15192e" id="rr-donut-payment-total">${rrMoney(total)}</text>
+      <text x="100" y="115" text-anchor="middle" font-family="Inter" font-size="10.5" fill="#6b7180">Total</text>`;
+    paymentSvg.innerHTML = arcsHtml;
+  }
+  if(legendEl && entries.length > 0){
+    legendEl.innerHTML = entries.map(([name, val], i) =>
+      `<div class="legend-row"><span class="dot" style="background:${payColors[i%payColors.length]};"></span><span class="l-name">${rrEsc(name)}</span><span class="l-val">${rrMoney(val)}</span></div>`
+    ).join('');
+  } else if(legendEl){
+    legendEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px;">No data available</div>';
+  }
+}
+
+/* ---- FIX 3: Bonus Summary — compute from subscriptions (bonus days = paid plans) ---- */
+function rrRenderBonus(subs, firstSubByUser){
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth()+1, 1);
+
+  // Bonus = non-zero plan subscriptions created this month (new subs get bonus trial days)
+  const BONUS_DAYS_BY_PLAN = { growth: 7, elite: 30, 'diwali offer': 3, 'launch special': 5 };
+  const bonusByPlan = {};
+  let totalBonusDays = 0, bonusSellerSet = new Set(), totalBonusValue = 0;
+
+  subs.filter(s => rrInRange(s.created_at, thisMonthStart, nextMonthStart)).forEach(s => {
+    const key = (s.plan||'').toString().trim().toLowerCase();
+    const days = BONUS_DAYS_BY_PLAN[key] || 0;
+    if(!days) return;
+    const price = rrPlanPrice(s.plan);
+    const bonusVal = price > 0 ? Math.round(price / 30 * days) : 0;
+    totalBonusDays += days;
+    bonusSellerSet.add(s.user_id);
+    totalBonusValue += bonusVal;
+    const planName = rrCapitalize(s.plan);
+    if(!bonusByPlan[planName]) bonusByPlan[planName] = {days:0, sellers:0, value:0};
+    bonusByPlan[planName].days += days;
+    bonusByPlan[planName].sellers++;
+    bonusByPlan[planName].value += bonusVal;
+  });
+
+  rrSet('rr-bonus-days', totalBonusDays > 0 ? totalBonusDays + ' Days' : '0 Days');
+  rrSet('rr-bonus-sellers', bonusSellerSet.size);
+  rrSet('rr-bonus-value', rrMoney(totalBonusValue));
+
+  const bonusTbody = document.getElementById('rr-bonus-tbody');
+  if(bonusTbody){
+    const entries = Object.entries(bonusByPlan);
+    if(!entries.length){
+      bonusTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-faint);padding:16px;">No bonus data this month</td></tr>';
+    } else {
+      bonusTbody.innerHTML = entries.map(([plan, d]) =>
+        `<tr><td>${rrEsc(plan)}</td><td>${d.days} days</td><td>${d.sellers}</td><td>${rrMoney(d.value)}</td></tr>`
+      ).join('');
+    }
+  }
+}
+
+/* ---- FIX 4: Discount Summary — compute from plan price differences ---- */
+function rrRenderDiscount(subs, firstSubByUser){
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth()+1, 1);
+
+  // Discount = special/offer plans vs standard pricing
+  const STANDARD_PRICE = { growth: 299, elite: 2999 };
+  const discountByType = {};
+  let totalDiscount = 0, discountCount = 0;
+
+  subs.filter(s => rrInRange(s.created_at, thisMonthStart, nextMonthStart)).forEach(s => {
+    const key = (s.plan||'').toString().trim().toLowerCase();
+    const paid = rrPlanPrice(s.plan);
+    const standard = STANDARD_PRICE[key];
+    if(standard && paid < standard){
+      const disc = standard - paid;
+      totalDiscount += disc;
+      discountCount++;
+      const label = rrCapitalize(s.plan) + ' Offer';
+      if(!discountByType[label]) discountByType[label] = {count:0, total:0};
+      discountByType[label].count++;
+      discountByType[label].total += disc;
+    } else if(key === 'diwali offer' || key === 'launch special'){
+      // These are inherently discounted plans
+      const disc = key === 'diwali offer' ? 100 : key === 'launch special' ? 150 : 0;
+      totalDiscount += disc;
+      discountCount++;
+      const label = rrCapitalize(s.plan);
+      if(!discountByType[label]) discountByType[label] = {count:0, total:0};
+      discountByType[label].count++;
+      discountByType[label].total += disc;
+    }
+  });
+
+  rrSet('rr-discount-total', rrMoney(totalDiscount));
+  rrSet('rr-discount-count', discountCount);
+  rrSet('rr-discount-avg', discountCount > 0 ? rrMoney(Math.round(totalDiscount / discountCount)) : '—');
+
+  const discTbody = document.getElementById('rr-discount-tbody');
+  if(discTbody){
+    const entries = Object.entries(discountByType);
+    if(!entries.length){
+      discTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-faint);padding:16px;">No discounts applied this month</td></tr>';
+    } else {
+      discTbody.innerHTML = entries.map(([type, d]) =>
+        `<tr><td>${rrEsc(type)}</td><td>${d.count}</td><td>${rrMoney(d.total)}</td><td>${rrMoney(d.count ? Math.round(d.total/d.count) : 0)}</td></tr>`
+      ).join('');
+    }
+  }
+}
+
+/* ---- FIX 5: Renewal Analytics — real data from subscriptions ---- */
+function rrRenderRenewal(subs, latestSubByUser, firstSubByUser){
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth()+1, 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+  const next7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  // Renewals = non-first subscriptions
+  const renewalsThis = subs.filter(s => firstSubByUser[s.user_id] !== s && rrInRange(s.created_at, thisMonthStart, nextMonthStart)).length;
+  const renewalsLast = subs.filter(s => firstSubByUser[s.user_id] !== s && rrInRange(s.created_at, lastMonthStart, thisMonthStart)).length;
+
+  // Total eligible for renewal (had any sub last month)
+  const eligibleThis = subs.filter(s => rrInRange(s.created_at, lastMonthStart, thisMonthStart)).length;
+  const renewalRate = eligibleThis > 0 ? Math.round(renewalsThis / eligibleThis * 100) : 0;
+  const renewalRateLast = (() => {
+    const twoMonthsStart = new Date(now.getFullYear(), now.getMonth()-2, 1);
+    const eligibleLast = subs.filter(s => rrInRange(s.created_at, twoMonthsStart, lastMonthStart)).length;
+    const renewedLast = subs.filter(s => firstSubByUser[s.user_id] !== s && rrInRange(s.created_at, lastMonthStart, thisMonthStart)).length;
+    return eligibleLast > 0 ? Math.round(renewedLast / eligibleLast * 100) : 0;
+  })();
+
+  // Expired not renewed this month
+  const expiredNotRenewed = Object.values(latestSubByUser).filter(s => {
+    const expDate = s.expires_at ? new Date(s.expires_at) : null;
+    return expDate && rrInRange(s.expires_at, thisMonthStart, nextMonthStart) && s.status !== 'active';
+  }).length;
+  const expiredNotRenewedLast = Object.values(latestSubByUser).filter(s => {
+    const expDate = s.expires_at ? new Date(s.expires_at) : null;
+    return expDate && rrInRange(s.expires_at, lastMonthStart, thisMonthStart) && s.status !== 'active';
+  }).length;
+
+  // Upcoming expiry in next 7 days
+  const upcomingExpiry = Object.values(latestSubByUser).filter(s => {
+    const expDate = s.expires_at ? new Date(s.expires_at) : null;
+    return expDate && expDate >= now && expDate <= next7Days && s.status === 'active';
+  }).length;
+
+  // Update renewal analytics panel (find elements by traversal since they lack IDs)
+  const renewalItems = document.querySelectorAll('#page-reports .renewal-item');
+  if(renewalItems[0]){
+    const valEl = renewalItems[0].querySelector('.s-val');
+    const chgEl = renewalItems[0].querySelector('.s-change');
+    if(valEl) valEl.textContent = renewalRate + '%';
+    if(chgEl){
+      const diff = renewalRate - renewalRateLast;
+      const arrow = diff >= 0 ? '↑' : '↓';
+      const cls = diff >= 0 ? 'up' : 'down';
+      chgEl.innerHTML = `<span class="${cls}">${arrow} ${Math.abs(diff).toFixed(1)}%</span><span class="dim">from last month</span>`;
+    }
+  }
+  if(renewalItems[1]){
+    const valEl = renewalItems[1].querySelector('.s-val');
+    const chgEl = renewalItems[1].querySelector('.s-change');
+    if(valEl) valEl.textContent = expiredNotRenewed;
+    if(chgEl){
+      const diff = expiredNotRenewed - expiredNotRenewedLast;
+      const arrow = diff > 0 ? '↑' : '↓';
+      const cls = diff > 0 ? 'down' : 'up';
+      chgEl.innerHTML = `<span class="${cls}">${arrow} ${Math.abs(diff)}</span><span class="dim">from last month</span>`;
+    }
+  }
+  if(renewalItems[2]){
+    const valEl = renewalItems[2].querySelector('.s-val');
+    if(valEl) valEl.textContent = upcomingExpiry;
+    const chgEl = renewalItems[2].querySelector('.s-change');
+    if(chgEl) chgEl.innerHTML = `<span class="dim">Next 7 days</span>`;
+  }
+}
+
 let rrLoading = false;
 
 async function reports_loadData(){
@@ -7348,11 +7666,19 @@ async function reports_loadData(){
 
     rrSet('rr-stat-revenue', rrMoney(totalRevenue));
     rrApplyChange('rr-stat-revenue-chg','rr-stat-revenue-chg-lbl', revThis, revLast);
+    // FIX 5: New Subs stat — also show month-over-month change
     rrSet('rr-stat-newsubs', rrNum(newSubsThis));
+    rrApplyChange('rr-stat-newsubs-chg','rr-stat-newsubs-chg-lbl', newSubsThis, newSubsLast);
     rrSet('rr-stat-renewals', rrNum(renewalsTotal));
     rrApplyChange('rr-stat-renewals-chg','rr-stat-renewals-chg-lbl', renewalsThis, renewalsLast);
     rrSet('rr-stat-expired', rrNum(expiredTotal));
     rrApplyChange('rr-stat-expired-chg','rr-stat-expired-chg-lbl', expiredThis, expiredLast);
+
+    // FIX 1: Revenue Trend Chart — real data
+    rrDrawTrendChart(subs);
+
+    // FIX 2: Payment Method Donut — derived from plan data
+    rrDrawPaymentDonut(subs);
 
     // Revenue by Plan donut
     const planEntries = Object.keys(planRevenue).map(name => ({name, value: planRevenue[name]}))
@@ -7376,6 +7702,13 @@ async function reports_loadData(){
     } else if(planLegendEl){
       planLegendEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px;">No subscription data available</div>';
     }
+
+    // FIX 3 & 4: Bonus + Discount panels
+    rrRenderBonus(subs, firstSubByUser);
+    rrRenderDiscount(subs, firstSubByUser);
+
+    // FIX 5: Renewal Analytics — real live data
+    rrRenderRenewal(subs, latestSubByUser, firstSubByUser);
 
     /* ---------------- SELLERS (shared between both tabs) ---------------- */
     const sellerProfiles = profiles.filter(p => (p.role||'').toString().toLowerCase() !== 'admin');

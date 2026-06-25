@@ -2631,6 +2631,287 @@ button{font-family:inherit;}
   background:transparent;border:none;box-shadow:none;padding:0;min-height:0;
 }
 
+/* ═══════════════════════════════════════════════
+   BANNER MANAGEMENT TAB
+═══════════════════════════════════════════════ */
+#page-settings .bm-wrap { display:flex; flex-direction:column; gap:20px; }
+
+/* breadcrumb */
+#page-settings .bm-breadcrumb {
+  display:flex; align-items:center; gap:6px;
+  font-size:12.5px; color:var(--text-dim); font-weight:500;
+}
+#page-settings .bm-breadcrumb span { color:var(--text-faint); }
+#page-settings .bm-breadcrumb a { color:var(--text-dim); cursor:pointer; }
+#page-settings .bm-breadcrumb a:hover { color:var(--blue); }
+#page-settings .bm-breadcrumb .bm-bc-active { color:var(--text); font-weight:600; }
+
+/* top row */
+#page-settings .bm-toprow {
+  display:flex; align-items:center; justify-content:space-between;
+}
+#page-settings .bm-toprow h2 { font-size:22px; font-weight:800; letter-spacing:-.3px; }
+#page-settings .bm-toprow p { font-size:13px; color:var(--text-dim); margin-top:2px; }
+#page-settings .bm-create-btn {
+  display:flex; align-items:center; gap:8px;
+  background:var(--purple); color:#fff; border:none;
+  padding:11px 20px; border-radius:10px;
+  font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit;
+  box-shadow:0 4px 12px rgba(124,58,237,.28);
+  transition:background .15s;
+}
+#page-settings .bm-create-btn:hover { background:#6d28d9; }
+#page-settings .bm-create-btn svg { width:16px; height:16px; }
+
+/* info strip */
+#page-settings .bm-info-strip {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:14px 20px; font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:8px;
+}
+#page-settings .bm-info-strip svg { width:15px; height:15px; color:var(--blue); flex-shrink:0; }
+
+/* tabs */
+#page-settings .bm-tabs {
+  display:flex; gap:4px; border-bottom:2px solid var(--border); padding-bottom:0;
+}
+#page-settings .bm-tab {
+  padding:9px 18px; font-size:13.5px; font-weight:600; cursor:pointer;
+  border:none; background:none; font-family:inherit; color:var(--text-dim);
+  border-bottom:2px solid transparent; margin-bottom:-2px; border-radius:8px 8px 0 0;
+  transition:color .15s;
+}
+#page-settings .bm-tab:hover { color:var(--text); }
+#page-settings .bm-tab.active { color:var(--purple); border-bottom-color:var(--purple); }
+
+/* stat cards */
+#page-settings .bm-stats {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+}
+#page-settings .bm-stat-card {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px 20px; display:flex; align-items:center; gap:14px;
+  box-shadow:var(--shadow);
+}
+#page-settings .bm-stat-icon {
+  width:44px; height:44px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+#page-settings .bm-stat-icon svg { width:22px; height:22px; }
+#page-settings .bm-stat-label { font-size:12px; color:var(--text-dim); font-weight:600; margin-bottom:4px; }
+#page-settings .bm-stat-val { font-size:26px; font-weight:800; letter-spacing:-.5px; }
+#page-settings .bm-si-purple { background:var(--purple-light); color:var(--purple); }
+#page-settings .bm-si-green  { background:var(--green-light);  color:var(--green); }
+#page-settings .bm-si-orange { background:var(--orange-light); color:var(--orange); }
+#page-settings .bm-si-red    { background:var(--red-light);    color:var(--red); }
+
+/* filters */
+#page-settings .bm-filters {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+#page-settings .bm-search {
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--border); border-radius:10px;
+  padding:9px 14px; background:#fff; flex:1; min-width:180px; max-width:280px;
+}
+#page-settings .bm-search svg { width:14px; height:14px; color:var(--text-faint); flex-shrink:0; }
+#page-settings .bm-search input {
+  border:none; outline:none; font-size:13px; font-family:inherit;
+  color:var(--text); background:transparent; width:100%;
+}
+#page-settings .bm-search input::placeholder { color:var(--text-faint); }
+#page-settings .bm-fsel {
+  display:flex; flex-direction:column; gap:1px;
+  border:1px solid var(--border); border-radius:10px; padding:6px 12px;
+  background:#fff; cursor:pointer; min-width:140px;
+}
+#page-settings .bm-fsel-label { font-size:10.5px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.5px; }
+#page-settings .bm-fsel select {
+  border:none; outline:none; font-size:13px; font-weight:600;
+  font-family:inherit; color:var(--text); background:transparent; cursor:pointer; padding:0;
+}
+#page-settings .bm-date-filter {
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--border); border-radius:10px; padding:9px 14px;
+  background:#fff; cursor:pointer; min-width:180px; color:var(--text-dim); font-size:13px;
+}
+#page-settings .bm-date-filter svg { width:14px; height:14px; }
+#page-settings .bm-reset-btn {
+  display:flex; align-items:center; gap:6px;
+  border:1px solid var(--border); border-radius:10px; padding:9px 16px;
+  background:#fff; cursor:pointer; font-size:13px; font-weight:600; color:var(--text);
+  font-family:inherit; transition:background .15s;
+}
+#page-settings .bm-reset-btn:hover { background:var(--bg); }
+#page-settings .bm-reset-btn svg { width:13px; height:13px; }
+
+/* table */
+#page-settings .bm-table-card {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden;
+}
+#page-settings .bm-table-scroll { overflow-x:auto; }
+#page-settings .bm-table { width:100%; border-collapse:collapse; min-width:900px; }
+#page-settings .bm-table thead th {
+  padding:12px 16px; text-align:left; font-size:12px; font-weight:700;
+  color:var(--text-dim); background:var(--bg); border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+#page-settings .bm-table tbody td {
+  padding:14px 16px; border-bottom:1px solid var(--border); vertical-align:middle;
+  font-size:13px;
+}
+#page-settings .bm-table tbody tr:last-child td { border-bottom:none; }
+#page-settings .bm-table tbody tr:hover { background:#fafbfd; }
+
+/* banner preview thumb */
+#page-settings .bm-thumb {
+  width:90px; height:52px; border-radius:8px; object-fit:cover;
+  flex-shrink:0; border:1px solid var(--border); overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; color:#fff; letter-spacing:.5px;
+}
+#page-settings .bm-title-cell .bm-t { font-size:13.5px; font-weight:700; color:var(--text); }
+#page-settings .bm-title-cell .bm-s { font-size:12px; color:var(--text-dim); margin-top:2px; }
+
+/* type badge */
+#page-settings .bm-type-badge {
+  display:inline-block; padding:3px 10px; border-radius:6px;
+  font-size:11.5px; font-weight:700; background:#eef0f7; color:var(--text-dim);
+  margin-bottom:4px;
+}
+#page-settings .bm-pos { font-size:12px; color:var(--text-dim); }
+
+/* link */
+#page-settings .bm-link { color:var(--blue); font-weight:600; font-size:13px; }
+#page-settings .bm-link-dash { color:var(--text-faint); }
+
+/* status badges */
+#page-settings .bm-status {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 12px; border-radius:20px;
+  font-size:12px; font-weight:700;
+}
+#page-settings .bm-status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+#page-settings .bm-s-active    { background:var(--green-light);  color:var(--green); }
+#page-settings .bm-s-scheduled { background:var(--orange-light); color:var(--orange); }
+#page-settings .bm-s-inactive  { background:var(--red-light);    color:var(--red); }
+
+/* schedule */
+#page-settings .bm-schedule { font-size:12.5px; color:var(--text); }
+#page-settings .bm-schedule .bm-from { font-weight:600; }
+#page-settings .bm-schedule .bm-to   { color:var(--text-dim); }
+#page-settings .bm-schedule-dash     { color:var(--text-faint); }
+
+/* action btns */
+#page-settings .bm-edit-btn {
+  padding:6px 16px; border-radius:8px; border:1.5px solid var(--border);
+  background:#fff; font-size:12.5px; font-weight:700; cursor:pointer;
+  font-family:inherit; color:var(--text); transition:background .15s;
+}
+#page-settings .bm-edit-btn:hover { background:var(--purple-light); border-color:var(--purple); color:var(--purple); }
+#page-settings .bm-more-btn {
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--border);
+  background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:15px; color:var(--text-dim);
+}
+#page-settings .bm-more-btn:hover { background:var(--bg); }
+
+/* table footer */
+#page-settings .bm-table-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; border-top:1px solid var(--border);
+  font-size:13px; color:var(--text-dim);
+}
+#page-settings .bm-pagination { display:flex; align-items:center; gap:6px; }
+#page-settings .bm-pg-btn {
+  width:34px; height:34px; border-radius:8px; border:1.5px solid var(--border);
+  background:#fff; cursor:pointer; font-size:13px; font-weight:600;
+  display:flex; align-items:center; justify-content:center; color:var(--text);
+  transition:all .15s;
+}
+#page-settings .bm-pg-btn:hover { background:var(--purple-light); border-color:var(--purple); color:var(--purple); }
+#page-settings .bm-pg-btn.active { background:var(--purple); border-color:var(--purple); color:#fff; }
+#page-settings .bm-pg-btn:disabled { opacity:.4; cursor:not-allowed; }
+#page-settings .bm-perpage {
+  display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim);
+}
+#page-settings .bm-perpage select {
+  border:1px solid var(--border); border-radius:8px; padding:6px 10px;
+  font-size:13px; font-family:inherit; background:#fff; cursor:pointer; outline:none;
+}
+
+/* ── Modal ── */
+#bm-modal-overlay {
+  position:fixed; inset:0; background:rgba(15,20,40,.35); z-index:100;
+  display:none; align-items:center; justify-content:center;
+}
+#bm-modal-overlay.open { display:flex; }
+#bm-modal {
+  background:#fff; border-radius:16px; width:560px; max-width:95vw;
+  max-height:90vh; display:flex; flex-direction:column;
+  box-shadow:0 24px 60px rgba(16,24,40,.2);
+}
+#bm-modal .bm-mhead {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 24px; border-bottom:1px solid var(--border);
+}
+#bm-modal .bm-mhead h3 { font-size:16px; font-weight:800; }
+#bm-modal .bm-mclose {
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--border);
+  background:#fff; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-dim);
+}
+#bm-modal .bm-mclose svg { width:14px; height:14px; }
+#bm-modal .bm-mbody { padding:24px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px; }
+#bm-modal .bm-mrow { display:flex; flex-direction:column; gap:6px; }
+#bm-modal .bm-mrow label { font-size:12.3px; font-weight:700; color:var(--text-dim); }
+#bm-modal .bm-mrow input,
+#bm-modal .bm-mrow select,
+#bm-modal .bm-mrow textarea {
+  border:1px solid var(--border); border-radius:9px; padding:10px 13px;
+  font-size:13.3px; font-family:inherit; color:var(--text); outline:none; background:#fff;
+}
+#bm-modal .bm-mrow input:focus,
+#bm-modal .bm-mrow select:focus,
+#bm-modal .bm-mrow textarea:focus { border-color:var(--purple); }
+#bm-modal .bm-mgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+#bm-modal .bm-mrow textarea { resize:vertical; min-height:64px; }
+#bm-modal .bm-upload-zone {
+  border:2px dashed var(--border); border-radius:10px; padding:24px;
+  text-align:center; cursor:pointer; transition:border-color .15s;
+}
+#bm-modal .bm-upload-zone:hover { border-color:var(--purple); }
+#bm-modal .bm-upload-zone svg { width:32px; height:32px; color:var(--text-faint); margin-bottom:8px; }
+#bm-modal .bm-upload-zone p { font-size:13px; color:var(--text-dim); }
+#bm-modal .bm-upload-zone span { font-size:12px; color:var(--text-faint); }
+#bm-modal .bm-mfooter {
+  display:flex; gap:10px; justify-content:flex-end;
+  padding:16px 24px; border-top:1px solid var(--border);
+}
+#bm-modal .bm-mcancel {
+  padding:10px 20px; border-radius:10px; border:1.5px solid var(--border);
+  background:#fff; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit;
+}
+#bm-modal .bm-msave {
+  padding:10px 22px; border-radius:10px; border:none;
+  background:var(--purple); color:#fff; font-size:13.5px; font-weight:700;
+  cursor:pointer; font-family:inherit;
+  box-shadow:0 4px 12px rgba(124,58,237,.28);
+}
+#bm-modal .bm-msave:hover { background:#6d28d9; }
+
+/* toast */
+#bm-toast {
+  position:fixed; bottom:28px; right:28px; z-index:200;
+  display:none; align-items:center; gap:10px;
+  padding:12px 20px; border-radius:12px; color:#fff;
+  font-size:13.5px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+#bm-toast.show { display:flex; }
+#bm-toast.success { background:var(--green); }
+#bm-toast.error   { background:var(--red); }
+
 /* ---- General tab: layout ---- */
 #page-settings .gs-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
 #page-settings .gs-col{display:flex;flex-direction:column;gap:20px;}
@@ -9162,6 +9443,12 @@ function settings_select(el, key){
     return;
   }
 
+  if(key==='banner'){
+    panel.classList.add('gs-flat');
+    bm_render(panel);
+    return;
+  }
+
   panel.innerHTML = `
     <div class="settings-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -9190,6 +9477,543 @@ function settings_saveGeneral(){
   setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; }, 1800);
 }
 window.settings_select = settings_select;
+
+/* ═══════════════════════════════════════════════
+   BANNER MANAGEMENT — JS
+═══════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+/* ── Sample data (replace with Supabase fetch) ── */
+let bmAllBanners = [
+  { id:1, title:'Premium Plan Offer',    sub:'Upgrade to Premium and get 20% OFF',   type:'Homepage', pos:'Top Hero Banner',  link:'/plans',            status:'Active',    start:'2024-05-01', end:'2024-05-31', color:'#6d28d9' },
+  { id:2, title:'Eid Special Offer',     sub:'Exclusive offer for this Eid',          type:'Dashboard', pos:'Top Banner',       link:'/offers/eid-special',status:'Active',    start:'2024-05-05', end:'2024-05-15', color:'#ea8a1f' },
+  { id:3, title:'Faster Payments',       sub:'Now enjoy quick and secure payments',   type:'Homepage', pos:'Middle Banner',    link:'/payment',          status:'Scheduled', start:'2024-05-20', end:'2024-05-31', color:'#2f6df6' },
+  { id:4, title:'Refer & Earn',          sub:'Refer new sellers and earn rewards',    type:'Dashboard', pos:'Bottom Banner',    link:'/referral',         status:'Active',    start:'2024-04-01', end:'2024-04-30', color:'#16a34a' },
+  { id:5, title:'System Maintenance',    sub:'We are improving your experience',      type:'Popup',    pos:'Popup Banner.',    link:null,                status:'Inactive',  start:null, end:null,           color:'#dc2626' },
+  { id:6, title:'New Seller Onboarding', sub:'Complete your profile to get started',  type:'Homepage', pos:'Top Hero Banner',  link:'/onboarding',       status:'Active',    start:'2024-06-01', end:'2024-06-30', color:'#7c3aed' },
+  { id:7, title:'Flash Sale Alert',      sub:'48 hours only — up to 50% off',         type:'Popup',    pos:'Popup Banner.',    link:'/sale',             status:'Active',    start:'2024-06-10', end:'2024-06-12', color:'#e0518a' },
+  { id:8, title:'Summer Collection',     sub:'Discover our new summer range',          type:'Dashboard', pos:'Middle Banner',    link:'/summer',           status:'Active',    start:'2024-06-01', end:'2024-07-31', color:'#0ea5a4' },
+  { id:9, title:'Referral Bonus',        sub:'Earn ₹500 for each new seller you refer',type:'Homepage', pos:'Middle Banner',   link:'/refer',            status:'Scheduled', start:'2024-07-01', end:'2024-07-31', color:'#f59e0b' },
+  { id:10,title:'App Download',          sub:'Get the seller app now',                type:'Homepage', pos:'Bottom Banner',    link:'/app',              status:'Active',    start:'2024-05-01', end:'2024-08-31', color:'#0284c7' },
+  { id:11,title:'Anniversary Sale',      sub:'Celebrating 2 years with you!',         type:'Popup',    pos:'Popup Banner.',    link:'/anniversary',      status:'Scheduled', start:'2024-08-01', end:'2024-08-03', color:'#7c3aed' },
+  { id:12,title:'Payment Reminder',      sub:'Clear dues to avoid suspension',        type:'Dashboard', pos:'Top Banner',       link:'/dues',             status:'Inactive',  start:null, end:null,           color:'#dc2626' },
+];
+
+let bmFiltered = [...bmAllBanners];
+let bmPage = 1;
+let bmPerPage = 10;
+let bmTab = 'all'; // all | homepage | dashboard | popup
+let bmEditId = null;
+
+/* ── Helpers ── */
+function bm_fmtDate(s){
+  if(!s) return '—';
+  const d = new Date(s);
+  const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${String(d.getDate()).padStart(2,'0')} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function bm_statusCls(s){
+  return s==='Active'?'bm-s-active':s==='Scheduled'?'bm-s-scheduled':'bm-s-inactive';
+}
+
+function bm_computeStats(){
+  const total     = bmAllBanners.length;
+  const active    = bmAllBanners.filter(b=>b.status==='Active').length;
+  const scheduled = bmAllBanners.filter(b=>b.status==='Scheduled').length;
+  const inactive  = bmAllBanners.filter(b=>b.status==='Inactive').length;
+  return {total, active, scheduled, inactive};
+}
+
+function bm_toast(msg, type='success'){
+  let t = document.getElementById('bm-toast');
+  if(!t){ t=document.createElement('div'); t.id='bm-toast'; document.body.appendChild(t); }
+  t.className='show '+type;
+  t.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M5 13l4 4L19 7"/></svg> ${msg}`;
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>{ t.className=''; },3000);
+}
+
+/* ── Main render ── */
+window.bm_render = function(panel){
+  const stats = bm_computeStats();
+  panel.innerHTML = `
+  <div class="bm-wrap">
+
+    <!-- Top row -->
+    <div class="bm-toprow">
+      <div>
+        <div class="bm-breadcrumb">
+          <a onclick="">Home</a>
+          <span>›</span>
+          <a onclick="">Settings</a>
+          <span>›</span>
+          <span class="bm-bc-active">Banner Management</span>
+        </div>
+        <h2 style="margin-top:8px;">Banner Management</h2>
+        <p>Create, manage and schedule banners to display on the platform.</p>
+      </div>
+      <button class="bm-create-btn" onclick="bm_openModal('add')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create New Banner
+      </button>
+    </div>
+
+    <!-- Info strip -->
+    <div class="bm-info-strip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+      Create, manage and schedule banners to display on the platform.
+    </div>
+
+    <!-- Tabs -->
+    <div class="bm-tabs">
+      <button class="bm-tab active" id="bm-tab-all"       onclick="bm_switchTab('all')">All Banners</button>
+      <button class="bm-tab"        id="bm-tab-homepage"  onclick="bm_switchTab('homepage')">Homepage Banners</button>
+      <button class="bm-tab"        id="bm-tab-dashboard" onclick="bm_switchTab('dashboard')">Dashboard Banners</button>
+      <button class="bm-tab"        id="bm-tab-popup"     onclick="bm_switchTab('popup')">Popup Banners</button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="bm-stats">
+      <div class="bm-stat-card">
+        <div class="bm-stat-icon bm-si-purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 16l-5.5-5.5L4 21"/></svg>
+        </div>
+        <div>
+          <div class="bm-stat-label">Total Banners</div>
+          <div class="bm-stat-val" id="bm-stat-total">${stats.total}</div>
+        </div>
+      </div>
+      <div class="bm-stat-card">
+        <div class="bm-stat-icon bm-si-green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+        </div>
+        <div>
+          <div class="bm-stat-label">Active Banners</div>
+          <div class="bm-stat-val" id="bm-stat-active">${stats.active}</div>
+        </div>
+      </div>
+      <div class="bm-stat-card">
+        <div class="bm-stat-icon bm-si-orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div>
+          <div class="bm-stat-label">Scheduled Banners</div>
+          <div class="bm-stat-val" id="bm-stat-scheduled">${stats.scheduled}</div>
+        </div>
+      </div>
+      <div class="bm-stat-card">
+        <div class="bm-stat-icon bm-si-red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <div>
+          <div class="bm-stat-label">Inactive Banners</div>
+          <div class="bm-stat-val" id="bm-stat-inactive">${stats.inactive}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bm-filters">
+      <div class="bm-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="bm-search-input" placeholder="Search banners..." oninput="bm_applyFilters()">
+      </div>
+      <div class="bm-fsel">
+        <span class="bm-fsel-label">Banner Type</span>
+        <select id="bm-filter-type" onchange="bm_applyFilters()">
+          <option value="">All Types</option>
+          <option value="Homepage">Homepage</option>
+          <option value="Dashboard">Dashboard</option>
+          <option value="Popup">Popup</option>
+        </select>
+      </div>
+      <div class="bm-fsel">
+        <span class="bm-fsel-label">Status</span>
+        <select id="bm-filter-status" onchange="bm_applyFilters()">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Scheduled">Scheduled</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="bm-date-filter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Select date range
+      </div>
+      <button class="bm-reset-btn" onclick="bm_resetFilters()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="bm-table-card">
+      <div class="bm-table-scroll">
+        <table class="bm-table">
+          <thead>
+            <tr>
+              <th>Banner</th>
+              <th>Title</th>
+              <th>Type / Position</th>
+              <th>Link</th>
+              <th>Status</th>
+              <th>Schedule</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bm-tbody"></tbody>
+        </table>
+      </div>
+      <div class="bm-table-footer">
+        <div id="bm-showing-text">Showing — banners</div>
+        <div style="display:flex;align-items:center;gap:20px;">
+          <div class="bm-pagination" id="bm-pagination"></div>
+          <div class="bm-perpage">
+            per page
+            <select id="bm-perpage-sel" onchange="bm_changePerPage()">
+              <option value="10">10 per page</option>
+              <option value="25">25 per page</option>
+              <option value="50">50 per page</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>`;
+
+  bm_applyFilters();
+};
+
+/* ── Tab switch ── */
+window.bm_switchTab = function(tab){
+  bmTab = tab;
+  bmPage = 1;
+  document.querySelectorAll('.bm-tab').forEach(t=>t.classList.remove('active'));
+  const el = document.getElementById('bm-tab-'+tab);
+  if(el) el.classList.add('active');
+  // Reset type filter to match tab
+  const typeSel = document.getElementById('bm-filter-type');
+  if(typeSel){
+    if(tab==='all')       typeSel.value='';
+    else if(tab==='homepage')  typeSel.value='Homepage';
+    else if(tab==='dashboard') typeSel.value='Dashboard';
+    else if(tab==='popup')     typeSel.value='Popup';
+  }
+  bm_applyFilters();
+};
+
+/* ── Filters ── */
+window.bm_applyFilters = function(){
+  const q      = (document.getElementById('bm-search-input')?.value||'').toLowerCase();
+  const type   = document.getElementById('bm-filter-type')?.value||'';
+  const status = document.getElementById('bm-filter-status')?.value||'';
+
+  bmFiltered = bmAllBanners.filter(b=>{
+    if(q && !(b.title.toLowerCase().includes(q)||b.sub.toLowerCase().includes(q))) return false;
+    if(type   && b.type   !== type)   return false;
+    if(status && b.status !== status) return false;
+    return true;
+  });
+  bmPage = 1;
+  bm_renderTable();
+};
+
+window.bm_resetFilters = function(){
+  const si = document.getElementById('bm-search-input');
+  const tf = document.getElementById('bm-filter-type');
+  const sf = document.getElementById('bm-filter-status');
+  if(si) si.value='';
+  if(tf) tf.value='';
+  if(sf) sf.value='';
+  bmTab='all';
+  document.querySelectorAll('.bm-tab').forEach(t=>t.classList.remove('active'));
+  const allTab = document.getElementById('bm-tab-all');
+  if(allTab) allTab.classList.add('active');
+  bmFiltered=[...bmAllBanners];
+  bmPage=1;
+  bm_renderTable();
+};
+
+window.bm_changePerPage = function(){
+  bmPerPage = parseInt(document.getElementById('bm-perpage-sel')?.value)||10;
+  bmPage=1; bm_renderTable();
+};
+
+/* ── Table render ── */
+function bm_renderTable(){
+  const tbody = document.getElementById('bm-tbody');
+  if(!tbody) return;
+  const total = bmFiltered.length;
+  const start = (bmPage-1)*bmPerPage;
+  const slice = bmFiltered.slice(start, start+bmPerPage);
+  const from  = total ? start+1 : 0;
+  const to    = Math.min(start+bmPerPage, total);
+
+  const showEl = document.getElementById('bm-showing-text');
+  if(showEl) showEl.textContent = `Showing ${from} to ${to} of ${total} banners`;
+
+  if(!total){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-dim);">No banners found</td></tr>`;
+    bm_renderPagination(total);
+    return;
+  }
+
+  tbody.innerHTML = slice.map(b=>`
+    <tr>
+      <td>
+        <div class="bm-thumb" style="background:${b.color};">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5" width="28" height="28"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 16l-5.5-5.5L4 21"/></svg>
+        </div>
+      </td>
+      <td class="bm-title-cell">
+        <div class="bm-t">${b.title}</div>
+        <div class="bm-s">${b.sub}</div>
+      </td>
+      <td>
+        <div class="bm-type-badge">${b.type}</div>
+        <div class="bm-pos">${b.pos}</div>
+      </td>
+      <td>
+        ${b.link
+          ? `<span class="bm-link">${b.link}</span>`
+          : `<span class="bm-link-dash">-</span>`}
+      </td>
+      <td>
+        <span class="bm-status ${bm_statusCls(b.status)}">
+          <span class="bm-status-dot"></span>${b.status}
+        </span>
+      </td>
+      <td class="bm-schedule">
+        ${b.start
+          ? `<div style="display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="bm-from">${bm_fmtDate(b.start)}</span></div>
+             <div class="bm-to" style="margin-top:2px;">to ${bm_fmtDate(b.end)}</div>`
+          : `<span class="bm-schedule-dash">-</span>`}
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="bm-edit-btn" onclick="bm_openModal('edit',${b.id})">Edit</button>
+          <button class="bm-more-btn" onclick="bm_moreMenu(${b.id}, this)">⋮</button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  bm_renderPagination(total);
+}
+
+/* ── Pagination ── */
+function bm_renderPagination(total){
+  const el = document.getElementById('bm-pagination');
+  if(!el) return;
+  const pages = Math.ceil(total/bmPerPage);
+  if(pages<=1){ el.innerHTML=''; return; }
+  let h='';
+  h+=`<button class="bm-pg-btn" onclick="bm_goPage(${bmPage-1})" ${bmPage===1?'disabled':''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>`;
+  for(let p=1;p<=pages;p++){
+    if(pages>6 && p>2 && p<pages-1 && Math.abs(p-bmPage)>1) continue;
+    h+=`<button class="bm-pg-btn ${p===bmPage?'active':''}" onclick="bm_goPage(${p})">${p}</button>`;
+  }
+  h+=`<button class="bm-pg-btn" onclick="bm_goPage(${bmPage+1})" ${bmPage===pages?'disabled':''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+  </button>`;
+  el.innerHTML=h;
+}
+
+window.bm_goPage = function(p){
+  const pages = Math.ceil(bmFiltered.length/bmPerPage);
+  if(p<1||p>pages) return;
+  bmPage=p; bm_renderTable();
+};
+
+/* ── More menu ── */
+window.bm_moreMenu = function(id, btn){
+  const existing = document.getElementById('bm-more-menu');
+  if(existing){ existing.remove(); return; }
+  const b = bmAllBanners.find(x=>x.id===id);
+  if(!b) return;
+  const menu = document.createElement('div');
+  menu.id='bm-more-menu';
+  menu.style.cssText=`position:fixed;background:#fff;border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 8px 24px rgba(16,24,40,.14);min-width:150px;padding:6px;z-index:300;font-size:13px;`;
+  const rect = btn.getBoundingClientRect();
+  menu.style.top=(rect.bottom+6)+'px';
+  menu.style.right=(window.innerWidth-rect.right)+'px';
+  const statusNext = b.status==='Active'?'Inactive':b.status==='Inactive'?'Active':'Active';
+  menu.innerHTML=`
+    <div style="padding:8px 12px;cursor:pointer;border-radius:7px;font-weight:600;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''" onclick="bm_openModal('edit',${id});document.getElementById('bm-more-menu')?.remove();">
+      ✏️ Edit Banner
+    </div>
+    <div style="padding:8px 12px;cursor:pointer;border-radius:7px;font-weight:600;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''" onclick="bm_toggleStatus(${id});document.getElementById('bm-more-menu')?.remove();">
+      ${b.status==='Active'?'⏸️ Deactivate':'▶️ Activate'}
+    </div>
+    <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+    <div style="padding:8px 12px;cursor:pointer;border-radius:7px;font-weight:600;color:var(--red);" onmouseover="this.style.background='var(--red-light)'" onmouseout="this.style.background=''" onclick="bm_deleteBanner(${id});document.getElementById('bm-more-menu')?.remove();">
+      🗑️ Delete
+    </div>`;
+  document.body.appendChild(menu);
+  setTimeout(()=>{ document.addEventListener('click', ()=>{ menu.remove(); }, {once:true}); }, 10);
+};
+
+window.bm_toggleStatus = function(id){
+  const b = bmAllBanners.find(x=>x.id===id);
+  if(!b) return;
+  b.status = b.status==='Active'?'Inactive':'Active';
+  bm_refreshStats();
+  bm_applyFilters();
+  bm_toast(`Banner "${b.title}" ${b.status.toLowerCase()}d.`);
+};
+
+window.bm_deleteBanner = function(id){
+  const b = bmAllBanners.find(x=>x.id===id);
+  if(!b || !confirm(`Delete "${b.title}"? This cannot be undone.`)) return;
+  bmAllBanners = bmAllBanners.filter(x=>x.id!==id);
+  bmFiltered   = bmFiltered.filter(x=>x.id!==id);
+  bm_refreshStats();
+  bm_renderTable();
+  bm_toast('Banner deleted.', 'success');
+};
+
+function bm_refreshStats(){
+  const s = bm_computeStats();
+  ['total','active','scheduled','inactive'].forEach(k=>{
+    const el=document.getElementById('bm-stat-'+k);
+    if(el) el.textContent=s[k];
+  });
+}
+
+/* ── Modal ── */
+window.bm_openModal = function(mode, id){
+  bmEditId = (mode==='edit') ? id : null;
+  let existing = document.getElementById('bm-modal-overlay');
+  if(!existing){
+    existing = document.createElement('div');
+    existing.id='bm-modal-overlay';
+    existing.onclick=function(e){ if(e.target===this) bm_closeModal(); };
+    document.body.appendChild(existing);
+  }
+
+  const b = mode==='edit' ? bmAllBanners.find(x=>x.id===id) : null;
+
+  existing.innerHTML=`
+  <div id="bm-modal">
+    <div class="bm-mhead">
+      <h3>${mode==='edit'?'Edit Banner':'Create New Banner'}</h3>
+      <button class="bm-mclose" onclick="bm_closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="bm-mbody">
+      <div class="bm-mrow">
+        <label>Banner Title *</label>
+        <input type="text" id="bm-f-title" value="${b?b.title:''}" placeholder="e.g. Premium Plan Offer">
+      </div>
+      <div class="bm-mrow">
+        <label>Description</label>
+        <input type="text" id="bm-f-sub" value="${b?b.sub:''}" placeholder="Short subtitle text">
+      </div>
+      <div class="bm-mgrid">
+        <div class="bm-mrow">
+          <label>Banner Type *</label>
+          <select id="bm-f-type">
+            ${['Homepage','Dashboard','Popup'].map(t=>`<option ${b&&b.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="bm-mrow">
+          <label>Position</label>
+          <select id="bm-f-pos">
+            ${['Top Hero Banner','Top Banner','Middle Banner','Bottom Banner','Popup Banner.'].map(p=>`<option ${b&&b.pos===p?'selected':''}>${p}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="bm-mrow">
+        <label>Link / URL</label>
+        <input type="text" id="bm-f-link" value="${b&&b.link?b.link:''}" placeholder="/plans or https://...">
+      </div>
+      <div class="bm-mgrid">
+        <div class="bm-mrow">
+          <label>Start Date</label>
+          <input type="date" id="bm-f-start" value="${b&&b.start?b.start:''}">
+        </div>
+        <div class="bm-mrow">
+          <label>End Date</label>
+          <input type="date" id="bm-f-end" value="${b&&b.end?b.end:''}">
+        </div>
+      </div>
+      <div class="bm-mgrid">
+        <div class="bm-mrow">
+          <label>Status</label>
+          <select id="bm-f-status">
+            ${['Active','Scheduled','Inactive'].map(s=>`<option ${b&&b.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="bm-mrow">
+          <label>Accent Colour</label>
+          <input type="color" id="bm-f-color" value="${b?b.color:'#7c3aed'}" style="height:42px;padding:4px 8px;cursor:pointer;">
+        </div>
+      </div>
+      <div class="bm-mrow">
+        <label>Banner Image</label>
+        <div class="bm-upload-zone" onclick="document.getElementById('bm-f-img').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <p>Click to upload banner image</p>
+          <span>PNG, JPG, WebP up to 2MB</span>
+          <input type="file" id="bm-f-img" accept="image/*" style="display:none;">
+        </div>
+      </div>
+      <div id="bm-f-error" style="color:var(--red);font-size:12.5px;display:none;"></div>
+    </div>
+    <div class="bm-mfooter">
+      <button class="bm-mcancel" onclick="bm_closeModal()">Cancel</button>
+      <button class="bm-msave" onclick="bm_saveBanner()">
+        ${mode==='edit'?'Update Banner':'Create Banner'}
+      </button>
+    </div>
+  </div>`;
+
+  existing.classList.add('open');
+};
+
+window.bm_closeModal = function(){
+  const o = document.getElementById('bm-modal-overlay');
+  if(o) o.classList.remove('open');
+  bmEditId=null;
+};
+
+window.bm_saveBanner = function(){
+  const title  = (document.getElementById('bm-f-title')?.value||'').trim();
+  const sub    = (document.getElementById('bm-f-sub')?.value||'').trim();
+  const type   = document.getElementById('bm-f-type')?.value||'Homepage';
+  const pos    = document.getElementById('bm-f-pos')?.value||'Top Banner';
+  const link   = (document.getElementById('bm-f-link')?.value||'').trim()||null;
+  const start  = document.getElementById('bm-f-start')?.value||null;
+  const end    = document.getElementById('bm-f-end')?.value||null;
+  const status = document.getElementById('bm-f-status')?.value||'Active';
+  const color  = document.getElementById('bm-f-color')?.value||'#7c3aed';
+  const errEl  = document.getElementById('bm-f-error');
+
+  if(!title){ errEl.textContent='Banner title is required.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  if(bmEditId){
+    const b = bmAllBanners.find(x=>x.id===bmEditId);
+    if(b){ Object.assign(b,{title,sub,type,pos,link,start,end,status,color}); }
+    bm_toast('Banner updated successfully!');
+  } else {
+    const newId = Math.max(...bmAllBanners.map(x=>x.id),0)+1;
+    bmAllBanners.push({id:newId,title,sub,type,pos,link,start,end,status,color});
+    bm_toast('New banner created!');
+  }
+
+  bm_closeModal();
+  bm_refreshStats();
+  bm_applyFilters();
+};
+
+})();
 
 /* ===== SUPABASE CONFIG ===== */
 const SUPA_URL = 'https://zkafglojonspzlsfxcdh.supabase.co';

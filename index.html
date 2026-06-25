@@ -59,10 +59,10 @@ button{font-family:inherit;}
     flex-direction:column;
     flex-shrink:0;
     padding:20px 14px;
-    position:sticky;
+    position:fixed;
     top:0;
+    left:0;
     height:100vh;
-    min-height:100vh;
     overflow:hidden;
     overflow-y:auto;
     scrollbar-width:none;
@@ -233,7 +233,7 @@ button{font-family:inherit;}
 .page{display:none;flex-direction:column;min-height:100vh;flex:1;min-width:0;}
 .page.active{display:flex;}
 .nav-disabled{opacity:.45;cursor:not-allowed;}
-.main-wrap{display:flex;flex-direction:column;min-width:0;overflow-x:hidden;}
+.main-wrap{display:flex;flex-direction:column;min-width:0;overflow-x:hidden;margin-left:72px;}
 
 /* ===== Dashboard ===== */
 #page-dashboard .content {padding:4px 28px 32px;}

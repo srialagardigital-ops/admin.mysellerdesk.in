@@ -7820,17 +7820,15 @@ function escHtml(str){
 /* ── Init ── */
 leads_updateDate();
 
-// Fetch when page becomes active
-const origGoToPage = window.goToPage;
-window.goToPage = function(evt, pageId){
-  if(typeof origGoToPage === 'function') origGoToPage(evt, pageId);
-  if(pageId === 'leads'){ fetchLeads(); }
-};
-
-// Also fetch if leads page is somehow already active on load
-if(document.getElementById('page-leads')?.classList.contains('active')){
-  fetchLeads();
-}
+// Fetch when page becomes active — lazy lookup so script order doesn't matter
+window.goToPage = (function(prevGoToPage){
+  return function(evt, pageId){
+    // Call whatever goToPage was defined AFTER us (in script#2)
+    if(typeof prevGoToPage === 'function') prevGoToPage(evt, pageId);
+    else if(typeof window._goToPage === 'function') window._goToPage(evt, pageId);
+    if(pageId === 'leads'){ fetchLeads(); }
+  };
+})(window.goToPage);
 
 })();
 </script>
@@ -7855,7 +7853,7 @@ if(document.getElementById('page-leads')?.classList.contains('active')){
   setInterval(updateGreeting, 60000);
 })();
 
-function goToPage(evt, pageId){
+window._goToPage = function goToPage(evt, pageId){
   if(evt) evt.preventDefault();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('page-' + pageId);
@@ -7870,6 +7868,7 @@ function goToPage(evt, pageId){
   try { sessionStorage.setItem('msd_page', pageId); } catch(e){}
   window.scrollTo(0,0);
 }
+window.goToPage = window._goToPage;
 
 // Restore last visited page on load
 (function(){
@@ -7877,7 +7876,7 @@ function goToPage(evt, pageId){
   try { savedPage = sessionStorage.getItem('msd_page') || 'dashboard'; } catch(e){}
   document.getElementById('page-dashboard').classList.add('active');
   if(savedPage !== 'dashboard'){
-    goToPage(null, savedPage);
+    (window.goToPage || window._goToPage)(null, savedPage);
     if(savedPage === 'settings'){
       let savedSettingsKey = 'general';
       try { savedSettingsKey = sessionStorage.getItem('msd_settings_key') || 'general'; } catch(e){}
@@ -9959,12 +9958,13 @@ async function reports_loadData(){
 }
 window.reports_loadData = reports_loadData;
 
-// Load when the Reports page is opened (mirrors the Leads-page pattern)
-const rrOrigGoToPage = window.goToPage;
-window.goToPage = function(evt, pageId){
-  if(typeof rrOrigGoToPage === 'function') rrOrigGoToPage(evt, pageId);
-  if(pageId === 'reports') reports_loadData();
-};
+// Load when the Reports page is opened
+window.goToPage = (function(prevGoToPage){
+  return function(evt, pageId){
+    if(typeof prevGoToPage === 'function') prevGoToPage(evt, pageId);
+    if(pageId === 'reports') reports_loadData();
+  };
+})(window.goToPage);
 if(document.getElementById('page-reports')?.classList.contains('active')) reports_loadData();
 })();
 

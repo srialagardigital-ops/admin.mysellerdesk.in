@@ -7919,7 +7919,7 @@ Object.entries(sparkData).forEach(([id, {pts, color}]) => {
 });
 
 /* ---------------- SELLER GROWTH CHART ---------------- */
-const growthValues = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 // populated from Supabase,860,900,980,1050,1120,1080,1160,1130,1200,1180,1230,1254];
+const growthValues = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; // will be populated from Supabase
 const growthLabels = ['19 May','','','26 May','','','2 Jun','','','9 Jun','','','16 Jun','','','','','','','','','','','','','','19 Jun'];
 
 function dashboard_buildGrowthChart(){
@@ -13961,10 +13961,10 @@ performers_renderDetailPanel();
       const liveRes = await fetch(
         `${SUPA_URL}/rest/v1/active_sessions?select=*`,
         { headers: HEADERS }
-      );
-      if(liveRes.ok) {
+      ).catch(()=>null);
+      if(liveRes && liveRes.ok) {
         const liveSessions = await liveRes.json();
-        setVal('ao-val-totalVisitors', liveSessions.length);
+        if(Array.isArray(liveSessions)) setVal('ao-val-totalVisitors', liveSessions.length);
       }
 
       // ── 2. Today's stats from visitor_events ──
@@ -13975,9 +13975,10 @@ performers_renderDetailPanel();
       const res = await fetch(
         `${SUPA_URL}/rest/v1/visitor_events?select=*&created_at=gte.${todayISO}&order=created_at.desc&limit=5000`,
         { headers: HEADERS }
-      );
-      if(!res.ok) return;
+      ).catch(()=>null);
+      if(!res || !res.ok) return; // Table may not exist yet — fail silently
       const rows = await res.json();
+      if(!Array.isArray(rows)) return;
 
       // ── Update connection badge ──
       const badge = document.getElementById('ao-connection-badge');
@@ -14004,9 +14005,7 @@ performers_renderDetailPanel();
       setText('ao-top-device',  topDevice);
       setText('ao-top-country', topCountry);
 
-    } catch(e) {
-      console.error('Tracker fetch error:', e);
-    }
+    } catch(e) { /* analytics tables not set up yet */ }
   }
 
   // Run on load
@@ -14014,27 +14013,24 @@ performers_renderDetailPanel();
   // Auto refresh every 30 seconds
   setInterval(fetchAndRender, 30000);
 
-  // Supabase Realtime — instant update when new visitor arrives
-  try {
-    const ws = new WebSocket(
-      `wss://ouurdpvnkglkkeowooyc.supabase.co/realtime/v1/websocket?apikey=${SUPA_KEY}&vsn=1.0.0`
-    );
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        topic: "realtime:public:visitor_events",
-        event: "phx_join",
-        payload: {},
-        ref: "1"
-      }));
-    };
-    ws.onmessage = (msg) => {
-      const data = JSON.parse(msg.data);
-      if(data.event === 'INSERT' || data.event === 'UPDATE') {
-        fetchAndRender();
-      }
-    };
-    ws.onerror = () => {}; // silent fail, polling backup covers it
-  } catch(e) {}
+  // Supabase Realtime — only connect if visitor_events table exists
+  fetch(`${_SUPA_URL}/rest/v1/visitor_events?select=id&limit=1`, { headers:{ 'apikey': _SUPA_KEY, 'Authorization': 'Bearer ' + _SUPA_KEY } })
+    .then(r => {
+      if(!r.ok) return; // table doesn't exist yet, skip realtime
+      try {
+        const ws = new WebSocket(
+          `wss://ouurdpvnkglkkeowooyc.supabase.co/realtime/v1/websocket?apikey=${_SUPA_KEY}&vsn=1.0.0`
+        );
+        ws.onopen = () => {
+          ws.send(JSON.stringify({ topic:"realtime:public:visitor_events", event:"phx_join", payload:{}, ref:"1" }));
+        };
+        ws.onmessage = (msg) => {
+          const data = JSON.parse(msg.data);
+          if(data.event==='INSERT'||data.event==='UPDATE') fetchAndRender();
+        };
+        ws.onerror = () => {};
+      } catch(e) {}
+    }).catch(()=>{});
 
 })();
 </script>

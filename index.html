@@ -3620,6 +3620,12 @@ button{font-family:inherit;}
         </div>
       </div>
 
+      <!-- SUPABASE LOAD ERROR BANNER (hidden unless the sellers fetch fails) -->
+      <div id="sellers-load-error" style="display:none;align-items:center;gap:10px;background:var(--red-light);color:var(--red);border:1px solid #f5c6c6;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        <span>Could not load sellers from Supabase — <span class="sellers-load-error-msg"></span></span>
+      </div>
+
       <!-- STAT CARDS -->
       <div class="stat-grid">
         <div class="stat-card-simple">
@@ -6112,6 +6118,7 @@ function sourceBadge(src){
 }
 
 /* ── Fetch all leads ── */
+window.fetchLeads = fetchLeads;
 async function fetchLeads(){
   try {
     const res = await fetch(
@@ -6697,6 +6704,7 @@ function goToPage(evt, pageId){
   // Page-specific loaders
   if(pageId === 'leads'   && typeof fetchLeads       === 'function') fetchLeads();
   if(pageId === 'reports' && typeof reports_loadData === 'function') reports_loadData();
+  if(pageId === 'sellers' && typeof loadSellersFromSupabase === 'function') loadSellersFromSupabase();
 }
 window.goToPage = goToPage;
 
@@ -9214,7 +9222,29 @@ async function loadSellersFromSupabase(){
   try {
     // Reads directly from the `sellers` table — this is the table the seller
     // signup app (index.html) actually writes to.
-    const rows = await supa('sellers?select=*&order=created_at.desc');
+    // NOTE: no "order=created_at.desc" here — if that column doesn't exist on
+    // this table, PostgREST returns a 400 and the whole fetch silently comes
+    // back empty. We sort client-side instead, after we know what we got back.
+    const res = await fetch(SUPA_URL + '/rest/v1/sellers?select=*', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+
+    if(!res.ok){
+      const errText = await res.text();
+      console.error('loadSellersFromSupabase failed:', res.status, errText);
+      sellers_showLoadError(`Supabase error ${res.status}: ${errText.slice(0,200)}`);
+      return;
+    }
+
+    const rows = await res.json();
+    sellers_hideLoadError();
+
+    // Sort newest first if a created_at (or similar) field is present
+    rows.sort((a,b) => {
+      const ad = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const bd = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return bd - ad;
+    });
 
     const avClasses = ['av-1','av-2','av-3','av-4','av-5','av-6'];
     const newSellers = (rows || []).map((p, i) => {
@@ -9272,7 +9302,21 @@ async function loadSellersFromSupabase(){
     if(typeof performers_renderTable === 'function') performers_renderTable();
   } catch(e) {
     console.error('loadSellersFromSupabase failed:', e);
+    sellers_showLoadError(e.message || String(e));
   }
+}
+
+function sellers_showLoadError(msg){
+  const el = document.getElementById('sellers-load-error');
+  if(el){
+    el.style.display = 'flex';
+    const msgEl = el.querySelector('.sellers-load-error-msg');
+    if(msgEl) msgEl.textContent = msg;
+  }
+}
+function sellers_hideLoadError(){
+  const el = document.getElementById('sellers-load-error');
+  if(el) el.style.display = 'none';
 }
 
 async function loadSubsStats(){

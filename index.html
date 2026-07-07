@@ -9233,6 +9233,9 @@ function settings_choosePlan(name){
   .bn-loc-badge{ font-size:10.7px; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; }
   .bn-place-name{ font-size:13px; font-weight:700; margin-bottom:3px; }
   .bn-place-desc{ font-size:11.8px; color:var(--text-dim); line-height:1.5; margin-bottom:12px; }
+  .bn-place-size{ display:flex; align-items:center; gap:6px; font-size:11.3px; color:var(--text-dim); background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:7px 10px; margin-bottom:12px; }
+  .bn-place-size svg{ width:13px; height:13px; flex-shrink:0; }
+  .bn-place-size strong{ color:var(--text); font-weight:700; }
 
   .bn-mock{ background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; }
   .bn-mock-bar{ height:12px; border-radius:4px; margin-bottom:12px; }
@@ -9384,9 +9387,9 @@ const bn_icons = {
 };
 
 const bn_locations = {
-  landing:  { label:'Landing Page',     placement:'Top Hero Banner',      desc:'Displayed on the top section of your landing page.', icon:bn_icons.globe, color:'#7c3aed', bg:'#f1eaff' },
-  login:    { label:'Seller Login Page', placement:'Top Banner',          desc:'Displayed on top of the seller login page.',          icon:bn_icons.user,  color:'#2f6df6', bg:'#eaf1ff' },
-  dashboard:{ label:'Seller Dashboard', placement:'Top Dashboard Banner', desc:'Displayed at the top of the seller dashboard.',       icon:bn_icons.grid,  color:'#16a34a', bg:'#e8f9ef' }
+  landing:  { label:'Landing Page',     placement:'Top Hero Banner',      desc:'Displayed on the top section of your landing page.', icon:bn_icons.globe, color:'#7c3aed', bg:'#f1eaff', size:'1920 × 600px (wide)' },
+  login:    { label:'Seller Login Page', placement:'Top Banner',          desc:'Displayed on top of the seller login page.',          icon:bn_icons.user,  color:'#2f6df6', bg:'#eaf1ff', size:'1080 × 1350px (portrait)' },
+  dashboard:{ label:'Seller Dashboard', placement:'Top Dashboard Banner', desc:'Displayed at the top of the seller dashboard.',       icon:bn_icons.grid,  color:'#16a34a', bg:'#e8f9ef', size:'1600 × 320px (wide)' }
 };
 const bn_themes = {
   purple: 'linear-gradient(135deg,#7c3aed,#4c1d95)',
@@ -9576,6 +9579,7 @@ function bn_render(panel){
         </div>
         <div class="bn-place-name">${l.placement}</div>
         <div class="bn-place-desc">${l.desc}</div>
+        <div class="bn-place-size">${bn_icons.image}<span>Recommended size: <strong>${l.size}</strong></span></div>
         <div class="bn-place-preview-box">${previewInner}</div>
         <button type="button" class="bn-place-upload-btn" onclick="bn_quickPick('${key}')">
           ${bn_icons.upload}<span>${hasImage ? 'Replace Banner Image' : 'Upload Banner Image'}</span>

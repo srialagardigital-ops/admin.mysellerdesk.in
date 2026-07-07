@@ -9310,8 +9310,25 @@ function settings_choosePlan(name){
   #bn-drawer .bnd-theme-row{ display:flex; gap:8px; }
   #bn-drawer .bnd-theme-dot{ width:30px; height:30px; border-radius:50%; cursor:pointer; border:2.5px solid transparent; }
   #bn-drawer .bnd-theme-dot.sel{ border-color:var(--text); }
-  #bn-drawer .bnd-upload{ border:1.5px dashed var(--border); border-radius:10px; padding:14px; text-align:center; cursor:pointer; background:var(--bg); font-size:12px; color:var(--text-dim); }
-  #bn-drawer .bnd-upload:hover{ border-color:var(--blue); }
+  #bn-drawer .bnd-upload{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    border:1.5px dashed var(--border); border-radius:12px; padding:26px 16px; cursor:pointer;
+    background:var(--bg); transition:border-color .15s, background .15s;
+  }
+  #bn-drawer .bnd-upload:hover{ border-color:var(--blue); background:var(--blue-light); }
+  #bn-drawer .bnd-upload-icon{ width:34px; height:34px; border-radius:50%; background:var(--blue-light); color:var(--blue); display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+  #bn-drawer .bnd-upload-icon svg{ width:17px; height:17px; }
+  #bn-drawer .bnd-upload-title{ font-size:13.3px; font-weight:700; color:var(--text); }
+  #bn-drawer .bnd-upload-sub{ font-size:11.5px; color:var(--text-faint); margin-top:3px; }
+  #bn-drawer .bnd-upload-preview{ position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+  #bn-drawer .bnd-upload-preview img{ width:100%; height:130px; object-fit:cover; display:block; }
+  #bn-drawer .bnd-upload-remove{
+    position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:8px; border:none;
+    background:rgba(15,20,40,.65); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  #bn-drawer .bnd-upload-remove:hover{ background:rgba(220,38,38,.85); }
+  #bn-drawer .bnd-upload-remove svg{ width:14px; height:14px; }
+  #bn-drawer .bnd-upload-filename{ font-size:11.5px; color:var(--text-dim); margin-top:8px; text-align:center; }
   #bn-drawer .bnd-preview-label{ font-size:11.5px; color:var(--text-faint); margin-bottom:8px; }
   #bn-drawer .bnd-footer{ display:flex; gap:10px; padding:18px 24px; border-top:1px solid var(--border); position:sticky; bottom:0; background:#fff; }
   #bn-drawer .bnd-cancel-btn{ flex:1; padding:11px; border-radius:9px; border:1px solid var(--border); background:#fff; font-weight:700; font-size:13px; cursor:pointer; }
@@ -9335,6 +9352,7 @@ const bn_icons = {
   copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
   trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>',
   monitor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M20 16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3"/></svg>',
   filter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16l-6 8v6l-4 2v-8L4 4z"/></svg>',
   download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12M6 12l6 6 6-6"/><path d="M4 20h16"/></svg>',
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>',
@@ -9698,15 +9716,19 @@ function bn_ensureDrawer(){
           </div>
 
           <div class="bnd-divider"></div>
-          <div class="bnd-section-title">Banner Color Theme</div>
-          <div class="bnd-theme-row" id="bnd-theme-row"></div>
+          <div class="bnd-section-title">Banner Image</div>
+          <div id="bnd-upload-zone-wrap">
+            <label class="bnd-upload" id="bnd-upload-label">
+              <input type="file" id="bnd-image" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="bn_onImagePicked(this)">
+              <div class="bnd-upload-icon">${bn_icons.upload}</div>
+              <div class="bnd-upload-title">Click to upload banner image</div>
+              <div class="bnd-upload-sub">JPG, PNG or WEBP · Max 3MB</div>
+            </label>
+          </div>
 
           <div class="bnd-divider"></div>
-          <div class="bnd-section-title">Banner Image (Optional)</div>
-          <label class="bnd-upload" id="bnd-upload-label">
-            <input type="file" id="bnd-image" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="bn_onImagePicked(this)">
-            <span id="bnd-upload-text">Click to upload a custom banner image (JPG/PNG/WEBP, max 3MB). If skipped, the title above is shown on the selected color theme.</span>
-          </label>
+          <div class="bnd-section-title">Banner Color Theme <span style="font-weight:500;color:var(--text-faint);font-size:11.5px;">(used if no image is uploaded)</span></div>
+          <div class="bnd-theme-row" id="bnd-theme-row"></div>
 
           <div class="bnd-divider"></div>
           <div class="bnd-preview-label">Live Preview</div>
@@ -9735,6 +9757,27 @@ function bn_selectTheme(k){
   bn_updatePreview();
 }
 
+function bn_renderUploadZone(filename){
+  const wrap = document.getElementById('bnd-upload-zone-wrap');
+  if(!wrap) return;
+  if(bn_draftImage){
+    wrap.innerHTML = `
+      <div class="bnd-upload-preview">
+        <img src="${bn_draftImage}" alt="banner image">
+        <button type="button" class="bnd-upload-remove" onclick="bn_removeImage()">${bn_icons.close}</button>
+      </div>
+      ${filename ? `<div class="bnd-upload-filename">${bn_esc(filename)}</div>` : ''}`;
+  } else {
+    wrap.innerHTML = `
+      <label class="bnd-upload" id="bnd-upload-label">
+        <input type="file" id="bnd-image" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="bn_onImagePicked(this)">
+        <div class="bnd-upload-icon">${bn_icons.upload}</div>
+        <div class="bnd-upload-title">Click to upload banner image</div>
+        <div class="bnd-upload-sub">JPG, PNG or WEBP · Max 3MB</div>
+      </label>`;
+  }
+}
+
 function bn_onImagePicked(inputEl){
   const file = inputEl.files && inputEl.files[0];
   if(!file) return;
@@ -9743,10 +9786,16 @@ function bn_onImagePicked(inputEl){
   const reader = new FileReader();
   reader.onload = function(e){
     bn_draftImage = e.target.result;
-    document.getElementById('bnd-upload-text').textContent = file.name + ' selected — click to change.';
+    bn_renderUploadZone(file.name);
     bn_updatePreview();
   };
   reader.readAsDataURL(file);
+}
+
+function bn_removeImage(){
+  bn_draftImage = null;
+  bn_renderUploadZone();
+  bn_updatePreview();
 }
 
 function bn_updatePreview(){
@@ -9772,8 +9821,6 @@ function bn_openDrawer(id){
 
   document.getElementById('bnd-title').textContent = id ? 'Edit Banner' : 'Add New Banner';
   document.getElementById('bnd-submit-btn').textContent = id ? 'Save Changes' : 'Create Banner';
-  document.getElementById('bnd-image').value = '';
-  document.getElementById('bnd-upload-text').textContent = 'Click to upload a custom banner image (JPG/PNG/WEBP, max 3MB). If skipped, the title above is shown on the selected color theme.';
 
   if(id){
     const b = bn_load().find(x=>x.id===id);
@@ -9787,7 +9834,6 @@ function bn_openDrawer(id){
       document.getElementById('bnd-end').value = b.endDate || '';
       bn_draftTheme = b.theme || 'purple';
       bn_draftImage = b.image || null;
-      if(bn_draftImage) document.getElementById('bnd-upload-text').textContent = 'Custom image set — click to change.';
     }
   } else {
     document.getElementById('bnd-location').value = 'landing';
@@ -9799,6 +9845,7 @@ function bn_openDrawer(id){
     document.getElementById('bnd-end').value = '';
   }
   document.querySelectorAll('#bnd-theme-row .bnd-theme-dot').forEach(d => d.classList.toggle('sel', d.dataset.theme===bn_draftTheme));
+  bn_renderUploadZone();
   bn_updatePreview();
   document.getElementById('bn-drawer-overlay').classList.add('open');
 }
@@ -11256,6 +11303,7 @@ window.bn_closeDrawer = bn_closeDrawer;
 window.bn_closeDrawerOnOverlay = bn_closeDrawerOnOverlay;
 window.bn_selectTheme = bn_selectTheme;
 window.bn_onImagePicked = bn_onImagePicked;
+window.bn_removeImage = bn_removeImage;
 window.bn_updatePreview = bn_updatePreview;
 window.bn_saveBanner = bn_saveBanner;
 window.bn_duplicateBanner = bn_duplicateBanner;

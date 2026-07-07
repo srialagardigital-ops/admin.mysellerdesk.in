@@ -9932,7 +9932,7 @@ async function bn_quickSetLocationImage(key, dataUrl){
     await bn_fetchAll();
   }catch(e){
     console.error('bn_quickSetLocationImage failed:', e);
-    alert('Could not upload the image. Please try again.');
+    alert('Could not upload the image.\n\n' + (e && e.message ? e.message : 'Please try again.'));
   }
   bn_refresh();
 }
@@ -10108,7 +10108,13 @@ async function supa(path, opts={}){
     method: opts.method || 'GET',
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
-  if(!res.ok){ console.error('Supabase error:', res.status, await res.text()); return null; }
+  if(!res.ok){
+    const errBody = await res.text();
+    console.error('Supabase error:', res.status, errBody);
+    const err = new Error(`Supabase ${res.status}: ${errBody.slice(0,300)}`);
+    err.status = res.status;
+    throw err;
+  }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }

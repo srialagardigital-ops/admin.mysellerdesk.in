@@ -9488,10 +9488,6 @@ function bn_computeStatus(b){
 function bn_render(panel){
   const all = bn_load();
   const total = all.length;
-  const topRow = `
-    <div class="bn-toprow">
-      <button type="button" class="bn-add-btn" onclick="bn_openDrawer()">${bn_icons.plus}<span>Add New Banner</span></button>
-    </div>`;
   const withStatus = all.map(b => ({...b, _status: bn_computeStatus(b)}));
   const activeCount = withStatus.filter(b=>b._status==='active').length;
   const inactiveCount = withStatus.filter(b=>b._status==='inactive').length;
@@ -9648,7 +9644,7 @@ function bn_render(panel){
       </tr>`;
   }).join('') : (bn_loading && !bn_hasLoadedOnce)
       ? `<tr class="bn-empty-row"><td colspan="8">Loading banners...</td></tr>`
-      : `<tr class="bn-empty-row"><td colspan="8">No banners yet. Click "Add New Banner" to create your first one.</td></tr>`;
+      : `<tr class="bn-empty-row"><td colspan="8">No banners yet. Use "Upload Banner Image" on a placement card above to create one.</td></tr>`;
 
   const rangeStart = filtered.length ? pageStart+1 : 0;
   const rangeEnd = Math.min(pageStart+BN_PAGE_SIZE, filtered.length);
@@ -9704,7 +9700,7 @@ function bn_render(panel){
       </div>
     </div>`;
 
-  panel.innerHTML = topRow + heroRow + placementSection + tableSection;
+  panel.innerHTML = heroRow + placementSection + tableSection;
 
   bn_ensureDrawer();
 }

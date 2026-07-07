@@ -9250,6 +9250,20 @@ function settings_choosePlan(name){
   .bn-place-preview-gen{ width:100%; height:100px; border-radius:10px; display:flex; flex-direction:column; justify-content:center; padding:10px 12px; color:#fff; overflow:hidden; }
   .bn-place-preview-gen .pv-title{ font-size:13px; font-weight:800; line-height:1.25; }
   .bn-place-preview-gen .pv-sub{ font-size:10.8px; opacity:.9; margin-top:4px; line-height:1.3; }
+  .bn-carousel{ position:relative; }
+  .bn-car-nav{
+    position:absolute; top:50%; transform:translateY(-50%); width:24px; height:24px; border-radius:50%;
+    background:rgba(0,0,0,.45); border:none; color:#fff; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; padding:0;
+  }
+  .bn-car-nav:hover{ background:rgba(0,0,0,.65); }
+  .bn-car-nav svg{ width:13px; height:13px; }
+  .bn-car-prev{ left:6px; }
+  .bn-car-next{ right:6px; }
+  .bn-car-count{
+    position:absolute; top:6px; right:6px; background:rgba(0,0,0,.55); color:#fff;
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
+  }
   .bn-place-upload-btn{
     width:100%; display:flex; align-items:center; justify-content:center; gap:7px;
     padding:9px; border-radius:9px; border:1.5px dashed var(--border); background:var(--bg);
@@ -9359,6 +9373,27 @@ function settings_choosePlan(name){
   #bn-drawer .bnd-cancel-btn{ flex:1; padding:11px; border-radius:9px; border:1px solid var(--border); background:#fff; font-weight:700; font-size:13px; cursor:pointer; }
   #bn-drawer .bnd-submit-btn{ flex:1; padding:11px; border-radius:9px; border:none; background:var(--blue); color:#fff; font-weight:700; font-size:13px; cursor:pointer; }
   #bn-drawer .bnd-submit-btn:hover{ background:#2460e0; }
+
+  /* ---- Quick-upload metadata modal (title / target / schedule for placement-card uploads) ---- */
+  #bn-quick-overlay{ display:none; position:fixed; inset:0; background:rgba(15,20,40,.45); z-index:1300; align-items:center; justify-content:center; }
+  #bn-quick-overlay.open{ display:flex; }
+  #bn-quick-modal{ width:420px; max-width:92vw; max-height:88vh; overflow-y:auto; background:#fff; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+  #bn-quick-modal .bqm-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border); }
+  #bn-quick-modal .bqm-head h3{ font-size:15.5px; font-weight:800; }
+  #bn-quick-modal .bqm-close{ background:none; border:none; cursor:pointer; color:var(--text-dim); width:28px; height:28px; display:flex; align-items:center; justify-content:center; }
+  #bn-quick-modal .bqm-close svg{ width:16px; height:16px; }
+  #bn-quick-modal .bqm-body{ padding:20px 22px; }
+  #bn-quick-modal .bqm-note{ font-size:11.5px; color:var(--text-faint); margin-bottom:16px; line-height:1.5; }
+  #bn-quick-modal .bqm-group{ margin-bottom:16px; }
+  #bn-quick-modal .bqm-label{ font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:6px; display:block; }
+  #bn-quick-modal .bqm-input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:9px; font-size:13px; font-family:inherit; background:#fff; }
+  #bn-quick-modal .bqm-input:focus{ outline:none; border-color:var(--blue); }
+  #bn-quick-modal select.bqm-input{ cursor:pointer; }
+  #bn-quick-modal .bqm-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+  #bn-quick-modal .bqm-footer{ display:flex; gap:10px; padding:16px 22px; border-top:1px solid var(--border); position:sticky; bottom:0; background:#fff; }
+  #bn-quick-modal .bqm-cancel{ flex:1; padding:11px; border-radius:9px; border:1px solid var(--border); background:#fff; font-weight:700; font-size:13px; cursor:pointer; }
+  #bn-quick-modal .bqm-submit{ flex:1; padding:11px; border-radius:9px; border:none; background:var(--blue); color:#fff; font-weight:700; font-size:13px; cursor:pointer; }
+  #bn-quick-modal .bqm-submit:hover{ background:#2460e0; }
   `;
   document.head.appendChild(style);
 })();
@@ -9410,6 +9445,8 @@ let bn_filterPanelOpen = false;
 let bn_page = 1;
 const BN_PAGE_SIZE = 8;
 let bn_editingId = null;
+let bn_previewIdx = {}; // location key -> currently shown slide index in the placement-card mini carousel
+let bn_pendingQuick = null; // { key, dataUrls } awaiting title/target/schedule before being saved
 
 /* ---- Supabase-backed banner store ----
    Banners now live in the `banners` table in Supabase instead of
@@ -9533,7 +9570,11 @@ function bn_render(panel){
     const locBanners = withStatus.filter(b=>b.location===key);
     const count = locBanners.length;
     const primary = locBanners.slice().sort((a,b)=>b.createdAt-a.createdAt)[0];
-    const hasImage = !!(primary && primary.image);
+    const imgBanners = locBanners.filter(b=>b.image).sort((a,b)=>a.createdAt-b.createdAt);
+    const hasImage = imgBanners.length > 0;
+    if(hasImage){
+      if(bn_previewIdx[key] === undefined || bn_previewIdx[key] >= imgBanners.length) bn_previewIdx[key] = 0;
+    }
 
     let mock = '';
     if(key === 'login'){
@@ -9557,14 +9598,27 @@ function bn_render(panel){
       </div>`;
     }
 
-    const previewInner = hasImage
-      ? `<img class="bn-place-preview-img" src="${primary.image}" alt="banner">`
-      : primary
-        ? `<div class="bn-place-preview-gen" style="background:${bn_themes[primary.theme]||bn_themes.purple};">
+    let previewInner;
+    if(hasImage){
+      const idx = bn_previewIdx[key] || 0;
+      const cur = imgBanners[idx];
+      const navBtns = imgBanners.length > 1
+        ? `<button type="button" class="bn-car-nav bn-car-prev" onclick="event.stopPropagation();bn_previewNav('${key}',-1)">${bn_icons.chevL}</button>
+           <button type="button" class="bn-car-nav bn-car-next" onclick="event.stopPropagation();bn_previewNav('${key}',1)">${bn_icons.chevR}</button>
+           <div class="bn-car-count">${idx+1}/${imgBanners.length}</div>`
+        : '';
+      previewInner = `<div class="bn-carousel">
+        <img class="bn-place-preview-img" src="${cur.image}" alt="banner">
+        ${navBtns}
+      </div>`;
+    } else if(primary){
+      previewInner = `<div class="bn-place-preview-gen" style="background:${bn_themes[primary.theme]||bn_themes.purple};">
              <div class="pv-title">${bn_esc(primary.title)}</div>
              ${primary.subtitle ? `<div class="pv-sub">${bn_esc(primary.subtitle)}</div>` : ''}
-           </div>`
-        : mock;
+           </div>`;
+    } else {
+      previewInner = mock;
+    }
 
     return `
       <div class="bn-place-card">
@@ -9578,10 +9632,10 @@ function bn_render(panel){
         <div class="bn-place-size">${bn_icons.image}<span>Recommended size: <strong>${l.size}</strong></span></div>
         <div class="bn-place-preview-box">${previewInner}</div>
         <button type="button" class="bn-place-upload-btn" onclick="bn_quickPick('${key}')">
-          ${bn_icons.upload}<span>${hasImage ? 'Replace Banner Image' : 'Upload Banner Image'}</span>
+          ${bn_icons.upload}<span>${hasImage ? 'Add More Images' : 'Upload Banner Images'}</span>
         </button>
-        ${hasImage ? `<button type="button" class="bn-place-remove-btn" onclick="bn_quickRemoveImage('${key}')">${bn_icons.trash}<span>Remove Image</span></button>` : ''}
-        <input type="file" id="bn-quick-file-${key}" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="bn_quickImagePicked('${key}', this)">
+        ${hasImage ? `<button type="button" class="bn-place-remove-btn" onclick="bn_quickRemoveImage('${key}')">${bn_icons.trash}<span>Remove This Slide</span></button>` : ''}
+        <input type="file" id="bn-quick-file-${key}" accept="image/png,image/jpeg,image/webp" multiple style="display:none" onchange="bn_quickImagePicked('${key}', this)">
       </div>`;
   }).join('');
 
@@ -9895,56 +9949,174 @@ function bn_quickPick(key){
   if(inp) inp.click();
 }
 
-function bn_quickImagePicked(key, inputEl){
-  const file = inputEl.files && inputEl.files[0];
-  if(!file) return;
-  if(!/^image\/(png|jpeg|jpg|webp)$/.test(file.type)){ alert('Unsupported image type.'); inputEl.value=''; return; }
-  if(file.size > 3*1024*1024){ alert('Image is larger than 3MB.'); inputEl.value=''; return; }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    bn_quickSetLocationImage(key, e.target.result);
-    inputEl.value = '';
-  };
-  reader.readAsDataURL(file);
+function bn_previewNav(key, dir){
+  const all = bn_load();
+  const imgBanners = all.filter(b=>b.location===key && b.image).sort((a,b)=>a.createdAt-b.createdAt);
+  if(!imgBanners.length) return;
+  let idx = (bn_previewIdx[key] || 0) + dir;
+  if(idx < 0) idx = imgBanners.length - 1;
+  if(idx >= imgBanners.length) idx = 0;
+  bn_previewIdx[key] = idx;
+  bn_refresh();
 }
 
-async function bn_quickSetLocationImage(key, dataUrl){
-  const all = bn_load();
-  const locBanners = all.filter(b=>b.location===key);
-  const primary = locBanners.slice().sort((a,b)=>b.createdAt-a.createdAt)[0];
+function bn_quickImagePicked(key, inputEl){
+  const files = inputEl.files ? Array.from(inputEl.files) : [];
+  if(!files.length) return;
+  for(const file of files){
+    if(!/^image\/(png|jpeg|jpg|webp)$/.test(file.type)){ alert(file.name + ': unsupported image type.'); inputEl.value=''; return; }
+    if(file.size > 3*1024*1024){ alert(file.name + ': image is larger than 3MB.'); inputEl.value=''; return; }
+  }
+  Promise.all(files.map(file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('Could not read ' + file.name));
+    reader.readAsDataURL(file);
+  }))).then(dataUrls => {
+    inputEl.value = '';
+    bn_openQuickMeta(key, dataUrls);
+  }).catch(e => {
+    console.error('bn_quickImagePicked failed:', e);
+    alert('Could not read the selected image(s).');
+    inputEl.value = '';
+  });
+}
+
+/* Small modal asking Title / Target Audience / Status / Schedule before the
+   picked image(s) are actually saved as banner slide(s). */
+function bn_openQuickMeta(key, dataUrls){
+  bn_pendingQuick = { key, dataUrls };
+  const l = bn_locations[key];
+  const count = dataUrls.length;
+
+  const existing = document.getElementById('bn-quick-overlay');
+  if(existing) existing.remove();
+
+  const html = `
+    <div id="bn-quick-overlay" class="open" onclick="bn_closeQuickMetaOnOverlay(event)">
+      <div id="bn-quick-modal">
+        <div class="bqm-head">
+          <h3>${count > 1 ? `Banner Details (${count} images)` : 'Banner Details'}</h3>
+          <button class="bqm-close" onclick="bn_closeQuickMeta()">${bn_icons.close}</button>
+        </div>
+        <div class="bqm-body">
+          <div class="bqm-note">${l.label} — ${l.placement}. ${count > 1 ? `These ${count} images will be added as separate slides, all sharing the details below.` : 'Set how this banner should appear and who should see it.'}</div>
+          <div class="bqm-group">
+            <label class="bqm-label">Banner Title <span style="color:var(--red);">*</span></label>
+            <input class="bqm-input" id="bqm-title" type="text" value="${bn_esc(l.label + ' Banner')}" placeholder="e.g. 30 Days Free Trial">
+          </div>
+          <div class="bqm-row">
+            <div>
+              <label class="bqm-label">Target Audience</label>
+              <select class="bqm-input" id="bqm-target">
+                <option value="all_visitors">All Visitors</option>
+                <option value="all_sellers">All Sellers</option>
+                <option value="new_sellers">New Sellers</option>
+                <option value="premium_sellers">Premium Sellers</option>
+              </select>
+            </div>
+            <div>
+              <label class="bqm-label">Status</label>
+              <select class="bqm-input" id="bqm-status">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="scheduled">Scheduled</option>
+              </select>
+            </div>
+          </div>
+          <div class="bqm-row">
+            <div>
+              <label class="bqm-label">Start Date</label>
+              <input class="bqm-input" id="bqm-start" type="date">
+            </div>
+            <div>
+              <label class="bqm-label">End Date</label>
+              <input class="bqm-input" id="bqm-end" type="date">
+            </div>
+          </div>
+        </div>
+        <div class="bqm-footer">
+          <button class="bqm-cancel" onclick="bn_closeQuickMeta()">Cancel</button>
+          <button class="bqm-submit" onclick="bn_submitQuickMeta()">${count > 1 ? 'Save ' + count + ' Banners' : 'Save Banner'}</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  const titleInput = document.getElementById('bqm-title');
+  if(titleInput){ titleInput.focus(); titleInput.select(); }
+}
+
+function bn_closeQuickMeta(){
+  const ov = document.getElementById('bn-quick-overlay');
+  if(ov) ov.remove();
+  bn_pendingQuick = null;
+}
+
+function bn_closeQuickMetaOnOverlay(e){
+  if(e.target && e.target.id === 'bn-quick-overlay') bn_closeQuickMeta();
+}
+
+function bn_submitQuickMeta(){
+  if(!bn_pendingQuick) return;
+  const title = document.getElementById('bqm-title').value.trim();
+  if(!title){ alert('Please enter a banner title.'); return; }
+  const meta = {
+    title,
+    target: document.getElementById('bqm-target').value,
+    status: document.getElementById('bqm-status').value,
+    startDate: document.getElementById('bqm-start').value,
+    endDate: document.getElementById('bqm-end').value
+  };
+  const { key, dataUrls } = bn_pendingQuick;
+  bn_closeQuickMeta();
+  bn_quickAddImages(key, dataUrls, meta);
+}
+
+/* Every picked image becomes its own new banner "slide" for that location
+   (instead of overwriting a single image), so a placement can carry a
+   multi-image carousel. All slides from one upload share the title/target/
+   schedule entered in the modal; the title gets a "(n)" suffix when more
+   than one image was picked, so entries stay distinguishable in the table. */
+async function bn_quickAddImages(key, dataUrls, meta){
+  const l = bn_locations[key];
+  const m = meta || { title: l.label + ' Banner', target:'all_visitors', status:'active', startDate:'', endDate:'' };
   try{
-    if(primary){
-      await supa(`banners?id=eq.${primary.id}`, { method:'PATCH', body: { image: dataUrl } });
-    } else {
-      const l = bn_locations[key];
+    for(let i=0; i<dataUrls.length; i++){
+      const title = dataUrls.length > 1 ? `${m.title} (${i+1})` : m.title;
       await supa('banners', { method:'POST', body: bn_toRow({
         location: key,
-        title: l.label + ' Banner',
+        title,
         subtitle: '',
-        target: 'all_visitors',
-        status: 'active',
-        startDate: '',
-        endDate: '',
+        target: m.target,
+        status: m.status,
+        startDate: m.startDate,
+        endDate: m.endDate,
         theme: 'purple',
-        image: dataUrl
+        image: dataUrls[i]
       })});
     }
     await bn_fetchAll();
+    // jump the preview to the newest slide just added
+    const imgBanners = bn_load().filter(b=>b.location===key && b.image).sort((a,b)=>a.createdAt-b.createdAt);
+    bn_previewIdx[key] = Math.max(0, imgBanners.length - 1);
   }catch(e){
-    console.error('bn_quickSetLocationImage failed:', e);
-    alert('Could not upload the image.\n\n' + (e && e.message ? e.message : 'Please try again.'));
+    console.error('bn_quickAddImages failed:', e);
+    alert('Could not upload the image(s).\n\n' + (e && e.message ? e.message : 'Please try again.'));
   }
   bn_refresh();
 }
 
 async function bn_quickRemoveImage(key){
   const all = bn_load();
-  const locBanners = all.filter(b=>b.location===key);
-  const primary = locBanners.slice().sort((a,b)=>b.createdAt-a.createdAt)[0];
-  if(!primary) return;
+  const imgBanners = all.filter(b=>b.location===key && b.image).sort((a,b)=>a.createdAt-b.createdAt);
+  if(!imgBanners.length) return;
+  const idx = bn_previewIdx[key] || 0;
+  const target = imgBanners[idx] || imgBanners[0];
+  if(!confirm('Remove this banner slide?')) return;
   try{
-    await supa(`banners?id=eq.${primary.id}`, { method:'PATCH', body: { image: null } });
+    await supa(`banners?id=eq.${target.id}`, { method:'DELETE' });
     await bn_fetchAll();
+    bn_previewIdx[key] = 0;
   }catch(e){
     console.error('bn_quickRemoveImage failed:', e);
     alert('Could not remove the image. Please try again.');
@@ -11484,7 +11656,11 @@ window.bn_duplicateBanner = bn_duplicateBanner;
 window.bn_deleteBanner = bn_deleteBanner;
 window.bn_quickPick = bn_quickPick;
 window.bn_quickImagePicked = bn_quickImagePicked;
-window.bn_quickSetLocationImage = bn_quickSetLocationImage;
+window.bn_closeQuickMeta = bn_closeQuickMeta;
+window.bn_closeQuickMetaOnOverlay = bn_closeQuickMetaOnOverlay;
+window.bn_submitQuickMeta = bn_submitQuickMeta;
+window.bn_previewNav = bn_previewNav;
+window.bn_quickAddImages = bn_quickAddImages;
 window.bn_quickRemoveImage = bn_quickRemoveImage;
 window.gs_updateSellerPreview = gs_updateSellerPreview;
 window.gs_updateInvoicePreview = gs_updateInvoicePreview;

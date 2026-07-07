@@ -9171,6 +9171,7 @@ function settings_select(el, key){
   if(key==='banner'){
     panel.classList.add('gs-flat');
     bn_render(panel);
+    bn_fetchAll().then(() => bn_refresh());
     return;
   }
 
@@ -9407,15 +9408,60 @@ let bn_page = 1;
 const BN_PAGE_SIZE = 8;
 let bn_editingId = null;
 
+/* ---- Supabase-backed banner store ----
+   Banners now live in the `banners` table in Supabase instead of
+   localStorage, so they're shared across admins/devices and actually
+   persist. bn_cache mirrors the table in memory so the rest of the
+   (synchronous) render code can keep calling bn_load() as before. */
+let bn_cache = [];
+let bn_loading = false;
+let bn_hasLoadedOnce = false;
+
 function bn_load(){
-  try{
-    const raw = localStorage.getItem('msd_banners_v2');
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return [];
+  return bn_cache;
 }
-function bn_save(list){
-  try{ localStorage.setItem('msd_banners_v2', JSON.stringify(list)); }catch(e){}
+
+function bn_fromRow(r){
+  return {
+    id: r.id,
+    location: r.location,
+    title: r.title,
+    subtitle: r.subtitle || '',
+    target: r.target,
+    status: r.status,
+    startDate: r.start_date || '',
+    endDate: r.end_date || '',
+    theme: r.theme || 'purple',
+    image: r.image || null,
+    createdAt: r.created_at ? new Date(r.created_at).getTime() : Date.now()
+  };
+}
+
+function bn_toRow(b){
+  return {
+    location: b.location,
+    title: b.title,
+    subtitle: b.subtitle || '',
+    target: b.target,
+    status: b.status,
+    start_date: b.startDate || null,
+    end_date: b.endDate || null,
+    theme: b.theme || 'purple',
+    image: b.image || null
+  };
+}
+
+async function bn_fetchAll(){
+  bn_loading = true;
+  try{
+    const rows = await supa('banners?select=*&order=created_at.desc');
+    bn_cache = (rows || []).map(bn_fromRow);
+  }catch(e){
+    console.error('bn_fetchAll failed:', e);
+  } finally {
+    bn_loading = false;
+    bn_hasLoadedOnce = true;
+  }
 }
 function bn_esc(str){
   return String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -9439,6 +9485,10 @@ function bn_computeStatus(b){
 function bn_render(panel){
   const all = bn_load();
   const total = all.length;
+  const topRow = `
+    <div class="bn-toprow">
+      <button type="button" class="bn-add-btn" onclick="bn_openDrawer()">${bn_icons.plus}<span>Add New Banner</span></button>
+    </div>`;
   const withStatus = all.map(b => ({...b, _status: bn_computeStatus(b)}));
   const activeCount = withStatus.filter(b=>b._status==='active').length;
   const inactiveCount = withStatus.filter(b=>b._status==='inactive').length;
@@ -9592,7 +9642,9 @@ function bn_render(panel){
           </div>
         </td>
       </tr>`;
-  }).join('') : `<tr class="bn-empty-row"><td colspan="8">No banners yet. Click "Add New Banner" to create your first one.</td></tr>`;
+  }).join('') : (bn_loading && !bn_hasLoadedOnce)
+      ? `<tr class="bn-empty-row"><td colspan="8">Loading banners...</td></tr>`
+      : `<tr class="bn-empty-row"><td colspan="8">No banners yet. Click "Add New Banner" to create your first one.</td></tr>`;
 
   const rangeStart = filtered.length ? pageStart+1 : 0;
   const rangeEnd = Math.min(pageStart+BN_PAGE_SIZE, filtered.length);
@@ -9648,7 +9700,7 @@ function bn_render(panel){
       </div>
     </div>`;
 
-  panel.innerHTML = heroRow + placementSection + tableSection;
+  panel.innerHTML = topRow + heroRow + placementSection + tableSection;
 
   bn_ensureDrawer();
 }
@@ -9856,41 +9908,47 @@ function bn_quickImagePicked(key, inputEl){
   reader.readAsDataURL(file);
 }
 
-function bn_quickSetLocationImage(key, dataUrl){
+async function bn_quickSetLocationImage(key, dataUrl){
   const all = bn_load();
   const locBanners = all.filter(b=>b.location===key);
   const primary = locBanners.slice().sort((a,b)=>b.createdAt-a.createdAt)[0];
-  if(primary){
-    const idx = all.findIndex(b=>b.id===primary.id);
-    all[idx] = {...all[idx], image: dataUrl};
-  } else {
-    const l = bn_locations[key];
-    all.push({
-      id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-      location: key,
-      title: l.label + ' Banner',
-      subtitle: '',
-      target: 'all_visitors',
-      status: 'active',
-      startDate: '',
-      endDate: '',
-      theme: 'purple',
-      image: dataUrl,
-      createdAt: Date.now()
-    });
+  try{
+    if(primary){
+      await supa(`banners?id=eq.${primary.id}`, { method:'PATCH', body: { image: dataUrl } });
+    } else {
+      const l = bn_locations[key];
+      await supa('banners', { method:'POST', body: bn_toRow({
+        location: key,
+        title: l.label + ' Banner',
+        subtitle: '',
+        target: 'all_visitors',
+        status: 'active',
+        startDate: '',
+        endDate: '',
+        theme: 'purple',
+        image: dataUrl
+      })});
+    }
+    await bn_fetchAll();
+  }catch(e){
+    console.error('bn_quickSetLocationImage failed:', e);
+    alert('Could not upload the image. Please try again.');
   }
-  bn_save(all);
   bn_refresh();
 }
 
-function bn_quickRemoveImage(key){
+async function bn_quickRemoveImage(key){
   const all = bn_load();
   const locBanners = all.filter(b=>b.location===key);
   const primary = locBanners.slice().sort((a,b)=>b.createdAt-a.createdAt)[0];
   if(!primary) return;
-  const idx = all.findIndex(b=>b.id===primary.id);
-  all[idx] = {...all[idx], image: null};
-  bn_save(all);
+  try{
+    await supa(`banners?id=eq.${primary.id}`, { method:'PATCH', body: { image: null } });
+    await bn_fetchAll();
+  }catch(e){
+    console.error('bn_quickRemoveImage failed:', e);
+    alert('Could not remove the image. Please try again.');
+  }
   bn_refresh();
 }
 
@@ -9954,7 +10012,7 @@ function bn_closeDrawerOnOverlay(e){
   if(e.target && e.target.id === 'bn-drawer-overlay') bn_closeDrawer();
 }
 
-function bn_saveBanner(){
+async function bn_saveBanner(){
   const location = document.getElementById('bnd-location').value;
   const title = document.getElementById('bnd-title-input').value.trim();
   const subtitle = document.getElementById('bnd-subtitle').value.trim();
@@ -9966,38 +10024,52 @@ function bn_saveBanner(){
   if(!title){ alert('Please enter a banner title.'); return; }
   if(status === 'scheduled' && (!startDate || !endDate)){ alert('Please set both start and end dates for a scheduled banner.'); return; }
 
-  const all = bn_load();
-  if(bn_editingId){
-    const idx = all.findIndex(b=>b.id===bn_editingId);
-    if(idx > -1){
-      all[idx] = {...all[idx], location, title, subtitle, target, status, startDate, endDate, theme:bn_draftTheme, image:bn_draftImage};
+  const draft = { location, title, subtitle, target, status, startDate, endDate, theme:bn_draftTheme, image:bn_draftImage };
+
+  const submitBtn = document.getElementById('bnd-submit-btn');
+  const originalLabel = submitBtn ? submitBtn.textContent : '';
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Saving...'; }
+
+  try{
+    if(bn_editingId){
+      await supa(`banners?id=eq.${bn_editingId}`, { method:'PATCH', body: bn_toRow(draft) });
+    } else {
+      await supa('banners', { method:'POST', body: bn_toRow(draft) });
     }
-  } else {
-    all.push({
-      id: Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-      location, title, subtitle, target, status, startDate, endDate,
-      theme: bn_draftTheme, image: bn_draftImage, createdAt: Date.now()
-    });
+    await bn_fetchAll();
+    bn_closeDrawer();
+  }catch(e){
+    console.error('bn_saveBanner failed:', e);
+    alert('Could not save the banner. Please try again.');
+  } finally {
+    if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
   }
-  bn_save(all);
-  bn_closeDrawer();
   bn_refresh();
 }
 
-function bn_duplicateBanner(id){
+async function bn_duplicateBanner(id){
   const all = bn_load();
   const b = all.find(x=>x.id===id);
   if(!b) return;
-  const copy = {...b, id: Date.now().toString(36)+Math.random().toString(36).slice(2,7), title: b.title + ' (Copy)', createdAt: Date.now()};
-  all.push(copy);
-  bn_save(all);
+  try{
+    await supa('banners', { method:'POST', body: bn_toRow({...b, title: b.title + ' (Copy)'}) });
+    await bn_fetchAll();
+  }catch(e){
+    console.error('bn_duplicateBanner failed:', e);
+    alert('Could not duplicate the banner. Please try again.');
+  }
   bn_refresh();
 }
 
-function bn_deleteBanner(id){
+async function bn_deleteBanner(id){
   if(!confirm('Delete this banner?')) return;
-  const all = bn_load().filter(b=>b.id!==id);
-  bn_save(all);
+  try{
+    await supa(`banners?id=eq.${id}`, { method:'DELETE' });
+    await bn_fetchAll();
+  }catch(e){
+    console.error('bn_deleteBanner failed:', e);
+    alert('Could not delete the banner. Please try again.');
+  }
   bn_refresh();
 }
 
